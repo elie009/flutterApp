@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/SignInPage.dart';
+import 'package:flutter_app/service/auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  String email = '';
+  String password = '';
+
   @override
   Widget build(BuildContext context) {
     String defaultFontFamily = 'Roboto-Light.ttf';
@@ -129,6 +138,9 @@ class SignUpPage extends StatelessWidget {
                           fontSize: defaultFontSize),
                       hintText: "Phone Number",
                     ),
+                    onChanged: (val) {
+                      setState(() => email = val);
+                    },
                   ),
                   SizedBox(
                     height: 15,
@@ -157,6 +169,10 @@ class SignUpPage extends StatelessWidget {
                       ),
                       hintText: "Invitation Code",
                     ),
+                    obscureText: true,
+                    onChanged: (val) {
+                      setState(() => password = val);
+                    },
                   ),
                   SizedBox(
                     height: 10,
@@ -185,7 +201,7 @@ class SignUpPage extends StatelessWidget {
                   SizedBox(
                     height: 15,
                   ),
-                  SignInButtonWidget(),
+                  SignInButtonWidget(email, password),
                   SizedBox(
                     height: 10,
                   ),
@@ -240,6 +256,16 @@ class SignUpPage extends StatelessWidget {
 }
 
 class SignInButtonWidget extends StatelessWidget {
+  final AuthService _auth = AuthService();
+
+  String email = '';
+  String password = '';
+
+  SignInButtonWidget(String email, String password) {
+    this.email = email;
+    this.password = password;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -269,14 +295,24 @@ class SignInButtonWidget extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(vertical: 10.0, horizontal: 42.0),
             child: Text(
-              "SIGN UP",
+              "SIGN IN",
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 25.0,
                   fontFamily: "WorkSansBold"),
             ),
           ),
-          onPressed: () => {}),
+          onPressed: () async {
+            print(email);
+            print(password);
+            // dynamic result = await _auth.signInAnon();
+            // if (result == null) {
+            //   print('error signing in');
+            // } else {
+            //   print('signed in');
+            //   print(result.uid);
+            // }
+          }),
     );
   }
 }

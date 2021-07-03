@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/SignInPage.dart';
+import 'package:flutter_app/service/auth.dart';
 import 'package:flutter_app/widgets/BestFoodWidget.dart';
 import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
 import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
@@ -11,7 +12,10 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> {
+  final AuthService _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,17 +36,19 @@ class _HomePageState extends State<HomePage> {
                 Icons.notifications_none,
                 color: Color(0xFF3a3737),
               ),
-              onPressed: () {Navigator.push(context, ScaleRoute(page: SignInPage()));})
+              onPressed: () async {
+                await _auth.signOut();
+              })
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            SearchWidget(),
+            SearchWidget(), 
             TopMenus(),
             PopularFoodsWidget(),
             BestFoodWidget(),
-          ],
+          ], 
         ),
       ),
       bottomNavigationBar: BottomNavBarWidget(),

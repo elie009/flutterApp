@@ -12,6 +12,10 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  // text field state
+  String email = '';
+  String password = '';
+
   @override
   Widget build(BuildContext context) {
     String defaultFontFamily = 'Roboto-Light.ttf';
@@ -56,7 +60,7 @@ class _SignInPageState extends State<SignInPage> {
                   SizedBox(
                     height: 15,
                   ),
-                  TextField(
+                  TextFormField(
                     showCursor: true,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -79,11 +83,14 @@ class _SignInPageState extends State<SignInPage> {
                           fontSize: defaultFontSize),
                       hintText: "Phone Number",
                     ),
+                    onChanged: (val) {
+                      setState(() => email = val);
+                    },
                   ),
                   SizedBox(
                     height: 15,
                   ),
-                  TextField(
+                  TextFormField(
                     showCursor: true,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -112,6 +119,10 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       hintText: "Password",
                     ),
+                    obscureText: true,
+                    onChanged: (val) {
+                      setState(() => password = val);
+                    },
                   ),
                   SizedBox(
                     height: 15,
@@ -132,7 +143,7 @@ class _SignInPageState extends State<SignInPage> {
                   SizedBox(
                     height: 15,
                   ),
-                  SignInButtonWidget(),
+                  SignInButtonWidget(email, password),
                   SizedBox(
                     height: 2,
                   ),
@@ -188,6 +199,15 @@ class _SignInPageState extends State<SignInPage> {
 
 class SignInButtonWidget extends StatelessWidget {
   final AuthService _auth = AuthService();
+
+  String email = '';
+  String password = '';
+
+  SignInButtonWidget(String email, String password) {
+    this.email = email;
+    this.password = password;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -225,13 +245,15 @@ class SignInButtonWidget extends StatelessWidget {
             ),
           ),
           onPressed: () async {
-            dynamic result = await _auth.signInAnon();
-            if (result == null) {
-              print('error signing in');
-            } else {
-              print('signed in');
-              print(result);
-            }
+            print(email);
+            print(password);
+            // dynamic result = await _auth.signInAnon();
+            // if (result == null) {
+            //   print('error signing in');
+            // } else {
+            //   print('signed in');
+            //   print(result.uid);
+            // }
           }),
     );
   }
