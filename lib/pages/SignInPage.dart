@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/SignUpPage.dart';
+import 'package:flutter_app/service/auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignInPage extends StatefulWidget {
@@ -160,7 +161,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     InkWell(
                       onTap: () => {
-                      Navigator.push(context, ScaleRoute(page: SignUpPage()))
+                        Navigator.push(context, ScaleRoute(page: SignUpPage()))
                       },
                       child: Container(
                         child: Text(
@@ -186,6 +187,7 @@ class _SignInPageState extends State<SignInPage> {
 }
 
 class SignInButtonWidget extends StatelessWidget {
+  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -222,7 +224,15 @@ class SignInButtonWidget extends StatelessWidget {
                   fontFamily: "WorkSansBold"),
             ),
           ),
-          onPressed: () => {}),
+          onPressed: () async {
+            dynamic result = await _auth.signInAnon();
+            if (result == null) {
+              print('error signing in');
+            } else {
+              print('signed in');
+              print(result);
+            }
+          }),
     );
   }
 }
