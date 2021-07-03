@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/pages/HomePage.dart';
 import 'package:flutter_app/pages/SignInPage.dart';
 import 'package:flutter_app/service/auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,8 +11,12 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _formKey = GlobalKey<FormState>();
+  final AuthService _auth = AuthService();
+
   String email = '';
   String password = '';
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -25,294 +30,300 @@ class _SignUpPageState extends State<SignUpPage> {
         width: double.infinity,
         height: double.infinity,
         color: Colors.white70,
-        child: Column(
-          children: <Widget>[
-            Flexible(
-              flex: 1,
-              child: InkWell(
-                child: Container(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Icon(Icons.close),
+        child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                Flexible(
+                  flex: 1,
+                  child: InkWell(
+                    child: Container(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Icon(Icons.close),
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            Flexible(
-              flex: 15,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: 230,
-                    height: 100,
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/menus/ic_food_express.png",
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Row(
+                Flexible(
+                  flex: 15,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Flexible(
-                        flex: 1,
-                        child: TextField(
-                          showCursor: true,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: Color(0xFFF2F3F5),
-                            hintStyle: TextStyle(
-                              color: Color(0xFF666666),
-                              fontFamily: defaultFontFamily,
-                              fontSize: defaultFontSize,
-                            ),
-                            hintText: "First Name",
-                          ),
+                      Container(
+                        width: 230,
+                        height: 100,
+                        alignment: Alignment.center,
+                        child: Image.asset(
+                          "assets/images/menus/ic_food_express.png",
                         ),
                       ),
                       SizedBox(
-                        width: 10,
+                        height: 15,
                       ),
-                      Flexible(
-                        flex: 1,
-                        child: TextField(
-                          showCursor: true,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
+                      Row(
+                        children: <Widget>[
+                          Flexible(
+                            flex: 1,
+                            child: TextFormField(
+                              validator: (val) =>
+                                  val.isEmpty ? 'Enter an First Name' : null,
+                              showCursor: true,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Color(0xFFF2F3F5),
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF666666),
+                                  fontFamily: defaultFontFamily,
+                                  fontSize: defaultFontSize,
+                                ),
+                                hintText: "First Name",
                               ),
                             ),
-                            filled: true,
-                            fillColor: Color(0xFFF2F3F5),
-                            hintStyle: TextStyle(
-                              color: Color(0xFF666666),
-                              fontFamily: defaultFontFamily,
-                              fontSize: defaultFontSize,
-                            ),
-                            hintText: "Last Name",
                           ),
-                        ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Flexible(
+                            flex: 1,
+                            child: TextFormField(
+                              validator: (val) =>
+                                  val.isEmpty ? 'Enter an Last Name' : null,
+                              showCursor: true,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Color(0xFFF2F3F5),
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF666666),
+                                  fontFamily: defaultFontFamily,
+                                  fontSize: defaultFontSize,
+                                ),
+                                hintText: "Last Name",
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextField(
-                    showCursor: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        borderSide: BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
-                        ),
+                      SizedBox(
+                        height: 15,
                       ),
-                      filled: true,
-                      prefixIcon: Icon(
-                        Icons.phone,
-                        color: Color(0xFF666666),
-                        size: defaultIconSize,
-                      ),
-                      fillColor: Color(0xFFF2F3F5),
-                      hintStyle: TextStyle(
-                          color: Color(0xFF666666),
-                          fontFamily: defaultFontFamily,
-                          fontSize: defaultFontSize),
-                      hintText: "Phone Number",
-                    ),
-                    onChanged: (val) {
-                      setState(() => email = val);
-                    },
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextField(
-                    showCursor: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        borderSide: BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
-                        ),
-                      ),
-                      filled: true,
-                      prefixIcon: Icon(
-                        Icons.code,
-                        color: Color(0xFF666666),
-                        size: defaultIconSize,
-                      ),
-                      fillColor: Color(0xFFF2F3F5),
-                      hintStyle: TextStyle(
-                        color: Color(0xFF666666),
-                        fontFamily: defaultFontFamily,
-                        fontSize: defaultFontSize,
-                      ),
-                      hintText: "Invitation Code",
-                    ),
-                    obscureText: true,
-                    onChanged: (val) {
-                      setState(() => password = val);
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                      width: double.infinity,
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.info_outline,
+                      TextFormField(
+                        validator: (val) =>
+                            val.isEmpty ? 'Enter an email' : null,
+                        showCursor: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                            borderSide: BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
+                          ),
+                          filled: true,
+                          prefixIcon: Icon(
+                            Icons.phone,
                             color: Color(0xFF666666),
                             size: defaultIconSize,
                           ),
-                          Text(
-                            " Leave empty if you don't have Invitation Code",
+                          fillColor: Color(0xFFF2F3F5),
+                          hintStyle: TextStyle(
+                              color: Color(0xFF666666),
+                              fontFamily: defaultFontFamily,
+                              fontSize: defaultFontSize),
+                          hintText: "Email",
+                        ),
+                        onChanged: (val) {
+                          setState(() => email = val);
+                        },
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      TextFormField(
+                        validator: (val) => val.length < 6
+                            ? 'Enter an password 6+ char long'
+                            : null,
+                        showCursor: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                            borderSide: BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
+                          ),
+                          filled: true,
+                          prefixIcon: Icon(
+                            Icons.code,
+                            color: Color(0xFF666666),
+                            size: defaultIconSize,
+                          ),
+                          fillColor: Color(0xFFF2F3F5),
+                          hintStyle: TextStyle(
+                            color: Color(0xFF666666),
+                            fontFamily: defaultFontFamily,
+                            fontSize: defaultFontSize,
+                          ),
+                          hintText: "Password",
+                        ),
+                        obscureText: true,
+                        onChanged: (val) {
+                          setState(() => password = val);
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                          width: double.infinity,
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                error,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontFamily: defaultFontFamily,
+                                  fontSize: defaultFontSize,
+                                  fontStyle: FontStyle.normal,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          )),
+                      SizedBox(
+                        height: 15,
+                      ),
+
+                      //SignInButtonWidget(email, password, _formKey),
+                      ElevatedButton(
+                          onPressed: () {},
+                          child: Container(
+                            width: double.infinity,
+                            decoration: new BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                  color: Color(0xFFfbab66),
+                                ),
+                                BoxShadow(
+                                  color: Color(0xFFf7418c),
+                                ),
+                              ],
+                              gradient: new LinearGradient(
+                                  colors: [
+                                    Color(0xFFf7418c),
+                                    Color(0xFFfbab66)
+                                  ],
+                                  begin: const FractionalOffset(0.2, 0.2),
+                                  end: const FractionalOffset(1.0, 1.0),
+                                  stops: [0.0, 1.0],
+                                  tileMode: TileMode.clamp),
+                            ),
+                            child: MaterialButton(
+                                highlightColor: Colors.transparent,
+                                splashColor: Color(0xFFf7418c),
+                                //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                                onPressed: () async {
+                                  if (this._formKey.currentState.validate()) {
+                                    dynamic result = await _auth
+                                        .registerWithEmailAndPassword(
+                                            email, password);
+                                    if (result == null) {
+                                      setState(() => error =
+                                          'Please supply a valid email');
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => HomePage()),
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 42.0),
+                                  child: Text(
+                                    "SIGN UP",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 25.0,
+                                        fontFamily: "WorkSansBold"),
+                                  ),
+                                )),
+                          )),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      FacebookGoogleLogin()
+                    ],
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            "Already have an account? ",
                             style: TextStyle(
                               color: Color(0xFF666666),
                               fontFamily: defaultFontFamily,
                               fontSize: defaultFontSize,
                               fontStyle: FontStyle.normal,
                             ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
-                      )),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  SignInButtonWidget(email, password),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  FacebookGoogleLogin()
-                ],
-              ),
-            ),
-            Flexible(
-              flex: 1,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        "Already have an account? ",
-                        style: TextStyle(
-                          color: Color(0xFF666666),
-                          fontFamily: defaultFontFamily,
-                          fontSize: defaultFontSize,
-                          fontStyle: FontStyle.normal,
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(context, ScaleRoute(page: SignInPage()));
-                      },
-                      child: Container(
-                        child: Text(
-                          "Sign In",
-                          style: TextStyle(
-                            color: Color(0xFFf7418c),
-                            fontFamily: defaultFontFamily,
-                            fontSize: defaultFontSize,
-                            fontStyle: FontStyle.normal,
                           ),
                         ),
-                      ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context, ScaleRoute(page: SignInPage()));
+                          },
+                          child: Container(
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(
+                                color: Color(0xFFf7418c),
+                                fontFamily: defaultFontFamily,
+                                fontSize: defaultFontSize,
+                                fontStyle: FontStyle.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
+                  ),
+                )
+              ],
+            )),
       ),
-    );
-  }
-}
-
-class SignInButtonWidget extends StatelessWidget {
-  final AuthService _auth = AuthService();
-
-  String email = '';
-  String password = '';
-
-  SignInButtonWidget(String email, String password) {
-    this.email = email;
-    this.password = password;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: new BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Color(0xFFfbab66),
-          ),
-          BoxShadow(
-            color: Color(0xFFf7418c),
-          ),
-        ],
-        gradient: new LinearGradient(
-            colors: [Color(0xFFf7418c), Color(0xFFfbab66)],
-            begin: const FractionalOffset(0.2, 0.2),
-            end: const FractionalOffset(1.0, 1.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp),
-      ),
-      child: MaterialButton(
-          highlightColor: Colors.transparent,
-          splashColor: Color(0xFFf7418c),
-          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 42.0),
-            child: Text(
-              "SIGN IN",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25.0,
-                  fontFamily: "WorkSansBold"),
-            ),
-          ),
-          onPressed: () async {
-            print(email);
-            print(password);
-            // dynamic result = await _auth.signInAnon();
-            // if (result == null) {
-            //   print('error signing in');
-            // } else {
-            //   print('signed in');
-            //   print(result.uid);
-            // }
-          }),
     );
   }
 }
