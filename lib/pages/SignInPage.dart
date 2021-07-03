@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
+import 'package:flutter_app/pages/HomePage.dart';
 import 'package:flutter_app/pages/SignUpPage.dart';
 import 'package:flutter_app/service/auth.dart';
+import 'package:flutter_app/widgets/Loading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignInPage extends StatefulWidget {
@@ -12,9 +14,14 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  final _formKey = GlobalKey<FormState>();
+  final AuthService _auth = AuthService();
+  bool loading = false;
+
   // text field state
   String email = '';
   String password = '';
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -22,240 +29,279 @@ class _SignInPageState extends State<SignInPage> {
     double defaultFontSize = 14;
     double defaultIconSize = 17;
 
-    return Scaffold(
-      body: Container(
-        padding: EdgeInsets.only(left: 20, right: 20, top: 35, bottom: 30),
-        width: double.infinity,
-        height: double.infinity,
-        color: Colors.white70,
-        child: Column(
-          children: <Widget>[
-            Flexible(
-              flex: 1,
-              child: InkWell(
-                child: Container(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Icon(Icons.close),
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            Flexible(
-              flex: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: 230,
-                    height: 100,
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/menus/ic_food_express.png",
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                    showCursor: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        borderSide: BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
+    return loading
+        ? Loading()
+        : Scaffold(
+            body: Container(
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 35, bottom: 30),
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.white70,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        child: InkWell(
+                          child: Container(
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Icon(Icons.close),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
                         ),
                       ),
-                      filled: true,
-                      prefixIcon: Icon(
-                        Icons.phone,
-                        color: Color(0xFF666666),
-                        size: defaultIconSize,
-                      ),
-                      fillColor: Color(0xFFF2F3F5),
-                      hintStyle: TextStyle(
-                          color: Color(0xFF666666),
-                          fontFamily: defaultFontFamily,
-                          fontSize: defaultFontSize),
-                      hintText: "Phone Number",
-                    ),
-                    onChanged: (val) {
-                      setState(() => email = val);
-                    },
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                    showCursor: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        borderSide: BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
+                      Flexible(
+                        flex: 8,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: 230,
+                              height: 100,
+                              alignment: Alignment.center,
+                              child: Image.asset(
+                                "assets/images/menus/ic_food_express.png",
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            TextFormField(
+                              validator: (val) =>
+                                  val.isEmpty ? 'Enter an email' : null,
+                              showCursor: true,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                filled: true,
+                                prefixIcon: Icon(
+                                  Icons.phone,
+                                  color: Color(0xFF666666),
+                                  size: defaultIconSize,
+                                ),
+                                fillColor: Color(0xFFF2F3F5),
+                                hintStyle: TextStyle(
+                                    color: Color(0xFF666666),
+                                    fontFamily: defaultFontFamily,
+                                    fontSize: defaultFontSize),
+                                hintText: "Email",
+                              ),
+                              onChanged: (val) {
+                                setState(() => email = val);
+                              },
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            TextFormField(
+                              validator: (val) => val.length < 6
+                                  ? 'Enter an password 6+ char long'
+                                  : null,
+                              showCursor: true,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                filled: true,
+                                prefixIcon: Icon(
+                                  Icons.lock_outline,
+                                  color: Color(0xFF666666),
+                                  size: defaultIconSize,
+                                ),
+                                suffixIcon: Icon(
+                                  Icons.remove_red_eye,
+                                  color: Color(0xFF666666),
+                                  size: defaultIconSize,
+                                ),
+                                fillColor: Color(0xFFF2F3F5),
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF666666),
+                                  fontFamily: defaultFontFamily,
+                                  fontSize: defaultFontSize,
+                                ),
+                                hintText: "Password",
+                              ),
+                              obscureText: true,
+                              onChanged: (val) {
+                                setState(() => password = val);
+                              },
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                                width: double.infinity,
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      error,
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontFamily: defaultFontFamily,
+                                        fontSize: defaultFontSize,
+                                        fontStyle: FontStyle.normal,
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
+                                )),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Container(
+                              width: double.infinity,
+                              child: Text(
+                                "Forgot your password?",
+                                style: TextStyle(
+                                  color: Color(0xFF666666),
+                                  fontFamily: defaultFontFamily,
+                                  fontSize: defaultFontSize,
+                                  fontStyle: FontStyle.normal,
+                                ),
+                                textAlign: TextAlign.end,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            //SignInButtonWidget(email, password),
+
+                            ElevatedButton(
+                                onPressed: () {},
+                                child: Container(
+                                  width: double.infinity,
+                                  decoration: new BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0)),
+                                    boxShadow: <BoxShadow>[
+                                      BoxShadow(
+                                        color: Color(0xFFfbab66),
+                                      ),
+                                      BoxShadow(
+                                        color: Color(0xFFf7418c),
+                                      ),
+                                    ],
+                                    gradient: new LinearGradient(
+                                        colors: [
+                                          Color(0xFFf7418c),
+                                          Color(0xFFfbab66)
+                                        ],
+                                        begin: const FractionalOffset(0.2, 0.2),
+                                        end: const FractionalOffset(1.0, 1.0),
+                                        stops: [0.0, 1.0],
+                                        tileMode: TileMode.clamp),
+                                  ),
+                                  child: MaterialButton(
+                                      highlightColor: Colors.transparent,
+                                      splashColor: Color(0xFFf7418c),
+                                      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                                      onPressed: () async {
+                                        if (this
+                                            ._formKey
+                                            .currentState
+                                            .validate()) {
+                                          setState(() => loading = true);
+                                          dynamic result = await _auth
+                                              .signInWithEmailAndPassword(
+                                                  email, password);
+                                          if (result == null) {
+                                            setState(() {
+                                              error =
+                                                  'Could not sign in with those credentials';
+                                              loading = false;
+                                            });
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      HomePage()),
+                                            );
+                                            loading = false;
+                                          }
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10.0, horizontal: 42.0),
+                                        child: Text(
+                                          "SIGN IN",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 25.0,
+                                              fontFamily: "WorkSansBold"),
+                                        ),
+                                      )),
+                                )),
+
+                            SizedBox(
+                              height: 2,
+                            ),
+                            FacebookGoogleLogin()
+                          ],
                         ),
                       ),
-                      filled: true,
-                      prefixIcon: Icon(
-                        Icons.lock_outline,
-                        color: Color(0xFF666666),
-                        size: defaultIconSize,
-                      ),
-                      suffixIcon: Icon(
-                        Icons.remove_red_eye,
-                        color: Color(0xFF666666),
-                        size: defaultIconSize,
-                      ),
-                      fillColor: Color(0xFFF2F3F5),
-                      hintStyle: TextStyle(
-                        color: Color(0xFF666666),
-                        fontFamily: defaultFontFamily,
-                        fontSize: defaultFontSize,
-                      ),
-                      hintText: "Password",
-                    ),
-                    obscureText: true,
-                    onChanged: (val) {
-                      setState(() => password = val);
-                    },
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: Text(
-                      "Forgot your password?",
-                      style: TextStyle(
-                        color: Color(0xFF666666),
-                        fontFamily: defaultFontFamily,
-                        fontSize: defaultFontSize,
-                        fontStyle: FontStyle.normal,
-                      ),
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  SignInButtonWidget(email, password),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  FacebookGoogleLogin()
-                ],
-              ),
-            ),
-            Flexible(
-              flex: 1,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        "Don't have an account? ",
-                        style: TextStyle(
-                          color: Color(0xFF666666),
-                          fontFamily: defaultFontFamily,
-                          fontSize: defaultFontSize,
-                          fontStyle: FontStyle.normal,
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => {
-                        Navigator.push(context, ScaleRoute(page: SignUpPage()))
-                      },
-                      child: Container(
-                        child: Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            color: Color(0xFFf7418c),
-                            fontFamily: defaultFontFamily,
-                            fontSize: defaultFontSize,
-                            fontStyle: FontStyle.normal,
+                      Flexible(
+                        flex: 1,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  "Don't have an account? ",
+                                  style: TextStyle(
+                                    color: Color(0xFF666666),
+                                    fontFamily: defaultFontFamily,
+                                    fontSize: defaultFontSize,
+                                    fontStyle: FontStyle.normal,
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () => {
+                                  Navigator.push(
+                                      context, ScaleRoute(page: SignUpPage()))
+                                },
+                                child: Container(
+                                  child: Text(
+                                    "Sign Up",
+                                    style: TextStyle(
+                                      color: Color(0xFFf7418c),
+                                      fontFamily: defaultFontFamily,
+                                      fontSize: defaultFontSize,
+                                      fontStyle: FontStyle.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SignInButtonWidget extends StatelessWidget {
-  final AuthService _auth = AuthService();
-
-  String email = '';
-  String password = '';
-
-  SignInButtonWidget(String email, String password) {
-    this.email = email;
-    this.password = password;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: new BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Color(0xFFfbab66),
-          ),
-          BoxShadow(
-            color: Color(0xFFf7418c),
-          ),
-        ],
-        gradient: new LinearGradient(
-            colors: [Color(0xFFf7418c), Color(0xFFfbab66)],
-            begin: const FractionalOffset(0.2, 0.2),
-            end: const FractionalOffset(1.0, 1.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp),
-      ),
-      child: MaterialButton(
-          highlightColor: Colors.transparent,
-          splashColor: Color(0xFFf7418c),
-          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 42.0),
-            child: Text(
-              "SIGN IN",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25.0,
-                  fontFamily: "WorkSansBold"),
-            ),
-          ),
-          onPressed: () async {
-            print(email);
-            print(password);
-            // dynamic result = await _auth.signInAnon();
-            // if (result == null) {
-            //   print('error signing in');
-            // } else {
-            //   print('signed in');
-            //   print(result.uid);
-            // }
-          }),
-    );
+                      )
+                    ],
+                  ),
+                )),
+          );
   }
 }
 

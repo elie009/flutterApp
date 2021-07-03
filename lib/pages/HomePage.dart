@@ -44,11 +44,11 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            SearchWidget(), 
+            SearchWidget(),
             TopMenus(),
             PopularFoodsWidget(),
             BestFoodWidget(),
-          ], 
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavBarWidget(),
