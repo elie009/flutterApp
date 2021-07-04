@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/model/item_model.dart';
 
 class TopMenus extends StatefulWidget {
+  List<ItemModel> items;
+  TopMenus(List<ItemModel> items) {
+    this.items = items;
+  }
   @override
   _TopMenusState createState() => _TopMenusState();
 }
@@ -9,28 +14,24 @@ class _TopMenusState extends State<TopMenus> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          TopMenuTiles(name: "Burger", imageUrl: "ic_burger", slug: ""),
-          TopMenuTiles(name: "Sushi", imageUrl: "ic_sushi", slug: ""),
-          TopMenuTiles(name: "Pizza", imageUrl: "ic_pizza", slug: ""),
-          TopMenuTiles(name: "Cake", imageUrl: "ic_cake", slug: ""),
-          TopMenuTiles(name: "Ice Cream", imageUrl: "ic_ice_cream", slug: ""),
-          TopMenuTiles(name: "Soft Drink", imageUrl: "ic_soft_drink", slug: ""),
-          TopMenuTiles(name: "Burger", imageUrl: "ic_burger", slug: ""),
-          TopMenuTiles(name: "Sushi", imageUrl: "ic_sushi", slug: ""),
-        ],
-      ),
-    );
+        height: 100,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: <Widget>[
+            for (var i in widget.items)
+              TopMenuTiles(name: "Burger", imageUrl: "ic_burger", slug: "")
+          ],
+        ));
   }
 }
 
 class TopMenuTiles extends StatelessWidget {
-  String name;
-  String imageUrl;
-  String slug;
+  String name = 'Burger';
+  String imageUrl = 'ic_burger';
+  String slug = '';
+
+  // final ItemModel items;
+  // TopMenuTiles({this.items});
 
   TopMenuTiles(
       {Key key,

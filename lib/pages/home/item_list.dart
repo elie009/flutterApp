@@ -30,7 +30,7 @@ class _ItemListState extends State<ItemList> {
         child: Column(
           children: <Widget>[
             SearchWidget(),
-            TopMenus(),
+            TopMenus(items),
             PopularFoodsWidget(),
             BestFoodWidget(),
           ],
