@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/item_model.dart';
+import 'package:provider/provider.dart';
 
 class TopMenus extends StatefulWidget {
-  List<ItemModel> items;
-  TopMenus(List<ItemModel> items) {
-    this.items = items;
-  }
   @override
   _TopMenusState createState() => _TopMenusState();
 }
 
 class _TopMenusState extends State<TopMenus> {
+
   @override
   Widget build(BuildContext context) {
+    final items = Provider.of<List<ItemModel>>(context);
     return Container(
         height: 100,
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: <Widget>[
-            for (var i in widget.items)
-              TopMenuTiles(name: "Burger", imageUrl: "ic_burger", slug: "")
+            if (items != null)
+              for (var i in items)
+                TopMenuTiles(name: "Burger", imageUrl: "ic_burger", slug: "")
           ],
         ));
   }

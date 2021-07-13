@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/model/user_model.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
-import 'package:flutter_app/pages/HomePage.dart';
+import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/SignInPage.dart';
 import 'package:flutter_app/pages/SignUpPage.dart';
 import 'package:flutter_app/pages/wrapper.dart';

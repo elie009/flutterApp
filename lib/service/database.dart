@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_app/model/item_model.dart';
 
 class DatabaseService {
@@ -9,11 +10,32 @@ class DatabaseService {
   final CollectionReference itemCollection =
       FirebaseFirestore.instance.collection('item');
 
-  Future updateUserData(String sugars, String name, int strength) async {
+  final CollectionReference userCollection =
+      FirebaseFirestore.instance.collection('user');
+
+  Future updateItemData(
+      String name, String description, int strength, String image) async {
     return await itemCollection.doc(uid).set({
-      'sugars': sugars,
+      'itemid': uid,
+      'description': description,
       'name': name,
-      'strength': strength,
+      'itemCount': strength,
+      'imageName': image,
+    });
+  }
+
+  Future deleteItemData() async {
+    return await itemCollection.doc(uid).delete();
+  }
+
+  Future updateUserData(User user, String firstname, String lastname) async {
+    return await userCollection.doc(uid).set({
+      'uid': user.uid,
+      'email': user.email,
+      'status': 'PENDING',
+      'phoneNumber': user.phoneNumber,
+      'firstName': firstname,
+      'lastName': lastname,
     });
   }
 
@@ -21,14 +43,16 @@ class DatabaseService {
   List<ItemModel> _itemListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       return ItemModel(
+        id: doc.get('itemid') ?? '',
         name: doc.get('name') ?? '',
-        strength: doc.get('strength') ?? 0,
-        sugars: doc.get('sugars') ?? '0',
+        itemCount: doc.get('itemCount') ?? 0,
+        description: doc.get('description') ?? '0',
+        imageName: doc.get('imageName') ?? '0',
       );
     }).toList();
   }
 
-  // get item stream
+  // get all item stream
   Stream<List<ItemModel>> get items {
     return itemCollection.snapshots().map(_itemListFromSnapshot);
   }

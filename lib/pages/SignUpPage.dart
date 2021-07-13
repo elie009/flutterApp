@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/pages/HomePage.dart';
+import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/SignInPage.dart';
 import 'package:flutter_app/service/auth.dart';
 import 'package:flutter_app/widgets/Loading.dart';
@@ -18,6 +18,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String email = '';
   String password = '';
+  String firstName = '';
+  String lastName = '';
   String error = '';
 
   @override
@@ -96,6 +98,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                       ),
                                       hintText: "First Name",
                                     ),
+                                    onChanged: (val) {
+                                      setState(() => firstName = val);
+                                    },
                                   ),
                                 ),
                                 SizedBox(
@@ -126,6 +131,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                       ),
                                       hintText: "Last Name",
                                     ),
+                                    onChanged: (val) {
+                                      setState(() => lastName = val);
+                                    },
                                   ),
                                 ),
                               ],
@@ -260,7 +268,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                           setState(() => loading = true);
                                           dynamic result = await _auth
                                               .registerWithEmailAndPassword(
-                                                  email, password);
+                                                  email,
+                                                  password,
+                                                  firstName,
+                                                  lastName);
                                           if (result == null) {
                                             setState(() {
                                               error =

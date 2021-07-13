@@ -1,7 +1,10 @@
 class ItemModel {
+  final String id;
   final String name;
-  final String sugars;
-  final int strength;
+  final String description;
+  final int itemCount;
+  final String imageName;
 
-  ItemModel({this.name, this.sugars, this.strength});
+  ItemModel(
+      {this.id, this.name, this.description, this.itemCount, this.imageName});
 }
