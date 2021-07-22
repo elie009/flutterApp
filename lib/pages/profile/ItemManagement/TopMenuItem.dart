@@ -9,11 +9,35 @@ import 'package:flutter_app/widgets/TopMenu/TopMenus.dart';
 import 'package:provider/provider.dart';
 
 class TopMenuItem extends StatefulWidget {
+  String productName;
+  String productPrice;
+  String productImage;
+  String productCartQuantity;
+
+  TopMenuItem(this.productName, this.productPrice, this.productImage,
+      this.productCartQuantity);
+
   @override
-  State<StatefulWidget> createState() => _TopMenuItem();
+  State<StatefulWidget> createState() => _TopMenuItem(
+      productName: this.productName,
+      productPrice: this.productPrice,
+      productImage: this.productImage,
+      productCartQuantity: this.productCartQuantity);
 }
 
 class _TopMenuItem extends State<TopMenuItem> {
+  String productName;
+  String productPrice;
+  String productImage;
+  String productCartQuantity;
+
+  _TopMenuItem({
+    @required this.productName,
+    @required this.productPrice,
+    @required this.productImage,
+    @required this.productCartQuantity,
+  });
+
   @override
   Widget build(BuildContext context) {
     var items = Provider.of<List<ItemModel>>(context);
@@ -24,17 +48,6 @@ class _TopMenuItem extends State<TopMenuItem> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 5),
-              child: Text(
-                "Your Food Cart",
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Color(0xFF3a3a3b),
-                    fontWeight: FontWeight.w600),
-                textAlign: TextAlign.left,
-              ),
-            ),
             SizedBox(
               height: 10,
             ),
@@ -50,6 +63,89 @@ class _TopMenuItem extends State<TopMenuItem> {
       ),
     );
   }
+}
+
+Widget FlextText1(String title, String description) {
+  return Flexible(
+    child: new Container(
+      padding: new EdgeInsets.only(right: 20.0, top: 20.0),
+      child: Column(
+        children: <Widget>[
+          new Text(
+            title, //'Text larget test sample for sample output only',
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontSize: 18.0,
+              color: new Color(0xFF212121),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          new Text(
+            description, //'This only for sample display purpose no other than that',
+            overflow: TextOverflow.fade,
+            style: new TextStyle(
+              fontSize: 13.0,
+              color: new Color(0xFF212121),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget cryptoChange() {
+  return Align(
+    alignment: Alignment.topRight,
+    child: RichText(
+      text: TextSpan(
+        text: "+3.67%",
+        style: TextStyle(
+            fontWeight: FontWeight.bold, color: Colors.green, fontSize: 20),
+        children: <TextSpan>[
+          TextSpan(
+              text: "\n+202.835",
+              style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold)),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget cryptoAmount() {
+  return Align(
+    alignment: Alignment.centerLeft,
+    child: Padding(
+      padding: const EdgeInsets.only(left: 20.0),
+      child: Row(
+        children: <Widget>[
+          RichText(
+            textAlign: TextAlign.left,
+            text: TextSpan(
+              text: "\n\$12.279",
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 35,
+              ),
+              children: <TextSpan>[
+                TextSpan(
+                    text: "\n0.1349",
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 Widget cancelButton = FlatButton(
@@ -120,52 +216,26 @@ class CartItem extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Center(
                         child: Image.asset(
-                      "assets/images/popular_foods/$productImage.png",
+                      "assets/images/popular_foods/ic_popular_food_1.png",
                       width: 110,
                       height: 100,
                     )),
                   ),
                 ),
+                FlextText1(this.productName, this.productDesc),
                 Column(
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SizedBox(
                       height: 5,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        Column(
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              child: Text(
-                                "$productName",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Color(0xFF3a3a3b),
-                                    fontWeight: FontWeight.w400),
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              child: Text(
-                                "$productDesc",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Color(0xFF3a3a3b),
-                                    fontWeight: FontWeight.w400),
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
                             InkWell(
                               onTap: () {
@@ -196,22 +266,14 @@ class CartItem extends StatelessWidget {
                                   },
                                 );
                               },
-                              child: Image.asset(
-                                "assets/images/menus/ic_delete.png",
-                                width: 25,
-                                height: 25,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 180,
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(top: 30.0),
-                              alignment: Alignment.topRight,
-                              child: Image.asset(
-                                "assets/images/menus/ic_cart.png",
-                                width: 25,
-                                height: 25,
+                              child: new Container(
+                                alignment: Alignment.topRight,
+                                padding: EdgeInsets.only(top: 25.0),
+                                child: Image.asset(
+                                  "assets/images/menus/ic_delete.png",
+                                  width: 25,
+                                  height: 25,
+                                ),
                               ),
                             ),
                           ],
