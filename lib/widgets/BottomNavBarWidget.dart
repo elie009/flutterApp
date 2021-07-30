@@ -11,13 +11,20 @@ class BottomNavBarWidget extends StatefulWidget {
 }
 
 class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
-  int currentIndex = 0;
+  int _selectedIndex = 0;
   List<Widget> pages;
   Widget currentPage;
   HomePage homePage;
   FoodDetailsPage foodDetailsPage;
   FoodOrderPage foodOrderPage;
   ProfilePage profilePage;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      currentPage = pages[index];
+    });
+  }
 
   @override
   void initState() {
@@ -65,11 +72,9 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
             ),
           ),
         ],
-        onTap: (int index) {
-          setState(() {
-            currentPage = pages[index];
-          });
-        },
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+        currentIndex: _selectedIndex,
       ),
       body: currentPage,
     );

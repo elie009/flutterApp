@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_app/pages/profile/ItemManagement/TopMenuMgmtPage.dart';
 import 'package:flutter_app/widgets/BottomShhetWidget.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -255,8 +254,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                Divider(height: 20, color: Colors.black),
-                BottomMenu(),
               ],
             ),
           ),
@@ -279,103 +276,5 @@ class GetClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return true;
-  }
-}
-
-class BottomMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TopMenuMgmtPage()),
-              );
-            },
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.list,
-                  color: Colors.blue.shade900,
-                  size: 35,
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  "Popular Items",
-                  style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w300),
-                )
-              ],
-            ),
-          ),
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.auto_awesome,
-                color: Color(0xFF23c58a),
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "Popular Items",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.star,
-                color: Colors.yellow.shade400,
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "Best Items",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.trending_up,
-                color: Colors.black,
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "Sales Mgmt.",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }

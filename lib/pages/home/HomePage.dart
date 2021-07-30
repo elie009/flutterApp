@@ -1,16 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/item_model.dart';
-import 'package:flutter_app/pages/SignInPage.dart';
 import 'package:flutter_app/pages/home/BodyContainer.dart';
 import 'package:flutter_app/service/auth.dart';
 import 'package:flutter_app/service/database.dart';
-import 'package:flutter_app/widgets/BestFoodWidget.dart';
-import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
-import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
-import 'package:flutter_app/widgets/SearchWidget.dart';
-import 'package:flutter_app/widgets/TopMenu/TopMenus.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
