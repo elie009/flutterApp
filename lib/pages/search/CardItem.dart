@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/object/ProperyObj.dart';
+import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +37,8 @@ class Cards extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        Navigator.push(
+            context, ScaleRoute(page: ItemDetailsPage(props: props)));
         print('this is card item');
       },
       child: Container(

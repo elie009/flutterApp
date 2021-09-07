@@ -8,6 +8,9 @@ import 'package:provider/provider.dart';
 import 'CardItem.dart';
 
 class SearchDisplayPage extends StatefulWidget {
+  String menuId;
+  SearchDisplayPage({Key key, @required this.menuId}) : super(key: key);
+
   @override
   _SearchDisplayPageState createState() => _SearchDisplayPageState();
 }
@@ -17,6 +20,8 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    String propId = widget.menuId;
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFFFAFAFA),
@@ -41,7 +46,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
           brightness: Brightness.light,
         ),
         body: StreamProvider<List<PropertyModel>>.value(
-          value: DatabaseService().propery,
+          value: DatabaseService().propery(propId),
           initialData: [],
           child: SingleChildScrollView(
             child: Column(

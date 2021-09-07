@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:provider/provider.dart';
 
 class TopMenus extends StatefulWidget {
@@ -43,7 +45,15 @@ class TopMenuTiles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        print('this top menu item');
+        Navigator.push(
+            context,
+            ScaleRoute(
+                page: SearchDisplayPage(
+              menuId: '001',
+            )));
+      },
       child: Column(
         children: <Widget>[
           Container(

@@ -108,7 +108,7 @@ class DatabaseService {
   }
 
   // get all property item on stream
-  Stream<List<PropertyModel>> get propery {
+  Stream<List<PropertyModel>> propery(String menuId) {
     return propertCollection.snapshots().map(_propertyListFromSnapshot);
   }
 

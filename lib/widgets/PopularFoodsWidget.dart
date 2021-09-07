@@ -253,7 +253,12 @@ class PopularFoodTitle extends StatelessWidget {
           GestureDetector(
             onTap: () {
               print('test home');
-              Navigator.push(context, ScaleRoute(page: SearchDisplayPage()));
+              Navigator.push(
+                  context,
+                  ScaleRoute(
+                      page: SearchDisplayPage(
+                    menuId: '001',
+                  )));
             },
             child: Text(
               "See all",
