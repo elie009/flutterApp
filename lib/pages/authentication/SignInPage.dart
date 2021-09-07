@@ -3,8 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
-import 'package:flutter_app/pages/SignUpPage.dart';
-import 'package:flutter_app/service/auth.dart';
+import 'package:flutter_app/pages/authentication/SignUpPage.dart';
+import 'package:flutter_app/service/Auth.dart';
 import 'package:flutter_app/widgets/Loading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

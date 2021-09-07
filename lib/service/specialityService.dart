@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_app/model/user_model.dart';
-import 'package:flutter_app/pages/SignInPage.dart';
-import 'package:flutter_app/service/database.dart';
+import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/pages/authentication/SignInPage.dart';
+import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
-class ItemService {
+class SpecialityService {
   Future addTopMenu(
       String itemname, String itemdesc, int itemvariety, String image) async {
     await DatabaseService(uid: itemID())
@@ -13,5 +13,9 @@ class ItemService {
 
   Future deleteTopMenu(String itemID) async {
     await DatabaseService(uid: itemID).deleteItemData();
+  }
+
+  Future deleteAllItem(String itemID) async {
+    await DatabaseService(uid: itemID).deleteAllitem();
   }
 }

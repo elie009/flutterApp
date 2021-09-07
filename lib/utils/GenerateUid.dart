@@ -19,11 +19,3 @@ String uidV1() {
 String itemID() {
   return (uuid.v4());
 }
-
-/* 
- * Generate a v5 (namespace-name-sha1-based) id
- * ex. c74a196f-f19d-5ea9-bffd-a2742432fc9c'
- */
-// String itemID() {
-//   return (uuid.v5());
-// }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/item_model.dart';
+import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/pages/home/BodyContainer.dart';
-import 'package:flutter_app/service/auth.dart';
-import 'package:flutter_app/service/database.dart';
+import 'package:flutter_app/service/Auth.dart';
+import 'package:flutter_app/database/Database.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key key}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -15,8 +17,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
-      body: StreamProvider<List<ItemModel>>.value(
+      body: StreamProvider<List<SpecialitiesModel>>.value(
         value: DatabaseService().items,
         initialData: null,
         child: Scaffold(

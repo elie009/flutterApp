@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/widgets/BottomShhetWidget.dart';
+import 'package:flutter_app/database/temp/DemoDataBase.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -8,6 +9,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final PrepareData _data = PrepareData();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -231,12 +234,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            "About",
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.lightBlue,
+                          InkWell(
+                            onTap: () {
+                              _data.execute();
+                              print('test');
+
+                            },
+                            child: Text(
+                              "Abouts",
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.lightBlue,
+                              ),
                             ),
                           ),
                           SizedBox(

@@ -6,6 +6,7 @@ import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BottomNavBarWidget extends StatefulWidget {
+  const BottomNavBarWidget({Key key}) : super(key: key);
   @override
   _BottomNavBarWidgetState createState() => _BottomNavBarWidgetState();
 }

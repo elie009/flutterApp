@@ -1,13 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/user_model.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
-import 'package:flutter_app/pages/SignInPage.dart';
-import 'package:flutter_app/pages/SignUpPage.dart';
+import 'package:flutter_app/pages/authentication/SignInPage.dart';
+import 'package:flutter_app/pages/authentication/SignUpPage.dart';
 import 'package:flutter_app/pages/wrapper.dart';
-import 'package:flutter_app/service/auth.dart';
+import 'package:flutter_app/service/Auth.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

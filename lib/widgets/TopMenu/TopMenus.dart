@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/item_model.dart';
+import 'package:flutter_app/model/MenuModel.dart';
 import 'package:provider/provider.dart';
 
 class TopMenus extends StatefulWidget {
@@ -8,10 +8,10 @@ class TopMenus extends StatefulWidget {
 }
 
 class _TopMenusState extends State<TopMenus> {
-
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<ItemModel>>(context);
+    final items = Provider.of<List<SpecialitiesModel>>(context);
+
     return Container(
         height: 100,
         child: ListView(
@@ -19,7 +19,7 @@ class _TopMenusState extends State<TopMenus> {
           children: <Widget>[
             if (items != null)
               for (var i in items)
-                TopMenuTiles(name: "Burger", imageUrl: "ic_burger", slug: "")
+                TopMenuTiles(name: i.name, imageUrl: "ic_burger", slug: "")
           ],
         ));
   }

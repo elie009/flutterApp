@@ -6,6 +6,7 @@ import 'package:flutter_app/widgets/SearchWidget.dart';
 import 'package:flutter_app/widgets/TopMenu/TopMenus.dart';
 
 class BodyContainer extends StatefulWidget {
+  BodyContainer({Key key}) : super(key: key);
   @override
   State<StatefulWidget> createState() => _BodyContainer();
 }
@@ -15,14 +16,12 @@ class _BodyContainer extends State<BodyContainer> {
   Widget build(BuildContext context) {
     return Container(
       child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            SearchWidget(),
-            TopMenus(),
-            PopularFoodsWidget(),
-            BestFoodWidget(),
-          ],
-        ),
+        child: Column(children: <Widget>[
+          SearchWidget(),
+          TopMenus(),
+          PopularFoodsWidget(),
+          BestFoodWidget(),
+        ]),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_app/model/user_model.dart';
-import 'package:flutter_app/pages/SignInPage.dart';
-import 'package:flutter_app/service/database.dart';
+import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/pages/authentication/SignInPage.dart';
+import 'package:flutter_app/database/Database.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;

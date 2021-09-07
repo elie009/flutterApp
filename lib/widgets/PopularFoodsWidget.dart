@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/RotationRoute.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
+import 'package:flutter_app/pages/search/SearchDisplay.dart';
+import 'package:provider/provider.dart';
 
 class PopularFoodsWidget extends StatefulWidget {
   @override
@@ -55,11 +58,11 @@ class PopularFoodTiles extends StatelessWidget {
           Container(
             padding: EdgeInsets.only(left: 10, right: 5, top: 5, bottom: 5),
             decoration: BoxDecoration(boxShadow: [
-              /* BoxShadow(
+              BoxShadow(
                 color: Color(0xFFfae3e2),
                 blurRadius: 15.0,
                 offset: Offset(0, 0.75),
-              ),*/
+              ),
             ]),
             child: Card(
                 color: Colors.white,
@@ -247,11 +250,19 @@ class PopularFoodTitle extends StatelessWidget {
                 color: Color(0xFF3a3a3b),
                 fontWeight: FontWeight.w300),
           ),
-          Text(
-            "See all",
-            style: TextStyle(
-                fontSize: 16, color: Colors.blue, fontWeight: FontWeight.w100),
-          )
+          GestureDetector(
+            onTap: () {
+              print('test home');
+              Navigator.push(context, ScaleRoute(page: SearchDisplayPage()));
+            },
+            child: Text(
+              "See all",
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w100),
+            ),
+          ),
         ],
       ),
     );
@@ -331,5 +342,3 @@ class PopularFoodItems extends StatelessWidget {
     );
   }
 }
-
-
