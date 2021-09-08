@@ -17,7 +17,6 @@ class _ProperyCardState extends State<ProperyCard> {
   @override
   Widget build(BuildContext context) {
     final items = Provider.of<List<PropertyModel>>(context);
-    print(items);
     return Column(
       children: <Widget>[
         for (PropertyModel i in items)

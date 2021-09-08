@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/object/ProperyObj.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
+import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/item/CarouselSlider.dart';
 import 'package:flutter_app/pages/item/PopupOffer.dart';
 import 'package:flutter_app/utils/Formatter.dart';
@@ -263,7 +264,9 @@ class AddToCartMenu extends StatelessWidget {
         children: <Widget>[
           Column(children: <Widget>[
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, ScaleRoute(page: BookingPage()));
+              },
               icon: Icon(Icons.access_time),
               color: Color(0xFFfd2c2c),
               iconSize: 30,

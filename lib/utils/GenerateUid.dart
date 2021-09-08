@@ -17,5 +17,13 @@ String uidV1() {
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
 String itemID() {
-  return (uuid.v4());
+  return ("item" + uuid.v4());
+}
+
+/* 
+ * Generate a v4 (random) id
+ * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
+ */
+String bookingID() {
+  return ("book" + uuid.v4());
 }
