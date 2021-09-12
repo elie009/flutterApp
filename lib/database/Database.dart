@@ -8,6 +8,7 @@ import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/object/BookingObj.dart';
 import 'package:flutter_app/object/ProperyObj.dart';
+import 'package:flutter_app/object/UserObt.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class DatabaseService {
@@ -34,9 +35,6 @@ class DatabaseService {
 
   final CollectionReference chatCollection =
       FirebaseFirestore.instance.collection('chats');
-
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('user');
 
   final CollectionReference mobileCollection =
       FirebaseFirestore.instance.collection('mobiles');
@@ -71,7 +69,6 @@ class DatabaseService {
       'bookDate': DateTime.now().toString(),
     });
   }
-  
 
   Future updateItemData(
       String name, String description, int price, String image) async {
@@ -84,14 +81,15 @@ class DatabaseService {
     });
   }
 
-  Future updateUserData(User user, String firstname, String lastname) async {
-    return await userCollection.doc(uid).set({
-      'uid': user.uid,
-      'email': user.email,
+  Future updateUserData(UserObj usrobj) async {
+    return await userCollection.doc(usrobj.uid).set({
+      'uid': usrobj.uid,
+      'email': usrobj.email,
       'status': 'PENDING',
-      'phoneNumber': user.phoneNumber,
-      'firstName': firstname,
-      'lastName': lastname,
+      'phoneNumber': usrobj.phoneNumber,
+      'firstName': usrobj.firstName,
+      'lastName': usrobj.lastName,
+      'image': usrobj.image,
     });
   }
 
@@ -248,8 +246,17 @@ class DatabaseService {
     result.docs.forEach((e) {
       chatData = e.data();
     });
-
     return chatData;
+  }
+
+  Future<Map<String, dynamic>> getUseData(String uid) async {
+    Map<String, dynamic> userData;
+    var result = await userCollection.where('uid', isEqualTo: uid).get();
+
+    result.docs.forEach((e) {
+      userData = e.data();
+    });
+    return userData;
   }
 
   // get all property item on stream

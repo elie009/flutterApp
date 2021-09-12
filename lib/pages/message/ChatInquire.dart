@@ -44,6 +44,8 @@ class ChatPageState extends State<ChatPage> {
   }
 
   List<Widget> generateSenderLayout(DocumentSnapshot documentSnapshot) {
+    print('generateSenderLayout');
+    ;
     return <Widget>[
       new Expanded(
         child: new Column(
@@ -98,6 +100,9 @@ class ChatPageState extends State<ChatPage> {
   }
 
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
+    print('generateReceiverLayout');
+    print(documentSnapshot.data());
+    print(documentSnapshot.get('profile_photo'));
     return <Widget>[
       new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +142,8 @@ class ChatPageState extends State<ChatPage> {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => GalleryPage(
-                              imagePath: documentSnapshot.get('image_url'),
+                              imagePath:
+                                  'https://images.unsplash.com/photo-1618641986557-1ecd230959aa?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8aW5zdGFncmFatJTIwcHJvZmlsZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80', //documentSnapshot.get('image_url'),
                             ),
                           ),
                         );
@@ -152,6 +158,7 @@ class ChatPageState extends State<ChatPage> {
   }
 
   generateMessages(AsyncSnapshot<QuerySnapshot> snapshot) {
+    print('generateMessages');
     return snapshot.data.docs
         .map<Widget>((doc) => Container(
               margin: const EdgeInsets.symmetric(vertical: 10.0),

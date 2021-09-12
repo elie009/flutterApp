@@ -100,19 +100,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       Navigator.of(context).pop();
       phoneNo = '+639950311066';
-      print(phoneNo.replaceAll(new RegExp(r'[^\w\s]+'), ''));
       DocumentReference mobileRef =
           DatabaseService().userCollection.doc('9uJd3K6rT3cEPmRb6G7xN6NBPCV2');
 
       await mobileRef.get().then((documentReference) {
-        print('1111.222');
         print(documentReference.exists);
         if (!documentReference.exists) {
-          print('2222');
-          print(mobileRef);
-
           mobileRef.set({}).then((documentReference) async {
-            print('3333');
             await DatabaseService().userCollection.add({
               'name': "No Name",
               'mobile': phoneNo.replaceAll(new RegExp(r'[^\w\s]+'), ''),
@@ -138,27 +132,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
               print(e);
             });
           });
-
-          print('true');
         } else {
-          print(AuthService().user);
-          print('else');
-          print(widget.prefs);
           widget.prefs.setString('uid', documentReference["uid"]);
           widget.prefs.setString('name', documentReference["firstName"]);
           widget.prefs
               .setString('profile_photo', documentReference["lastName"]);
 
-          print('MessagePage');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => MessagePage(prefs: widget.prefs),
             ),
           );
-          print('false');
         }
-
-        print('99999');
       }).catchError((e) {});
     } catch (e) {
       handleError(e);

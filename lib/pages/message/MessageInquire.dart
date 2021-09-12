@@ -36,12 +36,14 @@ class _InquireMessageState extends State<InquireMessage> {
         .collection('contacts');
 
     profileReference =
-        DatabaseService().usersCollection.doc(widget.prefs.getString('uid'));
+        DatabaseService().userCollection.doc(widget.prefs.getString('uid'));
 
     profileReference.snapshots().listen((querySnapshot) {
       profileSnapshot = querySnapshot;
+     
       widget.prefs.setString('name', profileSnapshot.get("firstName"));
-      widget.prefs.setString('profile_photo', profileSnapshot.get("uid"));
+      widget.prefs.setString('uid', profileSnapshot.get("uid"));
+      widget.prefs.setString('profile_photo', profileSnapshot.get("image"));
 
       setState(() {
         _yourNameController.text = profileSnapshot.get("firstName");

@@ -16,7 +16,7 @@ class Wrapper extends StatelessWidget {
     if (user == null) {
       return SignInPage(prefs: prefs);
     } else {
-      return BottomNavBarWidget();
+      return BottomNavBarWidget(prefs: prefs);
     }
   }
 }

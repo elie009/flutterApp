@@ -42,7 +42,7 @@ class _MessagePageState extends State<MessagePage> {
         .collection('contacts');
 
     profileReference =
-        DatabaseService().usersCollection.doc(widget.prefs.getString('uid'));
+        DatabaseService().userCollection.doc(widget.prefs.getString('uid'));
 
     profileReference.snapshots().listen((querySnapshot) {
       profileSnapshot = querySnapshot;
@@ -56,7 +56,6 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   generateContactTab() {
-  
     return Column(
       children: <Widget>[
         StreamBuilder<QuerySnapshot>(
@@ -264,7 +263,6 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   generateContactList(AsyncSnapshot<QuerySnapshot> snapshot) {
-
     return snapshot.data.docs
         .map((doc) => InkWell(
               child: Container(

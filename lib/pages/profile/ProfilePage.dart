@@ -1,18 +1,309 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/object/UserObt.dart';
 import 'package:flutter_app/widgets/BottomShhetWidget.dart';
 import 'package:flutter_app/database/temp/DemoDataBase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
+  final SharedPreferences prefs;
+  ProfilePage({this.prefs});
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _ProfilePageState createState() {
+    return new _ProfilePageState();
+  }
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   final PrepareData _data = PrepareData();
 
+  List<Widget> _children = [Container(), Container()];
+  DocumentReference profileReference;
+  DocumentSnapshot profileSnapshot;
+  final _yourNameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    profileReference =
+        DatabaseService().userCollection.doc(widget.prefs.getString('uid'));
+    profileReference.snapshots().listen((querySnapshot) {
+      profileSnapshot = querySnapshot;
+      widget.prefs.setString('name', profileSnapshot.get("firstName"));
+      widget.prefs.setString('profile_photo', profileSnapshot.get("uid"));
+
+      setState(() {
+        _yourNameController.text = profileSnapshot.get("firstName");
+      });
+    });
+  }
+
+  generateProfileTab() {
+    return Column(
+      children: <Widget>[
+        Stack(
+          children: <Widget>[
+            (profileSnapshot != null
+                ? (profileSnapshot.get('image') != null
+                    ? Container(
+                        width: 150.0,
+                        height: 150.0,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image:
+                                new NetworkImage(profileSnapshot.get('image')),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(80.0),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 5.0,
+                              color: Colors.black,
+                              offset: Offset(5.0, 6.0),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container())
+                : Container()),
+            (profileSnapshot != null
+                ? (profileSnapshot.get('uid') != null
+                    ? Positioned(
+                        bottom: 20.0,
+                        right: 20.0,
+                        child: InkWell(
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                            size: 28.0,
+                          ),
+                          onTap: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: ((builder) => BottomShhetWidget(
+                                      usrobj: UserObj(
+                                        profileSnapshot.get('uid'),
+                                        profileSnapshot.get('firstName'),
+                                        profileSnapshot.get('image'),
+                                        profileSnapshot.get('lastName'),
+                                        profileSnapshot.get('phoneNumber'),
+                                        profileSnapshot.get('status'),
+                                        profileSnapshot.get('email'),
+                                      ),
+                                    )));
+                          },
+                        ),
+                      )
+                    : Container())
+                : Container()),
+          ],
+        ),
+        SizedBox(
+          height: 18.0,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 50.0,
+            ),
+            Text(
+              "Robert Downey, Jr.",
+              style: TextStyle(
+                fontSize: 25.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(
+              width: 10.0,
+            ),
+            InkWell(
+              child: Icon(
+                Icons.create,
+                size: 18.0,
+                color: Colors.blue,
+              ),
+              onTap: () {},
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 10.0,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 50.0,
+            ),
+            Text(
+              "Actor and Producer",
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(
+              width: 10.0,
+            ),
+            InkWell(
+              child: Icon(
+                Icons.create,
+                size: 18.0,
+                color: Colors.blue,
+              ),
+              onTap: () {},
+            ),
+          ],
+        ),
+        Divider(
+          height: 30.0,
+          color: Colors.black,
+        ),
+        Container(
+          width: 350.0,
+          height: 60.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Text(
+                    "45",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 2.0,
+                  ),
+                  Text(
+                    "Follower",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              VerticalDivider(
+                width: 70.0,
+                color: Colors.black,
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    "20",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 2.0,
+                  ),
+                  Text(
+                    "Following",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              VerticalDivider(
+                width: 70.0,
+                color: Colors.black,
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    "30",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 2.0,
+                  ),
+                  Text(
+                    "Post",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Divider(
+          height: 20.0,
+          color: Colors.black,
+        ),
+        Container(
+          color: Colors.lightGreen,
+          width: MediaQuery.of(context).size.width,
+          height: 130.0,
+          child: Card(
+            // color: Colors.amber,
+            margin: EdgeInsets.symmetric(horizontal: 10.0),
+            elevation: 5.0,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  InkWell(
+                    onTap: () {
+                      _data.execute();
+                    },
+                    child: Text(
+                      "Abouts",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.lightBlue,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 7.0,
+                  ),
+                  Text(
+                    "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    _children = [
+      generateProfileTab(),
+    ];
     return Scaffold(
       // bottomNavigationBar: followButton(),
       body: Stack(
@@ -27,245 +318,7 @@ class _ProfilePageState extends State<ProfilePage> {
             width: MediaQuery.of(context).size.width,
             top: MediaQuery.of(context).size.height / 6.0,
             // left: 76.0,
-            child: Column(
-              children: <Widget>[
-                Stack(
-                  children: <Widget>[
-                    Container(
-                      width: 150.0,
-                      height: 150.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image:
-                              AssetImage("assets/images/profile/profile.jpeg"),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(80.0),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 5.0,
-                            color: Colors.black,
-                            offset: Offset(5.0, 6.0),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20.0,
-                      right: 20.0,
-                      child: InkWell(
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 28.0,
-                        ),
-                        onTap: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: ((builder) => BottomShhetWidget()));
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 18.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 50.0,
-                    ),
-                    Text(
-                      "Robert Downey, Jr.",
-                      style: TextStyle(
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
-                    InkWell(
-                      child: Icon(
-                        Icons.create,
-                        size: 18.0,
-                        color: Colors.blue,
-                      ),
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 50.0,
-                    ),
-                    Text(
-                      "Actor and Producer",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
-                    InkWell(
-                      child: Icon(
-                        Icons.create,
-                        size: 18.0,
-                        color: Colors.blue,
-                      ),
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 30.0,
-                  color: Colors.black,
-                ),
-                Container(
-                  width: 350.0,
-                  height: 60.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            "45",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            "Follower",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      VerticalDivider(
-                        width: 70.0,
-                        color: Colors.black,
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            "20",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            "Following",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      VerticalDivider(
-                        width: 70.0,
-                        color: Colors.black,
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            "30",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            "Post",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(
-                  height: 20.0,
-                  color: Colors.black,
-                ),
-                Container(
-                  color: Colors.lightGreen,
-                  width: MediaQuery.of(context).size.width,
-                  height: 130.0,
-                  child: Card(
-                    // color: Colors.amber,
-                    margin: EdgeInsets.symmetric(horizontal: 10.0),
-                    elevation: 5.0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              _data.execute();
-                              print('test');
-
-                            },
-                            child: Text(
-                              "Abouts",
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.lightBlue,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 7.0,
-                          ),
-                          Text(
-                            "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            child: generateProfileTab(),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/object/UserObt.dart';
 import 'package:flutter_app/pages/authentication/SignInPage.dart';
 import 'package:flutter_app/database/Database.dart';
 
@@ -63,9 +64,10 @@ class AuthService {
           email: email, password: password);
       User user = result.user;
 
+      UserObj usrobj = new UserObj(user.uid, provideFname, '', provideLname,
+          user.phoneNumber, 'PENDING', user.email);
       // create a new document for the user with uid
-      await DatabaseService(uid: user.uid)
-          .updateUserData(user, provideFname, provideLname);
+      await DatabaseService(uid: user.uid).updateUserData(usrobj);
 
       return _userFromFirebaseUser(user);
     } catch (e) {

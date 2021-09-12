@@ -4,6 +4,7 @@ import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/object/ChatHandlerObj.dart';
 import 'package:flutter_app/object/ProperyObj.dart';
+import 'package:flutter_app/object/UserObt.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/item/CarouselSlider.dart';
@@ -251,6 +252,8 @@ class BottomMenu extends StatelessWidget {
           Column(children: <Widget>[
             IconButton(
               onPressed: () {
+                print('fffffff');
+                print(prefs);
                 startAsyncInit(prefs, ownerUid, propsId, context);
               },
               icon: Icon(Icons.message),
@@ -282,6 +285,25 @@ CollectionReference chatReference;
 
 Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
     BuildContext context) async {
+  UserObj usrobj;
+  var userData = DatabaseService()
+      .userCollection
+      .doc("b7xWeMKk2tYKrHe2sm9zdcWZ0qv1")
+      .get();
+  userData.then((value) {
+    usrobj = new UserObj(
+      value.get('uid'),
+      value.get('firstName'),
+      value.get('image'),
+      value.get('lastName'),
+      value.get('phoneNumber'),
+      value.get('status'),
+      value.get('email'),
+    );
+    print('vvvvvv');
+    print(usrobj);
+  });
+
   _userContact =
       await DatabaseService().getUseContact(prefs.getString('uid'), ownerUid);
   String contactUid =

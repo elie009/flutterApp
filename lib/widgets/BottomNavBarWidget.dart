@@ -4,9 +4,11 @@ import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BottomNavBarWidget extends StatefulWidget {
-  const BottomNavBarWidget({Key key}) : super(key: key);
+  final SharedPreferences prefs;
+  const BottomNavBarWidget({Key key, this.prefs}) : super(key: key);
   @override
   _BottomNavBarWidgetState createState() => _BottomNavBarWidgetState();
 }
@@ -30,10 +32,11 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
   @override
   void initState() {
     super.initState();
+    print(widget.prefs);
     homePage = HomePage();
     foodDetailsPage = FoodDetailsPage();
     foodOrderPage = FoodOrderPage();
-    profilePage = ProfilePage();
+    profilePage = ProfilePage(prefs: widget.prefs);
     pages = [homePage, foodDetailsPage, foodOrderPage, profilePage];
     currentPage = homePage;
   }

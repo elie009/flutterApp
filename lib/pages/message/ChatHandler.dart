@@ -278,7 +278,7 @@ class ChatPageState extends State<ChatPage> {
       'text': messageText,
       'sender_id': widget.prefs.getString('uid'),
       'sender_name': widget.prefs.getString('name'),
-      'profile_photo': widget.prefs.getString('profile_photo'),
+      'profile_photo': widget.prefs.getString('image'),
       'image_url': imageUrl,
       'time': FieldValue.serverTimestamp(),
     });

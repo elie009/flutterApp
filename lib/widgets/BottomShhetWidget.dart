@@ -1,12 +1,17 @@
 import 'dart:io';
 import 'dart:async';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/object/UserObt.dart';
 import 'package:image_picker/image_picker.dart';
 
 File imageFile;
 
 class BottomShhetWidget extends StatefulWidget {
+  UserObj usrobj;
+  BottomShhetWidget({this.usrobj});
   @override
   _BottomShhetWidgetState createState() => _BottomShhetWidgetState();
 }
@@ -20,12 +25,19 @@ class _BottomShhetWidgetState extends State<BottomShhetWidget> {
     });
   }
 
-  void takePhotoByGallery() async {
-    File image = (await ImagePicker.platform
-        .pickImage(source: ImageSource.gallery)) as File;
-    setState(() {
-      imageFile = image;
-    });
+  Future<void> takePhotoByGallery() async {
+    File imageFile = File(await ImagePicker.platform
+        .pickImage(source: ImageSource.gallery)
+        .then((pickedFile) => pickedFile.path));
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('profiles/${widget.usrobj.uid}');
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+
+    await uploadTask;
+    String fileUrl = await storageReference.getDownloadURL();
+
+    widget.usrobj.image = fileUrl;
+    DatabaseService().updateUserData(widget.usrobj);
   }
 
   void removePhoto() {
