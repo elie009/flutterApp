@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BestFoodWidget extends StatefulWidget {
+  final SharedPreferences prefs;
+  BestFoodWidget({this.prefs});
   @override
   _BestFoodWidgetState createState() => _BestFoodWidgetState();
 }

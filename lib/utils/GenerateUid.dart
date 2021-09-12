@@ -24,6 +24,18 @@ String itemID() {
  * Generate a v4 (random) id
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
-String bookingID() {
+String get bookingID {
   return ("book" + uuid.v4());
+}
+
+/* 
+ * Generate a v4 (random) id
+ * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
+ */
+String get chatID {
+  return ("chat" + uuid.v4());
+}
+
+String get contactID {
+  return ("contact" + uuid.v4());
 }

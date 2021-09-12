@@ -41,6 +41,20 @@ class AuthService {
     }
   }
 
+  // sign in with smartphonoe
+  Future signInWithSmartPhone(String verificationId, String smsCode) async {
+    try {
+      final AuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId, smsCode: smsCode);
+      UserCredential result = await _auth.signInWithCredential(credential);
+      User user = result.user;
+      return _userFromFirebaseUser(user);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
   // register with email & password
   Future registerWithEmailAndPassword(String email, String password,
       String provideFname, String provideLname) async {

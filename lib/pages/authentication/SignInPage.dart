@@ -1,14 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/authentication/SignUpPage.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:flutter_app/widgets/Loading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInPage extends StatefulWidget {
+  final SharedPreferences prefs;
+  SignInPage({this.prefs});
   @override
   _SignInPageState createState() => _SignInPageState();
 }
@@ -228,11 +233,15 @@ class _SignInPageState extends State<SignInPage> {
                                               loading = false;
                                             });
                                           } else {
+                                            UserModel ref = result;
+                                            widget.prefs
+                                                .setString('uid', ref.uid);
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      HomePage()),
+                                                      HomePage(
+                                                          prefs: widget.prefs)),
                                             );
                                             loading = false;
                                           }

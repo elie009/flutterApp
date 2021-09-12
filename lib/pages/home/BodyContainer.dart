@@ -4,9 +4,11 @@ import 'package:flutter_app/widgets/BestFoodWidget.dart';
 import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
 import 'package:flutter_app/widgets/SearchWidget.dart';
 import 'package:flutter_app/widgets/TopMenu/TopMenus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BodyContainer extends StatefulWidget {
-  BodyContainer({Key key}) : super(key: key);
+  final SharedPreferences prefs;
+  BodyContainer({Key key, this.prefs}) : super(key: key);
   @override
   State<StatefulWidget> createState() => _BodyContainer();
 }
@@ -17,10 +19,10 @@ class _BodyContainer extends State<BodyContainer> {
     return Container(
       child: SingleChildScrollView(
         child: Column(children: <Widget>[
-          SearchWidget(),
-          TopMenus(),
-          PopularFoodsWidget(),
-          BestFoodWidget(),
+          SearchWidget(prefs: widget.prefs),
+          TopMenus(prefs: widget.prefs),
+          PopularFoodsWidget(prefs: widget.prefs),
+          BestFoodWidget(prefs: widget.prefs),
         ]),
       ),
     );

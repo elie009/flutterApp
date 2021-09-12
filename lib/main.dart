@@ -9,23 +9,28 @@ import 'package:flutter_app/pages/authentication/SignUpPage.dart';
 import 'package:flutter_app/pages/wrapper.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  SharedPreferences.getInstance().then((prefs) {
+    runApp(MyApp(prefs: prefs));
+  });
 }
 
 class MyApp extends StatelessWidget {
+  final SharedPreferences prefs;
+  MyApp({this.prefs});
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<UserModel >.value(
+    return StreamProvider<UserModel>.value(
       value: AuthService().user,
       initialData: null,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Roboto', hintColor: Color(0xFFd0cece)),
-        home: Wrapper(),
+        home: Wrapper(prefs: prefs),
       ),
     );
   }

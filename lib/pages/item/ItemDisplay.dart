@@ -1,17 +1,28 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/object/ChatHandlerObj.dart';
 import 'package:flutter_app/object/ProperyObj.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/item/CarouselSlider.dart';
 import 'package:flutter_app/pages/item/PopupOffer.dart';
+import 'package:flutter_app/pages/message/ChatInquire.dart';
+import 'package:flutter_app/pages/message/MessagePage.dart';
+import 'package:flutter_app/pages/message/RegistrationHandler.dart';
+import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
+import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
 import 'package:flutter_app/widgets/FoodDetailsSlider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ItemDetailsPage extends StatefulWidget {
   Property props;
-  ItemDetailsPage({Key key, @required this.props}) : super(key: key);
+  final SharedPreferences prefs;
+  ItemDetailsPage({Key key, @required this.props, this.prefs})
+      : super(key: key);
 
   @override
   _ItemDetailsPageState createState() => _ItemDetailsPageState();
@@ -102,7 +113,10 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                   ],
                 ),
               ),
-              BottomMenu(),
+              BottomMenu(
+                  prefs: widget.prefs,
+                  ownerUid: props.ownerUid,
+                  propsId: props.getPropId()),
             ],
           ),
         ),
@@ -166,6 +180,10 @@ class FoodTitleWidget extends StatelessWidget {
 }
 
 class BottomMenu extends StatelessWidget {
+  final SharedPreferences prefs;
+  final String ownerUid;
+  final String propsId;
+  BottomMenu({this.prefs, this.ownerUid, this.propsId});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -230,29 +248,82 @@ class BottomMenu extends StatelessWidget {
               )
             ],
           ),
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.message,
-                color: Color(0xFFe95959),
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "Chat Now",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFa9a9a9),
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
+          Column(children: <Widget>[
+            IconButton(
+              onPressed: () {
+                startAsyncInit(prefs, ownerUid, propsId, context);
+              },
+              icon: Icon(Icons.message),
+              color: Color(0xFFe95959),
+              iconSize: 35,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text(
+              "Chat Now",
+              style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w300),
+            )
+          ]),
+          SizedBox()
         ],
       ),
     );
   }
+}
+
+Map<String, dynamic> _chatData;
+Map<String, dynamic> _userContact;
+ChatHandler chatObj;
+CollectionReference chatReference;
+
+Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
+    BuildContext context) async {
+  _userContact =
+      await DatabaseService().getUseContact(prefs.getString('uid'), ownerUid);
+  String contactUid =
+      _userContact == null ? ownerUid : _userContact['contactUid'];
+  if (_userContact == null) {
+    DatabaseService()
+        .userCollection
+        .doc(prefs.getString('uid'))
+        .collection('contacts')
+        .add({
+      'contactUid': ownerUid,
+      'propsId': propsId,
+      'date': getDateNow,
+      'contactId': contactID,
+    });
+  }
+
+  _chatData =
+      await DatabaseService().getChatData(prefs.getString('uid'), contactUid);
+
+  if (_chatData == null) {
+    DatabaseService()
+        .addChat(prefs.getString('uid'), ownerUid, propsId)
+        .then((documentReference) {
+      chatObj = new ChatHandler(documentReference.id);
+    }).catchError((e) {});
+  } else {
+    chatObj = new ChatHandler(_chatData['chatId']);
+  }
+
+  chatReference = DatabaseService()
+      .chatCollection
+      .doc(chatObj.getChatId)
+      .collection('messages');
+
+  Navigator.push(
+      context,
+      ScaleRoute(
+          page: ChatPage(
+        prefs: prefs,
+        chatObj: chatObj,
+      )));
 }
 
 class AddToCartMenu extends StatelessWidget {

@@ -3,8 +3,11 @@ import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TopMenus extends StatefulWidget {
+  final SharedPreferences prefs;
+  TopMenus({this.prefs});
   @override
   _TopMenusState createState() => _TopMenusState();
 }
@@ -21,7 +24,11 @@ class _TopMenusState extends State<TopMenus> {
           children: <Widget>[
             if (items != null)
               for (var i in items)
-                TopMenuTiles(name: i.name, imageUrl: "ic_burger", slug: "")
+                TopMenuTiles(
+                    name: i.name,
+                    imageUrl: "ic_burger",
+                    slug: "",
+                    prefs: widget.prefs)
           ],
         ));
   }
@@ -31,6 +38,7 @@ class TopMenuTiles extends StatelessWidget {
   String name = 'Burger';
   String imageUrl = 'ic_burger';
   String slug = '';
+  SharedPreferences prefs;
 
   // final ItemModel items;
   // TopMenuTiles({this.items});
@@ -39,7 +47,8 @@ class TopMenuTiles extends StatelessWidget {
       {Key key,
       @required this.name,
       @required this.imageUrl,
-      @required this.slug})
+      @required this.slug,
+      @required this.prefs})
       : super(key: key);
 
   @override
@@ -52,6 +61,7 @@ class TopMenuTiles extends StatelessWidget {
             ScaleRoute(
                 page: SearchDisplayPage(
               menuId: '001',
+              prefs: prefs,
             )));
       },
       child: Column(

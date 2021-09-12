@@ -8,7 +8,7 @@ class PropertyModel {
   final int fixPrice;
   final String location;
   final String menuid;
-  
+  final String ownerUid;
 
   PropertyModel(
       {this.propid,
@@ -19,5 +19,6 @@ class PropertyModel {
       this.toPrice,
       this.fixPrice,
       this.location,
-      this.menuid});
+      this.menuid,
+      this.ownerUid});
 }

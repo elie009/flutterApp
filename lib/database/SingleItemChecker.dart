@@ -23,7 +23,7 @@ class SingleItemChecker {
   }
 
   Future addBooking(Booking item) async {
-    await DatabaseService(uid: bookingID()).updateBookingData(item);
+    await DatabaseService(uid: bookingID).updateBookingData(item);
   }
 
   Future updateBooking(Booking item) async {

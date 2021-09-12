@@ -39,6 +39,12 @@ dependencies:
   syncfusion_flutter_datepicker: ^19.2.60
 
 
+  shared_preferences: ^0.5.3+1 # for storing user credentials persistence
+  contact_picker: ^0.0.2 # to add friends from contact list
+  firebase_storage: ^10.0.3 # to send image to user for that we need to store image on server
+  photo_view: ^0.4.2 # to view sent and received image in expanded view
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

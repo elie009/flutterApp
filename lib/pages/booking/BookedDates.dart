@@ -54,7 +54,7 @@ class _BookedDatesState extends State<BookedDates> {
           month,
           day,
           '9uJd3K6rT3cEPmRb6G7xN6NBPCV4',
-          bookingID(),
+          bookingID,
           '9uJd3K6rT3cEPmRb6G7xN6NBPCV2',
           'APPROVE');
       endbook = book;

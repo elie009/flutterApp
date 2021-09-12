@@ -8,7 +8,7 @@ class Property {
   int fixPrice;
   String location;
   String menuid;
-
+  String ownerUid;
 
   Property(
       String propid,
@@ -19,7 +19,8 @@ class Property {
       int toPrice,
       int fixPrice,
       String location,
-      String menuid) {
+      String menuid,
+      String ownerUid) {
     this.propid = propid;
     this.title = title;
     this.description = description;
@@ -29,6 +30,7 @@ class Property {
     this.fixPrice = fixPrice;
     this.location = location;
     this.menuid = menuid;
+    this.ownerUid = ownerUid;
   }
 
   String getPropId() {
@@ -65,5 +67,9 @@ class Property {
 
   String getMenuId() {
     return this.menuid;
+  }
+
+  String getOwnerUid() {
+    return this.ownerUid;
   }
 }

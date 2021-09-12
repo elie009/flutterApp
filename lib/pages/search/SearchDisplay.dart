@@ -5,11 +5,14 @@ import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/widgets/SearchWidget.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'CardItem.dart';
 
 class SearchDisplayPage extends StatefulWidget {
   String menuId;
-  SearchDisplayPage({Key key, @required this.menuId}) : super(key: key);
+  final SharedPreferences prefs;
+  SearchDisplayPage({Key key, @required this.menuId, this.prefs})
+      : super(key: key);
 
   @override
   _SearchDisplayPageState createState() => _SearchDisplayPageState();
@@ -60,7 +63,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      ProperyCard(),
+                      ProperyCard(prefs: widget.prefs),
                       SizedBox(
                         height: 10,
                       ),

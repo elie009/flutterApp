@@ -13,13 +13,15 @@ class DataTableOffer extends StatefulWidget {
 class _DataTableOfferState extends State<DataTableOffer> {
   @override
   Widget build(BuildContext context) {
-    return Cards();
+    return Cards(
+      props: null,
+    );
   }
 }
 
 class Cards extends StatelessWidget {
   Property props;
-  Cards({Key, key, @required this.props}) : super(key: key);
+  Cards({Key key, @required this.props}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

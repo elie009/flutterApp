@@ -5,8 +5,11 @@ import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PopularFoodsWidget extends StatefulWidget {
+  final SharedPreferences prefs;
+  PopularFoodsWidget({this.prefs});
   @override
   _PopularFoodsWidgetState createState() => _PopularFoodsWidgetState();
 }
@@ -19,7 +22,7 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
       width: double.infinity,
       child: Column(
         children: <Widget>[
-          PopularFoodTitle(),
+          PopularFoodTitle(prefs: widget.prefs),
           Expanded(
             child: PopularFoodItems(),
           )
@@ -236,6 +239,9 @@ class PopularFoodTiles extends StatelessWidget {
 }
 
 class PopularFoodTitle extends StatelessWidget {
+  final SharedPreferences prefs;
+  PopularFoodTitle({this.prefs});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -258,6 +264,7 @@ class PopularFoodTitle extends StatelessWidget {
                   ScaleRoute(
                       page: SearchDisplayPage(
                     menuId: '001',
+                    prefs: prefs,
                   )));
             },
             child: Text(

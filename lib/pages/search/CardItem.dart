@@ -7,8 +7,11 @@ import 'package:flutter_app/object/ProperyObj.dart';
 import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProperyCard extends StatefulWidget {
+  final SharedPreferences prefs;
+  ProperyCard({this.prefs});
   @override
   _ProperyCardState createState() => _ProperyCardState();
 }
@@ -21,8 +24,19 @@ class _ProperyCardState extends State<ProperyCard> {
       children: <Widget>[
         for (PropertyModel i in items)
           Cards(
-              props: Property(i.propid, i.title, i.description, i.imageName,
-                  i.fromPrice, i.toPrice, i.fixPrice, i.location, i.menuid))
+            props: Property(
+                i.propid,
+                i.title,
+                i.description,
+                i.imageName,
+                i.fromPrice,
+                i.toPrice,
+                i.fixPrice,
+                i.location,
+                i.menuid,
+                i.ownerUid),
+            prefs: widget.prefs,
+          )
       ],
     );
   }
@@ -30,14 +44,15 @@ class _ProperyCardState extends State<ProperyCard> {
 
 class Cards extends StatelessWidget {
   Property props;
-  Cards({Key, key, @required this.props}) : super(key: key);
+  final SharedPreferences prefs;
+  Cards({Key key, @required this.props, this.prefs}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context, ScaleRoute(page: ItemDetailsPage(props: props)));
+        Navigator.push(context,
+            ScaleRoute(page: ItemDetailsPage(props: props, prefs: prefs)));
         print('this is card item');
       },
       child: Container(

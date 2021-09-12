@@ -6,8 +6,8 @@ class PrepareData {
   void execute() {
     //clearAll();
     //addData();
-    //addLotData();
-    addBookingData();
+    addLotData();
+    //addBookingData();
     print('your in the demo database');
   }
 
@@ -33,7 +33,8 @@ class PrepareData {
           0,
           500000,
           "Cebu City, Central Visayas",
-          "001");
+          "001",
+          'gwpyob2MajYVshSedicPuBYoBQ02');
 
       await DatabaseService(uid: id).updateProperyData(props);
     }
