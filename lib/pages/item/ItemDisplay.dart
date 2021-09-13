@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/object/ChatHandlerObj.dart';
 import 'package:flutter_app/object/ProperyObj.dart';
 import 'package:flutter_app/object/UserObt.dart';
@@ -10,13 +11,10 @@ import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/item/CarouselSlider.dart';
 import 'package:flutter_app/pages/item/PopupOffer.dart';
 import 'package:flutter_app/pages/message/ChatInquire.dart';
-import 'package:flutter_app/pages/message/MessagePage.dart';
-import 'package:flutter_app/pages/message/RegistrationHandler.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
-import 'package:flutter_app/widgets/FoodDetailsSlider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ItemDetailsPage extends StatefulWidget {
@@ -32,6 +30,7 @@ class ItemDetailsPage extends StatefulWidget {
 class _ItemDetailsPageState extends State<ItemDetailsPage> {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context);
     print('xxxx');
     print(widget.prefs);
     Property props = widget.props;
@@ -186,9 +185,12 @@ class BottomMenu extends StatelessWidget {
   final SharedPreferences prefs;
   final String ownerUid;
   final String propsId;
+
   BottomMenu({this.prefs, this.ownerUid, this.propsId});
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context);
+
     return Container(
       width: double.infinity,
       child: Row(
@@ -254,9 +256,7 @@ class BottomMenu extends StatelessWidget {
           Column(children: <Widget>[
             IconButton(
               onPressed: () {
-                print('fffffff');
-                print(prefs);
-                startAsyncInit(prefs, ownerUid, propsId, context);
+                startAsyncInit(user, ownerUid, propsId, context);
               },
               icon: Icon(Icons.message),
               color: Color(0xFFe95959),
@@ -285,26 +285,16 @@ Map<String, dynamic> _userContact;
 ChatHandler chatObj;
 CollectionReference chatReference;
 
-Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
+Future startAsyncInit(UserModel user, String ownerUid, String propsId,
     BuildContext context) async {
-  print('qqqqqq');
-  DatabaseService()
-      .userCollection
-      .doc(prefs.getString('uid'))
-      .get()
-      .then((value) {
-    new UserObj(
-      value.get('uid'),
-      value.get('firstName'),
-      value.get('image'),
-      value.get('lastName'),
-      value.get('phoneNumber'),
-      value.get('status'),
-      value.get('email'),
-    );
-    prefs.setString('image', value.get('image'));
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  DatabaseService().userCollection.doc(user.uid).get().then((value) {
+    prefs.setString('uid', value.get('uid'));
+    prefs.setString('profile_photo', value.get('image'));
   });
 
+  //wala pani na gamit
   DatabaseService().userCollection.doc(ownerUid).get().then((value) {
     new UserObj(
       value.get('uid'),
@@ -318,16 +308,11 @@ Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
     prefs.setString('owenerImage', value.get('image'));
   });
 
-  _userContact =
-      await DatabaseService().getUseContact(prefs.getString('uid'), ownerUid);
+  _userContact = await DatabaseService().getUseContact(user.uid, ownerUid);
   String contactUid =
       _userContact == null ? ownerUid : _userContact['contactUid'];
   if (_userContact == null) {
-    DatabaseService()
-        .userCollection
-        .doc(prefs.getString('uid'))
-        .collection('contacts')
-        .add({
+    DatabaseService().userCollection.doc(user.uid).collection('contacts').add({
       'contactUid': ownerUid,
       'propsId': propsId,
       'date': getDateNow,
@@ -335,12 +320,11 @@ Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
     });
   }
 
-  _chatData =
-      await DatabaseService().getChatData(prefs.getString('uid'), contactUid);
+  _chatData = await DatabaseService().getChatData(user.uid, contactUid);
 
   if (_chatData == null) {
     DatabaseService()
-        .addChat(prefs.getString('uid'), ownerUid, propsId)
+        .addChat(user.uid, ownerUid, propsId)
         .then((documentReference) {
       chatObj = new ChatHandler(documentReference.id);
     }).catchError((e) {});

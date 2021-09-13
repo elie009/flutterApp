@@ -8,9 +8,11 @@ import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/object/ChatHandlerObj.dart';
 import 'package:flutter_app/object/ChatMessageObj.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
+import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../FoodOrderPage.dart';
 import 'GallaryHandler.dart';
 
 class ChatPage extends StatefulWidget {
@@ -36,7 +38,6 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
-    print('xxxxxxxxxxxxx');
     super.initState();
     chatReference = DatabaseService()
         .chatCollection
@@ -176,12 +177,23 @@ class ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFFfd2c2c),
         title: Text('title here'),
       ),
       body: Container(
         padding: EdgeInsets.all(5),
         child: new Column(
           children: <Widget>[
+            Positioned(
+              width: MediaQuery.of(context).size.width,
+              top: MediaQuery.of(context).size.height / 6.0,
+              // left: 76.0,
+              child: CartItem(
+                  productName: textlimiter("sample text only need for it"),
+                  productPrice: "\$96.00",
+                  productImage: "ic_popular_food_1",
+                  productCartQuantity: "2"),
+            ),
             StreamBuilder<QuerySnapshot>(
               stream:
                   chatReference.orderBy('time', descending: true).snapshots(),

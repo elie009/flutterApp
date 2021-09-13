@@ -6,3 +6,9 @@ int toInt(String number) {
   return int.parse(number);
 }
 
+String textlimiter(String text) {
+  if (text.length > 13) {
+    return text.substring(0, 13) + '...';
+  }
+  return text;
+}

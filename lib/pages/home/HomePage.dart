@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/home/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:flutter_app/database/Database.dart';
@@ -19,6 +20,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('HomePage');
     return Scaffold(
       body: StreamProvider<List<SpecialitiesModel>>.value(
         value: DatabaseService().items,
