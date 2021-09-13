@@ -32,6 +32,8 @@ class ItemDetailsPage extends StatefulWidget {
 class _ItemDetailsPageState extends State<ItemDetailsPage> {
   @override
   Widget build(BuildContext context) {
+    print('xxxx');
+    print(widget.prefs);
     Property props = widget.props;
     return DefaultTabController(
       length: 2,
@@ -285,13 +287,13 @@ CollectionReference chatReference;
 
 Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
     BuildContext context) async {
-  UserObj usrobj;
-  var userData = DatabaseService()
+  print('qqqqqq');
+  DatabaseService()
       .userCollection
-      .doc("b7xWeMKk2tYKrHe2sm9zdcWZ0qv1")
-      .get();
-  userData.then((value) {
-    usrobj = new UserObj(
+      .doc(prefs.getString('uid'))
+      .get()
+      .then((value) {
+    new UserObj(
       value.get('uid'),
       value.get('firstName'),
       value.get('image'),
@@ -300,8 +302,20 @@ Future startAsyncInit(SharedPreferences prefs, String ownerUid, String propsId,
       value.get('status'),
       value.get('email'),
     );
-    print('vvvvvv');
-    print(usrobj);
+    prefs.setString('image', value.get('image'));
+  });
+
+  DatabaseService().userCollection.doc(ownerUid).get().then((value) {
+    new UserObj(
+      value.get('uid'),
+      value.get('firstName'),
+      value.get('image'),
+      value.get('lastName'),
+      value.get('phoneNumber'),
+      value.get('status'),
+      value.get('email'),
+    );
+    prefs.setString('owenerImage', value.get('image'));
   });
 
   _userContact =

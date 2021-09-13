@@ -36,6 +36,7 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
+    print('xxxxxxxxxxxxx');
     super.initState();
     chatReference = DatabaseService()
         .chatCollection
@@ -45,7 +46,7 @@ class ChatPageState extends State<ChatPage> {
 
   List<Widget> generateSenderLayout(DocumentSnapshot documentSnapshot) {
     print('generateSenderLayout');
-    ;
+
     return <Widget>[
       new Expanded(
         child: new Column(
@@ -92,7 +93,7 @@ class ChatPageState extends State<ChatPage> {
               margin: const EdgeInsets.only(left: 8.0),
               child: new CircleAvatar(
                 backgroundImage:
-                    new NetworkImage(documentSnapshot.get('profile_photo')),
+                    new NetworkImage(widget.prefs.getString('image')),
               )),
         ],
       ),
@@ -102,7 +103,7 @@ class ChatPageState extends State<ChatPage> {
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
     print('generateReceiverLayout');
     print(documentSnapshot.data());
-    print(documentSnapshot.get('profile_photo'));
+    print(widget.prefs.getString('image'));
     return <Widget>[
       new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +112,7 @@ class ChatPageState extends State<ChatPage> {
               margin: const EdgeInsets.only(right: 8.0),
               child: new CircleAvatar(
                 backgroundImage:
-                    new NetworkImage(documentSnapshot.get('profile_photo')),
+                    new NetworkImage(widget.prefs.getString('owenerImage')),
               )),
         ],
       ),
