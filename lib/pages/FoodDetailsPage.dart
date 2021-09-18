@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
+import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
 import 'package:flutter_app/widgets/FoodDetailsSlider.dart';
 
@@ -293,7 +294,7 @@ class AddToCartMenu extends StatelessWidget {
               width: 200.0,
               height: 45.0,
               decoration: new BoxDecoration(
-                color: Color(0xFFfd2c2c),
+                color: primaryColor,
                 border: Border.all(color: Colors.white, width: 2.0),
                 borderRadius: BorderRadius.circular(10.0),
               ),
@@ -311,7 +312,7 @@ class AddToCartMenu extends StatelessWidget {
           IconButton(
             onPressed: () {},
             icon: Icon(Icons.add),
-            color: Color(0xFFfd2c2c),
+            color: primaryColor,
             iconSize: 30,
           ),
         ],

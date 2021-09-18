@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/object/UserObt.dart';
+import 'package:flutter_app/model/UserObj.dart';
 import 'package:flutter_app/pages/authentication/SignInPage.dart';
 import 'package:flutter_app/database/Database.dart';
 
@@ -8,12 +7,12 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on FirebaseUser
-  UserModel _userFromFirebaseUser(User user) {
-    return user != null ? UserModel(uid: user.uid) : null;
+  UserBase _userFromFirebaseUser(User user) {
+    return user != null ? UserBase.auth(uid: user.uid) : null;
   }
 
   // auth change user stream
-  Stream<UserModel> get user {
+  Stream<UserBase> get user {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
 
@@ -64,7 +63,7 @@ class AuthService {
           email: email, password: password);
       User user = result.user;
 
-      UserObj usrobj = new UserObj(user.uid, provideFname, '', provideLname,
+      UserBase usrobj = new UserBase(user.uid, provideFname, '', provideLname,
           user.phoneNumber, 'PENDING', user.email);
       // create a new document for the user with uid
       await DatabaseService(uid: user.uid).updateUserData(usrobj);

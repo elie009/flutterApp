@@ -5,7 +5,7 @@ import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'MessagePage.dart';
+import 'inbox/MessagePage.dart';
 
 class RegistrationPage extends StatefulWidget {
   final SharedPreferences prefs;

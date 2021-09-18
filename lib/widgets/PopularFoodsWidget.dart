@@ -263,7 +263,7 @@ class PopularFoodTitle extends StatelessWidget {
                   context,
                   ScaleRoute(
                       page: SearchDisplayPage(
-                    menuId: '001',
+                    menuId: '1001',
                     prefs: prefs,
                   )));
             },

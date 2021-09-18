@@ -1,13 +1,22 @@
-class UserObj {
+class UserBase {
   String uid;
+  String email;
   String firstName;
-  String image;
   String lastName;
   String phoneNumber;
   String status;
-  String email;
+  String image;
 
-  UserObj(String uid, String firstName, String image, String lastName,
+  UserBase.auth(
+      {this.uid,
+      this.firstName,
+      this.image,
+      this.lastName,
+      this.phoneNumber,
+      this.status,
+      this.email});
+
+  UserBase(String uid, String firstName, String image, String lastName,
       String phoneNumber, String status, String email) {
     this.uid = uid;
     this.firstName = firstName;

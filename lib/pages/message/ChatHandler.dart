@@ -7,7 +7,7 @@ import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'GallaryHandler.dart';
+import 'inbox/GallaryHandler.dart';
 
 class ChatPage extends StatefulWidget {
   final SharedPreferences prefs;

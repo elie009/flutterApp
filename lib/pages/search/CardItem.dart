@@ -2,39 +2,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/object/ProperyObj.dart';
+import 'package:flutter_app/model/PropertyObj.dart';
 import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProperyCard extends StatefulWidget {
+class PropertyCard extends StatefulWidget {
   final SharedPreferences prefs;
-  ProperyCard({this.prefs});
+  PropertyCard({this.prefs});
   @override
-  _ProperyCardState createState() => _ProperyCardState();
+  _PropertyCardState createState() => _PropertyCardState();
 }
 
-class _ProperyCardState extends State<ProperyCard> {
+class _PropertyCardState extends State<PropertyCard> {
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<PropertyModel>>(context);
+    final items = Provider.of<List<Property>>(context);
     return Column(
       children: <Widget>[
-        for (PropertyModel i in items)
+        for (Property i in items)
           Cards(
-            props: Property(
-                i.propid,
-                i.title,
-                i.description,
-                i.imageName,
-                i.fromPrice,
-                i.toPrice,
-                i.fixPrice,
-                i.location,
-                i.menuid,
-                i.ownerUid),
+            props: Property(i.propid, i.title, i.description, i.imageName,
+                i.fixPrice, i.location, i.menuid, i.ownerUid, i.status),
             prefs: widget.prefs,
           )
       ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_app/utils/Utils.dart';
 
 class FoodOrderPage extends StatefulWidget {
   @override
@@ -291,7 +292,7 @@ class PromoCodeWidget extends StatelessWidget {
               suffixIcon: IconButton(
                   icon: Icon(
                     Icons.local_offer,
-                    color: Color(0xFFfd2c2c),
+                    color: primaryColor,
                   ),
                   onPressed: () {
                     debugPrint('222');
@@ -485,7 +486,7 @@ class AddToCartMenu extends StatelessWidget {
               width: 100.0,
               height: 35.0,
               decoration: BoxDecoration(
-                color: Color(0xFFfd2c2c),
+                color: primaryColor,
                 border: Border.all(color: Colors.white, width: 2.0),
                 borderRadius: BorderRadius.circular(5.0),
               ),
@@ -503,7 +504,7 @@ class AddToCartMenu extends StatelessWidget {
           IconButton(
             onPressed: () {},
             icon: Icon(Icons.add),
-            color: Color(0xFFfd2c2c),
+            color: primaryColor,
             iconSize: 18,
           ),
         ],

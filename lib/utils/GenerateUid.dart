@@ -16,7 +16,7 @@ String uidV1() {
  * Generate a v4 (random) id
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
-String itemID() {
+String get idMenu {
   return ("item" + uuid.v4());
 }
 
@@ -24,7 +24,7 @@ String itemID() {
  * Generate a v4 (random) id
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
-String get bookingID {
+String get idBooking {
   return ("book" + uuid.v4());
 }
 
@@ -32,10 +32,14 @@ String get bookingID {
  * Generate a v4 (random) id
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
-String get chatID {
+String get idChat {
   return ("chat" + uuid.v4());
 }
 
-String get contactID {
+String get idContact {
   return ("contact" + uuid.v4());
+}
+
+String get idPropertyLot {
+  return ("lot" + uuid.v4());
 }

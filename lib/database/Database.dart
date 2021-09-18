@@ -1,34 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contact_picker/contact_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/object/BookingObj.dart';
-import 'package:flutter_app/object/ProperyObj.dart';
-import 'package:flutter_app/object/UserObt.dart';
+import 'package:flutter_app/model/BookingObj.dart';
+import 'package:flutter_app/model/PropertyLotObj.dart';
+import 'package:flutter_app/model/PropertyObj.dart';
+import 'package:flutter_app/model/UserObj.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class DatabaseService {
   final String uid;
   DatabaseService({this.uid});
-  get fromPrice => null;
 
   Future deleteItemData() async {
-    return await itemCollection.doc(uid).delete();
+    return await menuCollection.doc(uid).delete();
   }
 
 // collection reference
-  final CollectionReference itemCollection =
-      FirebaseFirestore.instance.collection('item');
+  final CollectionReference menuCollection =
+      FirebaseFirestore.instance.collection('menu');
 
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('user');
 
-  final CollectionReference propertCollection =
+  final CollectionReference propertyCollection =
       FirebaseFirestore.instance.collection('property');
+
+  final CollectionReference properyLottCollection =
+      FirebaseFirestore.instance.collection('propertyLot');
 
   final CollectionReference bookingCollection =
       FirebaseFirestore.instance.collection('booking');
@@ -40,17 +38,16 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('mobiles');
 
   Future updateProperyData(Property data) async {
-    return await propertCollection.doc(data.propid).set({
+    return await propertyCollection.doc(data.propid).set({
       'propid': data.propid,
       'title': data.title,
       'description': data.description,
       'imageName': data.imageName,
-      'fromPrice': data.fromPrice,
-      'toPrice': data.toPrice,
       'fixPrice': data.fixPrice,
       'location': data.location,
       'menuid': data.menuid,
       'ownerUid': data.ownerUid,
+      'status': data.status,
     });
   }
 
@@ -70,18 +67,18 @@ class DatabaseService {
     });
   }
 
-  Future updateItemData(
-      String name, String description, int price, String image) async {
-    return await itemCollection.doc(uid).set({
-      'itemid': uid,
-      'description': description,
-      'name': name,
-      'itemCount': price,
-      'imageName': image,
+  Future updateMenuData(MenuModel menuitem) async {
+    return await menuCollection.doc(uid).set({
+      'menuid': menuitem.menuid,
+      'name': menuitem.name,
+      'description': menuitem.description,
+      'imageAppName': menuitem.imageAppName,
+      'imageWebName': menuitem.imageWebName,
+      'dropdownid': menuitem.dropdownid,
     });
   }
 
-  Future updateUserData(UserObj usrobj) async {
+  Future updateUserData(UserBase usrobj) async {
     return await userCollection.doc(usrobj.uid).set({
       'uid': usrobj.uid,
       'email': usrobj.email,
@@ -93,18 +90,34 @@ class DatabaseService {
     });
   }
 
+  Future updatePropertyLot(PropertyLot data) async {
+    await properyLottCollection.doc(data.propid).set({
+      'propid': data.propid,
+      'lotSize': data.lotSize,
+      'perSqm': data.perSqm,
+      'nearby': data.nearby,
+      'amenities': data.amenities,
+      'rentBillabletype': data.rentBillabletype,
+      'rentRestrictions': data.rentRestrictions,
+      'saleContainPaper': data.saleContainPaper,
+      'tradableItems': data.tradableItems,
+    });
+
+    return updateProperyData(data);
+  }
+
   //get item list from snapshot
-  List<UserModel> _userListFromSnapshot(QuerySnapshot snapshot) {
+  List<UserBase> _userListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return UserModel(
-          uid: doc.get('uid') ?? '',
-          email: doc.get('email') ?? '',
-          firstName: doc.get('firstName') ?? '',
-          lastName: doc.get('lastName') ?? '',
-          phoneNumber: doc.get('phoneNumber') ?? '',
-          status: doc.get('status') ?? '',
-          image: doc.get('image') ?? '',
+        return UserBase(
+          doc.get('uid') ?? '',
+          doc.get('email') ?? '',
+          doc.get('firstName') ?? '',
+          doc.get('lastName') ?? '',
+          doc.get('phoneNumber') ?? '',
+          doc.get('status') ?? '',
+          doc.get('image') ?? '',
         );
       } catch (e) {
         print(e.toString());
@@ -116,7 +129,7 @@ class DatabaseService {
   Future addChat(String uid, String ownerUid, String popsId) async {
     // chatCollection
     //     .add({'contact1': uid, 'contact2': ownerUid, 'propId': popsId});
-    String chatId = chatID;
+    String chatId = idChat;
     return await chatCollection.doc(chatId).set({
       'chatId': chatId,
       'propId': popsId,
@@ -126,17 +139,16 @@ class DatabaseService {
   }
 
   //get item list from snapshot
-  List<SpecialitiesModel> _itemListFromSnapshot(QuerySnapshot snapshot) {
+  List<MenuModel> _menuListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return SpecialitiesModel(
-          typeId: doc.get('itemid') ?? '',
-          imageAppName: doc.get('imageName') ?? '0',
-          imageWebName: doc.get('imageName') ?? '0',
-          id: doc.get('itemid') ?? '',
+        return MenuModel(
+          menuid: doc.get('menuid') ?? '',
           name: doc.get('name') ?? '',
-          itemCount: doc.get('itemCount') ?? 0,
-          description: doc.get('description') ?? '0',
+          description: doc.get('description') ?? '',
+          imageAppName: doc.get('imageAppName') ?? '',
+          imageWebName: doc.get('imageWebName') ?? '',
+          dropdownid: doc.get('dropdownid') ?? '',
         );
       } catch (e) {
         print(e.toString());
@@ -146,8 +158,8 @@ class DatabaseService {
   }
 
   // get all menu item on stream
-  Stream<List<SpecialitiesModel>> get items {
-    return itemCollection.snapshots().map(_itemListFromSnapshot);
+  Stream<List<MenuModel>> get getStreamMenu {
+    return menuCollection.snapshots().map(_menuListFromSnapshot);
   }
 
   //get item list from snapshot
@@ -166,20 +178,19 @@ class DatabaseService {
   }
 
 //get item list from snapshot
-  List<PropertyModel> _propertyListFromSnapshot(QuerySnapshot snapshot) {
+  List<Property> _propertyListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return PropertyModel(
-          propid: doc.get('propid') ?? '',
-          title: doc.get('title') ?? '',
-          description: doc.get('description') ?? '',
-          imageName: doc.get('imageName') ?? '',
-          fromPrice: doc.get('fromPrice') ?? 0,
-          toPrice: doc.get('toPrice') ?? 0,
-          fixPrice: doc.get('fixPrice') ?? 0,
-          location: doc.get('location') ?? '',
-          menuid: doc.get('menuid') ?? '',
-          ownerUid: doc.get('ownerUid') ?? '',
+        return Property(
+          doc.get('propid') ?? '',
+          doc.get('title') ?? '',
+          doc.get('description') ?? '',
+          doc.get('imageName') ?? '',
+          doc.get('fixPrice') ?? 0,
+          doc.get('location') ?? '',
+          doc.get('menuid') ?? '',
+          doc.get('ownerUid') ?? '',
+          doc.get('status') ?? '',
         );
       } catch (e) {
         print(e.toString());
@@ -189,35 +200,26 @@ class DatabaseService {
   }
 
   //get item booking from snapshot
-  List<BookingModel> _bookingListFromSnapshot(QuerySnapshot snapshot) {
+  List<Booking> _bookingListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return BookingModel(
-          fromYear: doc.get('fromYear') ?? '',
-          fromMonth: doc.get('fromMonth') ?? '',
-          fromDay: doc.get('fromDay') ?? '',
-          toYear: doc.get('toYear') ?? '',
-          toMonth: doc.get('toMonth') ?? '',
-          toDay: doc.get('toDay') ?? '',
-          propsId: doc.get('propsId') ?? '',
-          bookId: doc.get('bookId') ?? '',
-          userId: doc.get('userId') ?? '',
-          bookingStatus: doc.get('bookingStatus') ?? '',
+        return Booking(
+          doc.get('fromYear') ?? '',
+          doc.get('fromMonth') ?? '',
+          doc.get('fromDay') ?? '',
+          doc.get('toYear') ?? '',
+          doc.get('toMonth') ?? '',
+          doc.get('toDay') ?? '',
+          doc.get('propsId') ?? '',
+          doc.get('bookId') ?? '',
+          doc.get('userId') ?? '',
+          doc.get('bookingStatus') ?? '',
         );
       } catch (e) {
         print(e.toString());
         return null;
       }
     }).toList();
-  }
-
-// get all property item on stream
-  Stream<List<ContactModel>> chat(String uid, String propOwnerUid) {
-    return chatCollection
-        .where('contact1', isEqualTo: uid)
-        .where('contact2', isEqualTo: propOwnerUid)
-        .snapshots()
-        .map(_contactsFromSnapshot);
   }
 
   Future<Map<String, dynamic>> getChatData(
@@ -260,8 +262,8 @@ class DatabaseService {
   }
 
   // get all property item on stream
-  Stream<List<PropertyModel>> propery(String menuId) {
-    return propertCollection
+  Stream<List<Property>> propery(String menuId) {
+    return propertyCollection
         .where('menuid', isEqualTo: menuId)
         .snapshots()
         .map(_propertyListFromSnapshot);
@@ -270,7 +272,7 @@ class DatabaseService {
   }
 
 // get all booking item on stream
-  Stream<List<BookingModel>> booking(String propsid) {
+  Stream<List<Booking>> booking(String propsid) {
     return bookingCollection
         .where('propsId', isEqualTo: propsid)
         .where('bookingStatus', whereIn: ['BREAK', 'APPROVE'])
@@ -288,7 +290,7 @@ class DatabaseService {
 
   Future deleteAllitem() async {
     try {
-      var snapshots = await itemCollection.get();
+      var snapshots = await menuCollection.get();
       for (var doc in snapshots.docs) {
         await doc.reference.delete();
       }

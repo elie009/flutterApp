@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/SingleItemChecker.dart';
-import 'package:flutter_app/model/BookingModel.dart';
-import 'package:flutter_app/object/BookingObj.dart';
+import 'package:flutter_app/model/BookingObj.dart';
 import 'package:flutter_app/service/CheckBookingDate.dart';
+import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +17,7 @@ class BookedDates extends StatefulWidget {
 }
 
 class _BookedDatesState extends State<BookedDates> {
-  List<BookingModel> listitems;
+  List<Booking> listitems;
   String _selectedDate = '';
   String _dateCount = '';
   String _range = '';
@@ -54,7 +54,7 @@ class _BookedDatesState extends State<BookedDates> {
           month,
           day,
           '9uJd3K6rT3cEPmRb6G7xN6NBPCV4',
-          bookingID,
+          idBooking,
           '9uJd3K6rT3cEPmRb6G7xN6NBPCV2',
           'APPROVE');
       endbook = book;
@@ -67,7 +67,7 @@ class _BookedDatesState extends State<BookedDates> {
 
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<BookingModel>>(context);
+    final items = Provider.of<List<Booking>>(context);
     listitems = items;
     return Stack(
       children: <Widget>[
@@ -154,7 +154,7 @@ class _BookedDatesState extends State<BookedDates> {
                     width: 300.0,
                     height: 45.0,
                     decoration: new BoxDecoration(
-                      color: Color(0xFFfd2c2c),
+                      color: primaryColor,
                       border: Border.all(color: Colors.white, width: 2.0),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -199,7 +199,7 @@ class _BookedDatesState extends State<BookedDates> {
                     width: 300.0,
                     height: 45.0,
                     decoration: new BoxDecoration(
-                      color: Color(0xFFfd2c2c),
+                      color: primaryColor,
                       border: Border.all(color: Colors.white, width: 2.0),
                       borderRadius: BorderRadius.circular(10.0),
                     ),

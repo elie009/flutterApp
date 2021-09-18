@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/item/DataTableOffer.dart';
+import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/widgets/SearchWidget.dart';
 
 class PopupOffer extends StatelessWidget {
@@ -18,7 +19,6 @@ class PopupOffer extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             content: Builder(
               builder: (context) {
-                // Get available height and width of the build area of this widget. Make a choice depending on the size.
                 var height = MediaQuery.of(context).size.height;
                 var width = MediaQuery.of(context).size.width;
 
@@ -63,7 +63,7 @@ class PopupOffer extends StatelessWidget {
           ),
         ),
         icon: Icon(Icons.local_offer_outlined),
-        color: Color(0xFFfd2c2c),
+        color: primaryColor,
         iconSize: 30,
       ),
       Text(
@@ -115,7 +115,7 @@ class BottomMenu extends StatelessWidget {
             width: 200.0,
             height: 45.0,
             decoration: new BoxDecoration(
-              color: Color(0xFFfd2c2c),
+              color: primaryColor,
               border: Border.all(color: Colors.white, width: 2.0),
               borderRadius: BorderRadius.circular(10.0),
             ),

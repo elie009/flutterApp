@@ -1,12 +1,14 @@
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/object/BookingObj.dart';
-import 'package:flutter_app/object/ProperyObj.dart';
+import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/model/BookingObj.dart';
+import 'package:flutter_app/model/PropertyObj.dart';
+import 'package:flutter_app/utils/GenerateUid.dart';
 
 class PrepareData {
   void execute() {
     //clearAll();
-    //addData();
-    addLotData();
+    //addMenuData();
+    addProperyData();
     //addBookingData();
     print('your in the demo database');
   }
@@ -15,12 +17,19 @@ class PrepareData {
     await DatabaseService(uid: '9uJd3K6rT3cEPmRb6G7xN6NBPCV2').deleteAllitem();
   }
 
-  Future addData() async {
-    await DatabaseService(uid: '9uJd3K6rT3cEPmRb6G7xN6NBPCV1')
-        .updateItemData("Farm Log", "simple description", 2000, "");
+  String menuid = idMenu;
+
+  Future addMenuData() async {
+    await DatabaseService(uid: menuid).updateMenuData(MenuModel(
+        menuid: menuid,
+        name: 'Residential',
+        description: 'simple description',
+        imageAppName: '',
+        imageWebName: 'NA',
+        dropdownid: ''));
   }
 
-  Future addLotData() async {
+  Future addProperyData() async {
     final list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     for (int i in list) {
       String id = '9uJd3K6rT3cEPmRb6G7xN6NBPCV' + i.toString();
@@ -29,12 +38,11 @@ class PrepareData {
           "Lot for sale",
           "simple description",
           "assets/images/bestfood/ic_best_food_8.jpeg",
-          0,
-          0,
           500000,
           "Cebu City, Central Visayas",
           "001",
-          'gwpyob2MajYVshSedicPuBYoBQ02');
+          'gwpyob2MajYVshSedicPuBYoBQ02',
+          'APPROVE');
 
       await DatabaseService(uid: id).updateProperyData(props);
     }

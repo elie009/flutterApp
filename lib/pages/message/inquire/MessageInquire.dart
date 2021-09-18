@@ -10,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contact_picker/contact_picker.dart';
-import 'ChatHandler.dart';
-import 'RegistrationHandler.dart';
+import '../ChatHandler.dart';
+import '../RegistrationHandler.dart';
 
 class InquireMessage extends StatefulWidget {
   final SharedPreferences prefs;

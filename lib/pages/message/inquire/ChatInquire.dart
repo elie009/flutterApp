@@ -5,15 +5,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/model/ContactModel.dart';
-import 'package:flutter_app/object/ChatHandlerObj.dart';
-import 'package:flutter_app/object/ChatMessageObj.dart';
+import 'package:flutter_app/model/ChatHandlerObj.dart';
+import 'package:flutter_app/model/ChatMessageObj.dart';
+import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../FoodOrderPage.dart';
-import 'GallaryHandler.dart';
+import '../../FoodOrderPage.dart';
+import '../inbox/GallaryHandler.dart';
 
 class ChatPage extends StatefulWidget {
   final SharedPreferences prefs;
@@ -177,7 +178,7 @@ class ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFfd2c2c),
+        backgroundColor: primaryColor,
         title: Text('title here'),
       ),
       body: Container(
@@ -292,7 +293,7 @@ class ChatPageState extends State<ChatPage> {
       'text': text,
       'sender_id': widget.prefs.getString('uid'),
       'sender_name': widget.prefs.getString('name'),
-      'profile_photo': widget.prefs.getString('profile_photo'),
+      'profile_photo': widget.prefs.getString('image'),
       'image_url': '',
       'time': FieldValue.serverTimestamp(),
     }).then((documentReference) {
@@ -307,7 +308,7 @@ class ChatPageState extends State<ChatPage> {
       'text': messageText,
       'sender_id': widget.prefs.getString('uid'),
       'sender_name': widget.prefs.getString('name'),
-      'profile_photo': widget.prefs.getString('profile_photo'),
+      'profile_photo': widget.prefs.getString('image'),
       'image_url': imageUrl,
       'time': FieldValue.serverTimestamp(),
     });

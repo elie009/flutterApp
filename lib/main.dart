@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
@@ -10,6 +9,8 @@ import 'package:flutter_app/pages/wrapper.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'model/UserObj.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
   MyApp({this.prefs});
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<UserModel>.value(
+    return StreamProvider<UserBase>.value(
       value: AuthService().user,
       initialData: null,
       child: MaterialApp(

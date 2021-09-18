@@ -15,7 +15,7 @@ class TopMenus extends StatefulWidget {
 class _TopMenusState extends State<TopMenus> {
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<SpecialitiesModel>>(context);
+    final items = Provider.of<List<MenuModel>>(context);
 
     return Container(
         height: 100,

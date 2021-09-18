@@ -18,7 +18,9 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
   List<Widget> pages;
   Widget currentPage;
   HomePage homePage;
-  FoodDetailsPage foodDetailsPage;
+  FoodDetailsPage nearByLocationPage;
+  FoodDetailsPage messagePage;
+
   FoodOrderPage foodOrderPage;
   ProfilePage profilePage;
 
@@ -34,10 +36,17 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
     super.initState();
     print(widget.prefs);
     homePage = HomePage();
-    foodDetailsPage = FoodDetailsPage();
+    nearByLocationPage = FoodDetailsPage();
+    messagePage = FoodDetailsPage();
     foodOrderPage = FoodOrderPage();
     profilePage = ProfilePage(prefs: widget.prefs);
-    pages = [homePage, foodDetailsPage, foodOrderPage, profilePage];
+    pages = [
+      homePage,
+      nearByLocationPage,
+      messagePage,
+      foodOrderPage,
+      profilePage
+    ];
     currentPage = homePage;
   }
 
@@ -59,6 +68,13 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
             icon: Icon(Icons.near_me),
             title: Text(
               'Near By',
+              style: TextStyle(color: Color(0xFF2c2b2b)),
+            ),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message_outlined),
+            title: Text(
+              'Message',
               style: TextStyle(color: Color(0xFF2c2b2b)),
             ),
           ),

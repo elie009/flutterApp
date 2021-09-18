@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/PropertyObj.dart';
 import 'package:flutter_app/widgets/SearchWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +24,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
   @override
   Widget build(BuildContext context) {
     String propId = widget.menuId;
+    print('>>>>> ' + propId);
 
     return Scaffold(
         appBar: AppBar(
@@ -48,7 +49,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
           ),
           brightness: Brightness.light,
         ),
-        body: StreamProvider<List<PropertyModel>>.value(
+        body: StreamProvider<List<Property>>.value(
           value: DatabaseService().propery(propId),
           initialData: [],
           child: SingleChildScrollView(
@@ -63,7 +64,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      ProperyCard(prefs: widget.prefs),
+                      PropertyCard(prefs: widget.prefs),
                       SizedBox(
                         height: 10,
                       ),

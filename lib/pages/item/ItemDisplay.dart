@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/object/ChatHandlerObj.dart';
-import 'package:flutter_app/object/ProperyObj.dart';
-import 'package:flutter_app/object/UserObt.dart';
+import 'package:flutter_app/model/ChatHandlerObj.dart';
+import 'package:flutter_app/model/PropertyObj.dart';
+import 'package:flutter_app/model/UserObj.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/item/CarouselSlider.dart';
 import 'package:flutter_app/pages/item/PopupOffer.dart';
-import 'package:flutter_app/pages/message/ChatInquire.dart';
+import 'package:flutter_app/pages/message/inquire/ChatInquire.dart';
+import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
@@ -30,9 +30,8 @@ class ItemDetailsPage extends StatefulWidget {
 class _ItemDetailsPageState extends State<ItemDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserModel>(context);
-    print('xxxx');
-    print(widget.prefs);
+    final user = Provider.of<UserBase>(context);
+
     Property props = widget.props;
     return DefaultTabController(
       length: 2,
@@ -118,7 +117,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               BottomMenu(
                   prefs: widget.prefs,
                   ownerUid: props.ownerUid,
-                  propsId: props.getPropId()),
+                  propsId: props.propid),
             ],
           ),
         ),
@@ -189,7 +188,7 @@ class BottomMenu extends StatelessWidget {
   BottomMenu({this.prefs, this.ownerUid, this.propsId});
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserModel>(context);
+    final user = Provider.of<UserBase>(context);
 
     return Container(
       width: double.infinity,
@@ -285,18 +284,18 @@ Map<String, dynamic> _userContact;
 ChatHandler chatObj;
 CollectionReference chatReference;
 
-Future startAsyncInit(UserModel user, String ownerUid, String propsId,
+Future startAsyncInit(UserBase user, String ownerUid, String propsId,
     BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
   DatabaseService().userCollection.doc(user.uid).get().then((value) {
     prefs.setString('uid', value.get('uid'));
-    prefs.setString('profile_photo', value.get('image'));
+    prefs.setString('image', value.get('image'));
   });
 
   //wala pani na gamit
   DatabaseService().userCollection.doc(ownerUid).get().then((value) {
-    new UserObj(
+    new UserBase(
       value.get('uid'),
       value.get('firstName'),
       value.get('image'),
@@ -316,7 +315,7 @@ Future startAsyncInit(UserModel user, String ownerUid, String propsId,
       'contactUid': ownerUid,
       'propsId': propsId,
       'date': getDateNow,
-      'contactId': contactID,
+      'contactId': idContact,
     });
   }
 
@@ -359,7 +358,7 @@ class AddToCartMenu extends StatelessWidget {
                 Navigator.push(context, ScaleRoute(page: BookingPage()));
               },
               icon: Icon(Icons.access_time),
-              color: Color(0xFFfd2c2c),
+              color: primaryColor,
               iconSize: 30,
             ),
             Text(
@@ -381,7 +380,7 @@ class AddToCartMenu extends StatelessWidget {
             IconButton(
               onPressed: () {},
               icon: Icon(Icons.save_alt),
-              color: Color(0xFFfd2c2c),
+              color: primaryColor,
               iconSize: 30,
             ),
             Text(
@@ -399,7 +398,7 @@ class AddToCartMenu extends StatelessWidget {
             IconButton(
               onPressed: () {},
               icon: Icon(Icons.emoji_flags_outlined),
-              color: Color(0xFFfd2c2c),
+              color: primaryColor,
               iconSize: 30,
             ),
             Text(

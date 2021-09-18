@@ -1,10 +1,10 @@
-import 'package:flutter_app/model/BookingModel.dart';
+import 'package:flutter_app/model/BookingObj.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:intl/intl.dart';
 
 class CheckiingBookDate {
-  List<BookingModel> activeDates;
-  CheckiingBookDate(List<BookingModel> activeDates) {
+  List<Booking> activeDates;
+  CheckiingBookDate(List<Booking> activeDates) {
     this.activeDates = activeDates;
   }
 

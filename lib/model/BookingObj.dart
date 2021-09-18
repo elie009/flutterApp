@@ -33,45 +33,4 @@ class Booking {
     this.userId = userId;
     this.bookingStatus = bookingStatus;
   }
-
-
-  String getFromYear() {
-    return this.fromYear;
-  }
-
-  String getFromMonth() {
-    return this.fromMonth;
-  }
-
-  String getFromDay() {
-    return this.fromDay;
-  }
-
-  String getToYear() {
-    return this.toYear;
-  }
-
-  String getToMonth() {
-    return this.toMonth;
-  }
-
-  String getToDay() {
-    return this.toDay;
-  }
-
-  String getPropId() {
-    return this.propsId;
-  }
-
-  String getBookId() {
-    return this.bookId;
-  }
-
-  String getUserId() {
-    return this.userId;
-  }
-
-  String getBookingStatus() {
-    return this.bookingStatus;
-  }
 }

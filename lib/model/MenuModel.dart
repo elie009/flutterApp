@@ -1,18 +1,17 @@
-class SpecialitiesModel {
-  final String id;
-  final String name;
-  final String description;
-  final String typeId;
-  final int itemCount;
-  final String imageAppName;
-  final String imageWebName;
+class MenuModel {
+  String menuid;
+  String name;
+  String description;
+  String imageAppName;
+  String imageWebName;
+  String dropdownid;
 
-  SpecialitiesModel(
-      {this.typeId,
-      this.imageAppName,
-      this.imageWebName,
-      this.id,
-      this.name,
-      this.description,
-      this.itemCount});
+  MenuModel({
+    this.menuid,
+    this.name,
+    this.description,
+    this.imageAppName,
+    this.imageWebName,
+    this.dropdownid,
+  });
 }

@@ -4,19 +4,19 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/object/UserObt.dart';
+import 'package:flutter_app/model/UserObj.dart';
 import 'package:image_picker/image_picker.dart';
 
 File imageFile;
 
-class BottomShhetWidget extends StatefulWidget {
-  UserObj usrobj;
-  BottomShhetWidget({this.usrobj});
+class ImagePickerWidget extends StatefulWidget {
+  UserBase usrobj;
+  ImagePickerWidget({this.usrobj});
   @override
-  _BottomShhetWidgetState createState() => _BottomShhetWidgetState();
+  _ImagePickerWidgetState createState() => _ImagePickerWidgetState();
 }
 
-class _BottomShhetWidgetState extends State<BottomShhetWidget> {
+class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   void takePhotoByCamera() async {
     File image = (await ImagePicker.platform
         .pickImage(source: ImageSource.camera)) as File;

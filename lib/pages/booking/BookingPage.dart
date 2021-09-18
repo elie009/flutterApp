@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/BookingModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/BookingObj.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +34,7 @@ class _BookingPageState extends State<BookingPage> {
           brightness: Brightness.light,
           actions: <Widget>[],
         ),
-        body: StreamProvider<List<BookingModel>>.value(
+        body: StreamProvider<List<Booking>>.value(
           value: DatabaseService().booking('9uJd3K6rT3cEPmRb6G7xN6NBPCV4'),
           initialData: [],
           child: Container(
