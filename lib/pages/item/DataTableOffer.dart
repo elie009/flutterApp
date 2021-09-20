@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/pages/search/CardItem.dart';
 
@@ -20,7 +20,7 @@ class _DataTableOfferState extends State<DataTableOffer> {
 }
 
 class Cards extends StatelessWidget {
-  Property props;
+  PropertyModel props;
   Cards({Key key, @required this.props}) : super(key: key);
 
   @override

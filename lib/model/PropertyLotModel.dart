@@ -1,6 +1,6 @@
-import 'PropertyObj.dart';
+import 'PropertyModel.dart';
 
-class PropertyLot extends Property {
+class PropertyLotModel extends PropertyModel {
   double lotSize; //MD001PLT001001
   double perSqm; //MD001PLT001002
   String nearby; //MD001PLT001003
@@ -11,7 +11,10 @@ class PropertyLot extends Property {
   String tradableItems; //MD001PLT001008
   String status;
 
-  PropertyLot(
+  PropertyLotModel(
+    int numComments,
+    int numLike,
+    int numDisLike,
     String propid,
     String title,
     String description,
@@ -29,8 +32,8 @@ class PropertyLot extends Property {
     String saleContainPaper,
     String tradableItems,
     String status,
-  ) : super(propid, title, description, imageName, fixPrice, location, menuid,
-            ownerUid, status) {
+  ) : super(numComments, numLike, numDisLike, propid, title, description,
+            imageName, fixPrice, location, menuid, ownerUid, status) {
     this.lotSize = lotSize;
     this.perSqm = perSqm;
     this.nearby = nearby;

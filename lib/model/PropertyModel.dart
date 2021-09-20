@@ -1,4 +1,7 @@
-class Property {
+class PropertyModel {
+  int numComments;
+  int numLikes;
+  int numDisLike;
   String propid;
   String menuid;
   String ownerUid;
@@ -9,8 +12,37 @@ class Property {
   String description; //MD001PLT001012
   double fixPrice; //MD001PLT001013
 
-  Property(String propid, String title, String description, String imageName,
-      double fixPrice, String location, String menuid, String ownerUid, String status) {
+  PropertyModel.instance(PropertyModel i) {
+    this.numComments = i.numComments;
+    this.numLikes = i.numLikes;
+    this.numDisLike = i.numDisLike;
+    this.propid = i.propid;
+    this.title = i.title;
+    this.description = i.description;
+    this.imageName = i.imageName;
+    this.fixPrice = i.fixPrice;
+    this.location = i.location;
+    this.menuid = i.menuid;
+    this.ownerUid = i.ownerUid;
+    this.status = i.status;
+  }
+
+  PropertyModel(
+      int numComments,
+      int numLike,
+      int numDisLike,
+      String propid,
+      String title,
+      String description,
+      String imageName,
+      double fixPrice,
+      String location,
+      String menuid,
+      String ownerUid,
+      String status) {
+    this.numComments = numComments;
+    this.numLikes = numLike;
+    this.numDisLike = numDisLike;
     this.propid = propid;
     this.title = title;
     this.description = description;

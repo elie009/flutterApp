@@ -2,15 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PropertyCard extends StatefulWidget {
-  final SharedPreferences prefs;
-  PropertyCard({this.prefs});
+  
   @override
   _PropertyCardState createState() => _PropertyCardState();
 }
@@ -18,22 +17,22 @@ class PropertyCard extends StatefulWidget {
 class _PropertyCardState extends State<PropertyCard> {
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<Property>>(context);
+    final items = Provider.of<List<PropertyModel>>(context);
     return Column(
       children: <Widget>[
-        for (Property i in items)
-          Cards(
-            props: Property(i.propid, i.title, i.description, i.imageName,
-                i.fixPrice, i.location, i.menuid, i.ownerUid, i.status),
-            prefs: widget.prefs,
-          )
+        for (PropertyModel i in items)
+          if (i.status == 'APPROVE')
+            Cards(
+              props: PropertyModel.instance(i),
+              prefs: null,
+            )
       ],
     );
   }
 }
 
 class Cards extends StatelessWidget {
-  Property props;
+  PropertyModel props;
   final SharedPreferences prefs;
   Cards({Key key, @required this.props, this.prefs}) : super(key: key);
 

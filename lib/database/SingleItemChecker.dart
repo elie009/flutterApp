@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/BookingObj.dart';
-import 'package:flutter_app/model/PropertyLotObj.dart';
+import 'package:flutter_app/model/BookingModel.dart';
+import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/pages/authentication/SignInPage.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
@@ -21,15 +21,15 @@ class SingleItemChecker {
     await DatabaseService(uid: itemID).deleteAllitem();
   }
 
-  Future addBooking(Booking item) async {
+  Future addBooking(BookingModel item) async {
     await DatabaseService(uid: idBooking).updateBookingData(item);
   }
 
-  Future updateBooking(Booking item) async {
+  Future updateBooking(BookingModel item) async {
     await DatabaseService(uid: item.bookId).updateBookingData(item);
   }
 
-  Future addPropertyLot(PropertyLot item) async {
+  Future addPropertyLot(PropertyLotModel item) async {
     await DatabaseService().updatePropertyLot(item);
   }
 }

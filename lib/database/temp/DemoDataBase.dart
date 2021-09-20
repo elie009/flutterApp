@@ -1,7 +1,8 @@
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/BookingObj.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
+import 'package:flutter_app/model/BookingModel.dart';
+import 'package:flutter_app/model/PropertyLotModel.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class PrepareData {
@@ -30,21 +31,43 @@ class PrepareData {
   }
 
   Future addProperyData() async {
-    final list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    for (int i in list) {
-      String id = '9uJd3K6rT3cEPmRb6G7xN6NBPCV' + i.toString();
-      Property props = Property(
+    final list = [
+      "Lot for sale",
+      "Yuta data-data",
+      "Farm lot for rent",
+      "Condo for Sale",
+      "House and lot for sale",
+      "House for sale casamira",
+      "Townhouse for sale",
+      "For assume House and lot",
+      "Lot data2x",
+      "200m lot"
+    ];
+    for (String i in list) {
+      String id = idPropertyLot;
+      PropertyLotModel props = PropertyLotModel(
+          0,
+          0,
+          0,
           id,
-          "Lot for sale",
-          "simple description",
+          i,
+          'simple description',
           "assets/images/bestfood/ic_best_food_8.jpeg",
           500000,
-          "Cebu City, Central Visayas",
-          "001",
-          'gwpyob2MajYVshSedicPuBYoBQ02',
+          'Cebu City, Cebu',
+          '1001',
+          'b7xWeMKk2tYKrHe2sm9zdcWZ0qv1',
+          0.00,
+          0.00,
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
           'APPROVE');
 
-      await DatabaseService(uid: id).updateProperyData(props);
+      await DatabaseService(uid: id).updatePropertyLot(props);
     }
   }
 
@@ -124,7 +147,7 @@ class PrepareData {
       },
     ];
     list.forEach((e) async {
-      Booking props = Booking(
+      BookingModel props = BookingModel(
         e['fromYear'].toString(),
         e['fromMonth'].toString(),
         e['fromDay'].toString(),

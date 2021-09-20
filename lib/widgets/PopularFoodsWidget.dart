@@ -7,6 +7,8 @@ import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'card/ItemCard.dart';
+
 class PopularFoodsWidget extends StatefulWidget {
   final SharedPreferences prefs;
   PopularFoodsWidget({this.prefs});
@@ -18,7 +20,7 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 265,
+      height: 350,
       width: double.infinity,
       child: Column(
         children: <Widget>[
@@ -26,212 +28,6 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
           Expanded(
             child: PopularFoodItems(),
           )
-        ],
-      ),
-    );
-  }
-}
-
-class PopularFoodTiles extends StatelessWidget {
-  String name;
-  String imageUrl;
-  String rating;
-  String numberOfRating;
-  String price;
-  String slug;
-
-  PopularFoodTiles(
-      {Key key,
-      @required this.name,
-      @required this.imageUrl,
-      @required this.rating,
-      @required this.numberOfRating,
-      @required this.price,
-      @required this.slug})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(context, ScaleRoute(page: FoodDetailsPage()));
-      },
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(left: 10, right: 5, top: 5, bottom: 5),
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Color(0xFFfae3e2),
-                blurRadius: 15.0,
-                offset: Offset(0, 0.75),
-              ),
-            ]),
-            child: Card(
-                color: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
-                ),
-                child: Container(
-                  width: 170,
-                  height: 210,
-                  child: Column(
-                    children: <Widget>[
-                      Stack(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                              alignment: Alignment.topRight,
-                              width: double.infinity,
-                              padding: EdgeInsets.only(right: 5, top: 5),
-                              child: Container(
-                                height: 28,
-                                width: 28,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white70,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0xFFfae3e2),
-                                        blurRadius: 25.0,
-                                        offset: Offset(0.0, 0.75),
-                                      ),
-                                    ]),
-                                child: Icon(
-                                  Icons.favorite,
-                                  color: Color(0xFFfb3132),
-                                  size: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Center(
-                                child: Image.asset(
-                              'assets/images/popular_foods/' +
-                                  imageUrl +
-                                  ".png",
-                              width: 130,
-                              height: 140,
-                            )),
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Container(
-                            alignment: Alignment.bottomLeft,
-                            padding: EdgeInsets.only(left: 5, top: 5),
-                            child: Text(name,
-                                style: TextStyle(
-                                    color: Color(0xFF6e6e71),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500)),
-                          ),
-                          Container(
-                            alignment: Alignment.topRight,
-                            padding: EdgeInsets.only(right: 5),
-                            child: Container(
-                              height: 28,
-                              width: 28,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white70,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xFFfae3e2),
-                                      blurRadius: 25.0,
-                                      offset: Offset(0.0, 0.75),
-                                    ),
-                                  ]),
-                              child: Icon(
-                                Icons.near_me,
-                                color: Color(0xFFfb3132),
-                                size: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Container(
-                                alignment: Alignment.topLeft,
-                                padding: EdgeInsets.only(left: 5, top: 5),
-                                child: Text(rating,
-                                    style: TextStyle(
-                                        color: Color(0xFF6e6e71),
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400)),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(top: 3, left: 5),
-                                child: Row(
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFF9b9b9c),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.topLeft,
-                                padding: EdgeInsets.only(left: 5, top: 5),
-                                child: Text("($numberOfRating)",
-                                    style: TextStyle(
-                                        color: Color(0xFF6e6e71),
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400)),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            alignment: Alignment.bottomLeft,
-                            padding: EdgeInsets.only(left: 5, top: 5, right: 5),
-                            child: Text('\$' + price,
-                                style: TextStyle(
-                                    color: Color(0xFF6e6e71),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600)),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                )),
-          ),
         ],
       ),
     );
@@ -287,69 +83,78 @@ class PopularFoodItems extends StatelessWidget {
     return ListView(
       scrollDirection: Axis.horizontal,
       children: <Widget>[
-        PopularFoodTiles(
-            name: "Fried Egg",
-            imageUrl: "ic_popular_food_1",
-            rating: '4.9',
-            numberOfRating: '200',
-            price: '15.06',
-            slug: "fried_egg"),
-        PopularFoodTiles(
-            name: "Mixed Vegetable",
-            imageUrl: "ic_popular_food_3",
-            rating: "4.9",
-            numberOfRating: "100",
-            price: "17.03",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Salad With Chicken",
-            imageUrl: "ic_popular_food_4",
-            rating: "4.0",
-            numberOfRating: "50",
-            price: "11.00",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Mixed Salad",
-            imageUrl: "ic_popular_food_5",
-            rating: "4.00",
-            numberOfRating: "100",
-            price: "11.10",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Red meat,Salad",
-            imageUrl: "ic_popular_food_2",
-            rating: "4.6",
-            numberOfRating: "150",
-            price: "12.00",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Mixed Salad",
-            imageUrl: "ic_popular_food_5",
-            rating: "4.00",
-            numberOfRating: "100",
-            price: "11.10",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Potato,Meat fry",
-            imageUrl: "ic_popular_food_6",
-            rating: "4.2",
-            numberOfRating: "70",
-            price: "23.0",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Fried Egg",
-            imageUrl: "ic_popular_food_1",
-            rating: '4.9',
-            numberOfRating: '200',
-            price: '15.06',
-            slug: "fried_egg"),
-        PopularFoodTiles(
-            name: "Red meat,Salad",
-            imageUrl: "ic_popular_food_2",
-            rating: "4.6",
-            numberOfRating: "150",
-            price: "12.00",
-            slug: ""),
+        ItemCard(
+            title: "Lot for sale",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: '150000000.00',
+            numberOflikes: '9',
+            numberOfdislikes: '1',
+            numberOfComment: '13',
+            location: "Talisay City, Cebu"),
+        ItemCard(
+            title: "Yuta data data",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "6500.00",
+            numberOflikes: "4",
+            numberOfdislikes: "0",
+            numberOfComment: '5',
+            location: "Lapu-Lapu City, Cebu"),
+        ItemCard(
+            title: "For assume Casa mira south",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "500000.00",
+            numberOflikes: "4",
+            numberOfdislikes: "0",
+            numberOfComment: '5',
+            location: "Naga City, Cebu"),
+        ItemCard(
+            title: "Lot for rent per SQM",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "50.00",
+            numberOflikes: "6",
+            numberOfdislikes: "1",
+            numberOfComment: '5',
+            location: "Lapu-Lapu City, Cebu"),
+        ItemCard(
+            title: "House and lot for assume",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "300000.00",
+            numberOflikes: "2",
+            numberOfdislikes: "2",
+            numberOfComment: '3',
+            location: "Lapu-Lapu City, Cebu"),
+        ItemCard(
+            title: "Baratu nga yuta data-data",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "3500.00",
+            numberOflikes: "1",
+            numberOfdislikes: "0",
+            numberOfComment: '2',
+            location: "Balamban, Cebu"),
+        ItemCard(
+            title: "House for Rent",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "12000.00",
+            numberOflikes: "12",
+            numberOfdislikes: "1",
+            numberOfComment: '15',
+            location: "Cebu City, Cebu"),
+        ItemCard(
+            title: "Condo dool sa ayala center",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "3000000.00",
+            numberOflikes: "0",
+            numberOfdislikes: "0",
+            numberOfComment: '0',
+            location: "Cebu City, Cebu"),
+        ItemCard(
+            title: "House and lot",
+            imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
+            price: "2500000.00",
+            numberOflikes: "8",
+            numberOfdislikes: "0",
+            numberOfComment: '10',
+            location: "Lapu-Lapu City, Cebu"),
       ],
     );
   }

@@ -10,7 +10,7 @@ import 'package:flutter_app/service/Auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'model/UserObj.dart';
+import 'model/UserModel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
   MyApp({this.prefs});
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<UserBase>.value(
+    return StreamProvider<UserBaseModel>.value(
       value: AuthService().user,
       initialData: null,
       child: MaterialApp(

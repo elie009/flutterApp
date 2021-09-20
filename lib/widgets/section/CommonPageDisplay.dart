@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/home/BodyContent.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class BestFoodWidget extends StatefulWidget {
-  final SharedPreferences prefs;
-  BestFoodWidget({this.prefs});
+class CommonPageDisplay extends StatefulWidget {
+  final dynamic body;
+  CommonPageDisplay({this.body});
   @override
-  _BestFoodWidgetState createState() => _BestFoodWidgetState();
+  _CommonPageDisplayState createState() => _CommonPageDisplayState();
 }
 
-class _BestFoodWidgetState extends State<BestFoodWidget> {
+class _CommonPageDisplayState extends State<CommonPageDisplay> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +17,7 @@ class _BestFoodWidgetState extends State<BestFoodWidget> {
       child: Column(
         children: <Widget>[
           Expanded(
-            child: BodyContent(),
+            child: widget.body,
           )
         ],
       ),

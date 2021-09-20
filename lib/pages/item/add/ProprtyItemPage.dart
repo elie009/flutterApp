@@ -7,23 +7,22 @@ import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/SingleItemChecker.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyLotObj.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
-import 'package:flutter_app/model/UserObj.dart';
+import 'package:flutter_app/model/PropertyLotModel.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/add/InputPage.dart';
-import 'package:flutter_app/pages/item/add/component/AlertBox.dart';
+import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
-import 'package:flutter_app/widgets/topMenu/TopMenus.dart';
 import 'package:provider/provider.dart';
 
-import 'component/CheckBox.dart';
-import 'component/Dropdown.dart';
-import 'component/RadioBtn.dart';
+import '../../../widgets/components/CheckBox.dart';
+import '../../../widgets/components/Dropdown.dart';
+import '../../../widgets/components/RadioBtn.dart';
 
 class PropertyItemPage extends StatefulWidget {
-  Property props;
+  PropertyModel props;
   PropertyItemPage({this.props});
   @override
   _PropertyItemPageState createState() => _PropertyItemPageState();
@@ -33,7 +32,10 @@ class _PropertyItemPageState extends State<PropertyItemPage> {
   String _selectedLocation;
   bool _rental = false, _sale = false, _exchange = false;
   TextEditingController title;
-  var propItem = new PropertyLot(
+  var propItem = new PropertyLotModel(
+      0,
+      0,
+      0,
       '',
       '',
       '',
@@ -57,7 +59,7 @@ class _PropertyItemPageState extends State<PropertyItemPage> {
   String billValue;
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBase>(context);
+    final user = Provider.of<UserBaseModel>(context);
 
     return Container(
       child: Scaffold(

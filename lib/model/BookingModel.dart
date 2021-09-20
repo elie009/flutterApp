@@ -1,4 +1,4 @@
-class Booking {
+class BookingModel {
   String fromYear;
   String fromMonth;
   String fromDay;
@@ -10,7 +10,7 @@ class Booking {
   String userId;
   String bookingStatus;
 
-  Booking(
+  BookingModel(
     String fromYear,
     String fromMonth,
     String fromDay,

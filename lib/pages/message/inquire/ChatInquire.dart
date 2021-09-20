@@ -5,8 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/model/ContactModel.dart';
-import 'package:flutter_app/model/ChatHandlerObj.dart';
-import 'package:flutter_app/model/ChatMessageObj.dart';
+import 'package:flutter_app/model/ChatModel.dart';
 import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
@@ -18,7 +17,7 @@ import '../inbox/GallaryHandler.dart';
 
 class ChatPage extends StatefulWidget {
   final SharedPreferences prefs;
-  final ChatHandler chatObj;
+  final ChatModel chatObj;
 
   ChatPage({
     this.prefs,

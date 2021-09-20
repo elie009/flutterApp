@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
-import 'package:flutter_app/widgets/SearchWidget.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/pages/search/BodyContainer.dart';
+import 'package:flutter_app/service/Auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'CardItem.dart';
 
 class SearchDisplayPage extends StatefulWidget {
   String menuId;
@@ -24,59 +24,37 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
   @override
   Widget build(BuildContext context) {
     String propId = widget.menuId;
-    print('>>>>> ' + propId);
+    final AuthService _auth = AuthService();
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xFFFAFAFA),
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Color(0xFF3a3737),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Center(
-            child: Text(
-              "Item Carts",
-              style: TextStyle(
-                  color: Color(0xFF3a3737),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          brightness: Brightness.light,
-        ),
-        body: StreamProvider<List<Property>>.value(
-          value: DatabaseService().propery(propId),
-          initialData: [],
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                SearchWidget(),
-                Container(
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(
-                        height: 10,
-                      ),
-                      PropertyCard(prefs: widget.prefs),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                ),
+      body: StreamProvider<List<PropertyModel>>.value(
+        value: DatabaseService().properyByMenuId('1001'),
+        initialData: null,
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Color(0xFFFAFAFA),
+              elevation: 0,
+              title: Text(
+                "What would you like to eat?",
+                style: TextStyle(
+                    color: Color(0xFF3a3737),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500),
+              ),
+              brightness: Brightness.light,
+              actions: <Widget>[
+                IconButton(
+                    icon: Icon(
+                      Icons.notifications_none,
+                      color: Color(0xFF3a3737),
+                    ),
+                    onPressed: () async {
+                      await _auth.signOut();
+                    })
               ],
             ),
-          ),
-        ));
+            body: BodyContainer()),
+      ),
+    );
   }
 }

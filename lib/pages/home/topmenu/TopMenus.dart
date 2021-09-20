@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TopMenus extends StatefulWidget {
-  final SharedPreferences prefs;
-  TopMenus({this.prefs});
   @override
   _TopMenusState createState() => _TopMenusState();
 }
@@ -25,10 +24,10 @@ class _TopMenusState extends State<TopMenus> {
             if (items != null)
               for (var i in items)
                 TopMenuTiles(
-                    name: i.name,
-                    imageUrl: "ic_burger",
-                    slug: "",
-                    prefs: widget.prefs)
+                  name: i.name,
+                  imageUrl: "ic_burger",
+                  slug: "",
+                )
           ],
         ));
   }
@@ -38,31 +37,23 @@ class TopMenuTiles extends StatelessWidget {
   String name = 'Burger';
   String imageUrl = 'ic_burger';
   String slug = '';
-  SharedPreferences prefs;
 
   // final ItemModel items;
   // TopMenuTiles({this.items});
 
-  TopMenuTiles(
-      {Key key,
-      @required this.name,
-      @required this.imageUrl,
-      @required this.slug,
-      @required this.prefs})
-      : super(key: key);
+  TopMenuTiles({
+    Key key,
+    @required this.name,
+    @required this.imageUrl,
+    @required this.slug,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         print('this top menu item');
-        Navigator.push(
-            context,
-            ScaleRoute(
-                page: SearchDisplayPage(
-              menuId: '001',
-              prefs: prefs,
-            )));
+        Navigator.push(context, ScaleRoute(page: BodyContainer()));
       },
       child: Column(
         children: <Widget>[

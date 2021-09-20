@@ -50,7 +50,6 @@ class DropDownComponent extends StatelessWidget {
                     value: value,
                     isDense: true,
                     onChanged: (valueSelectedByUser) {
-                      print('ooooooo');
                       onChanged(valueSelectedByUser);
 
                       //_onShopDropItemSelected(valueSelectedByUser);

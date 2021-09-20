@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/SingleItemChecker.dart';
-import 'package:flutter_app/model/BookingObj.dart';
+import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/service/CheckBookingDate.dart';
 import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/Formatter.dart';
@@ -17,12 +17,12 @@ class BookedDates extends StatefulWidget {
 }
 
 class _BookedDatesState extends State<BookedDates> {
-  List<Booking> listitems;
+  List<BookingModel> listitems;
   String _selectedDate = '';
   String _dateCount = '';
   String _range = '';
   String _rangeCount = '';
-  Booking endbook = null;
+  BookingModel endbook = null;
   String isSelected = null;
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     setState(() {
@@ -46,7 +46,7 @@ class _BookedDatesState extends State<BookedDates> {
       String year = DateFormat('y').format(args.value).toString();
       String month = DateFormat('MM').format(args.value).toString();
       String day = DateFormat('dd').format(args.value).toString();
-      Booking book = new Booking(
+      BookingModel book = new BookingModel(
           year,
           month,
           day,
@@ -67,7 +67,7 @@ class _BookedDatesState extends State<BookedDates> {
 
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<Booking>>(context);
+    final items = Provider.of<List<BookingModel>>(context);
     listitems = items;
     return Stack(
       children: <Widget>[

@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/ChatHandlerObj.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
-import 'package:flutter_app/model/UserObj.dart';
+import 'package:flutter_app/model/ChatModel.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/item/CarouselSlider.dart';
@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ItemDetailsPage extends StatefulWidget {
-  Property props;
+  PropertyModel props;
   final SharedPreferences prefs;
   ItemDetailsPage({Key key, @required this.props, this.prefs})
       : super(key: key);
@@ -30,9 +30,9 @@ class ItemDetailsPage extends StatefulWidget {
 class _ItemDetailsPageState extends State<ItemDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBase>(context);
+    final user = Provider.of<UserBaseModel>(context);
 
-    Property props = widget.props;
+    PropertyModel props = widget.props;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -188,7 +188,7 @@ class BottomMenu extends StatelessWidget {
   BottomMenu({this.prefs, this.ownerUid, this.propsId});
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBase>(context);
+    final user = Provider.of<UserBaseModel>(context);
 
     return Container(
       width: double.infinity,
@@ -281,10 +281,10 @@ class BottomMenu extends StatelessWidget {
 
 Map<String, dynamic> _chatData;
 Map<String, dynamic> _userContact;
-ChatHandler chatObj;
+ChatModel chatObj;
 CollectionReference chatReference;
 
-Future startAsyncInit(UserBase user, String ownerUid, String propsId,
+Future startAsyncInit(UserBaseModel user, String ownerUid, String propsId,
     BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -295,7 +295,7 @@ Future startAsyncInit(UserBase user, String ownerUid, String propsId,
 
   //wala pani na gamit
   DatabaseService().userCollection.doc(ownerUid).get().then((value) {
-    new UserBase(
+    new UserBaseModel(
       value.get('uid'),
       value.get('firstName'),
       value.get('image'),
@@ -325,10 +325,10 @@ Future startAsyncInit(UserBase user, String ownerUid, String propsId,
     DatabaseService()
         .addChat(user.uid, ownerUid, propsId)
         .then((documentReference) {
-      chatObj = new ChatHandler(documentReference.id);
+      chatObj = new ChatModel(documentReference.id);
     }).catchError((e) {});
   } else {
-    chatObj = new ChatHandler(_chatData['chatId']);
+    chatObj = new ChatModel(_chatData['chatId']);
   }
 
   chatReference = DatabaseService()

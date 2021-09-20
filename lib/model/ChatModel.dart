@@ -1,7 +1,7 @@
-class ChatHandler {
+class ChatModel {
   String chatId;
 
-  ChatHandler(String chatId) {
+  ChatModel(String chatId) {
     this.chatId = chatId;
   }
 

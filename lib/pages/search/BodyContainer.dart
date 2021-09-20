@@ -1,16 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/pages/home/BodyContent.dart';
-import 'package:flutter_app/pages/home/topmenu/TopMenus.dart';
-import 'package:flutter_app/widgets/BestFoodWidget.dart';
-import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/pages/search/BodyContent.dart';
 import 'package:flutter_app/widgets/SearchWidget.dart';
 import 'package:flutter_app/widgets/section/CommonPageDisplay.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class BodyContainer extends StatefulWidget {
-  final SharedPreferences prefs;
-  BodyContainer({Key key, this.prefs}) : super(key: key);
   @override
   State<StatefulWidget> createState() => _BodyContainer();
 }
@@ -21,7 +17,6 @@ class _BodyContainer extends State<BodyContainer> {
     return Container(
       child: Column(children: [
         SearchWidget(),
-        TopMenus(),
         Expanded(
             child: Container(
           height: 400,

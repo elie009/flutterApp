@@ -1,4 +1,4 @@
-class UserBase {
+class UserBaseModel {
   String uid;
   String email;
   String firstName;
@@ -7,7 +7,7 @@ class UserBase {
   String status;
   String image;
 
-  UserBase.auth(
+  UserBaseModel.auth(
       {this.uid,
       this.firstName,
       this.image,
@@ -16,7 +16,7 @@ class UserBase {
       this.status,
       this.email});
 
-  UserBase(String uid, String firstName, String image, String lastName,
+  UserBaseModel(String uid, String firstName, String image, String lastName,
       String phoneNumber, String status, String email) {
     this.uid = uid;
     this.firstName = firstName;

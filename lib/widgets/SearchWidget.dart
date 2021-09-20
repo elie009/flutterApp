@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'components/ModalBox.dart';
+
 class SearchWidget extends StatelessWidget {
-  final SharedPreferences prefs;
-  SearchWidget({this.prefs});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,9 +24,17 @@ class SearchWidget extends StatelessWidget {
             color: Color(0xFFfb3132),
           ),
           fillColor: Color(0xFFFAFAFA),
-          suffixIcon: Icon(
-            Icons.sort,
+          suffixIcon: IconButton(
+            icon: Icon(Icons.sort),
             color: Color(0xFFfb3132),
+            onPressed: () {
+              ModalBox();
+              showModalBottomSheet<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalBox();
+                  });
+            },
           ),
           hintStyle: new TextStyle(color: Color(0xFFd0cece), fontSize: 18),
           hintText: "What would your like to buy?",

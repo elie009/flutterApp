@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/UserObj.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/authentication/SignInPage.dart';
 import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
@@ -12,7 +12,7 @@ class Wrapper extends StatelessWidget {
   Wrapper({this.prefs});
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBase>(context);
+    final user = Provider.of<UserBaseModel>(context);
     if (user == null) {
       return SignInPage(prefs: prefs);
     } else {

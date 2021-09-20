@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/BookingObj.dart';
-import 'package:flutter_app/model/PropertyLotObj.dart';
-import 'package:flutter_app/model/PropertyObj.dart';
-import 'package:flutter_app/model/UserObj.dart';
+import 'package:flutter_app/model/PropertyLotModel.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class DatabaseService {
@@ -37,8 +37,11 @@ class DatabaseService {
   final CollectionReference mobileCollection =
       FirebaseFirestore.instance.collection('mobiles');
 
-  Future updateProperyData(Property data) async {
+  Future updateProperyData(PropertyModel data) async {
     return await propertyCollection.doc(data.propid).set({
+      'numComments': data.numComments == null ? 0 : data.numComments,
+      'numLikes': data.numLikes == null ? 0 : data.numLikes,
+      'numDisLikes': data.numDisLike == null ? 0 : data.numDisLike,
       'propid': data.propid,
       'title': data.title,
       'description': data.description,
@@ -51,7 +54,7 @@ class DatabaseService {
     });
   }
 
-  Future updateBookingData(Booking data) async {
+  Future updateBookingData(BookingModel data) async {
     return await bookingCollection.doc(data.bookId).set({
       'fromYear': data.fromYear,
       'fromMonth': data.fromMonth,
@@ -78,7 +81,7 @@ class DatabaseService {
     });
   }
 
-  Future updateUserData(UserBase usrobj) async {
+  Future updateUserData(UserBaseModel usrobj) async {
     return await userCollection.doc(usrobj.uid).set({
       'uid': usrobj.uid,
       'email': usrobj.email,
@@ -90,7 +93,7 @@ class DatabaseService {
     });
   }
 
-  Future updatePropertyLot(PropertyLot data) async {
+  Future updatePropertyLot(PropertyLotModel data) async {
     await properyLottCollection.doc(data.propid).set({
       'propid': data.propid,
       'lotSize': data.lotSize,
@@ -107,10 +110,10 @@ class DatabaseService {
   }
 
   //get item list from snapshot
-  List<UserBase> _userListFromSnapshot(QuerySnapshot snapshot) {
+  List<UserBaseModel> _userListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return UserBase(
+        return UserBaseModel(
           doc.get('uid') ?? '',
           doc.get('email') ?? '',
           doc.get('firstName') ?? '',
@@ -178,10 +181,13 @@ class DatabaseService {
   }
 
 //get item list from snapshot
-  List<Property> _propertyListFromSnapshot(QuerySnapshot snapshot) {
+  List<PropertyModel> _propertyListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return Property(
+        return PropertyModel(
+          doc.get('numComments') ?? 0,
+          doc.get('numLikes') ?? 0,
+          doc.get('numDisLikes') ?? 0,
           doc.get('propid') ?? '',
           doc.get('title') ?? '',
           doc.get('description') ?? '',
@@ -200,10 +206,10 @@ class DatabaseService {
   }
 
   //get item booking from snapshot
-  List<Booking> _bookingListFromSnapshot(QuerySnapshot snapshot) {
+  List<BookingModel> _bookingListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return Booking(
+        return BookingModel(
           doc.get('fromYear') ?? '',
           doc.get('fromMonth') ?? '',
           doc.get('fromDay') ?? '',
@@ -262,7 +268,7 @@ class DatabaseService {
   }
 
   // get all property item on stream
-  Stream<List<Property>> propery(String menuId) {
+  Stream<List<PropertyModel>> properyByMenuId(String menuId) {
     return propertyCollection
         .where('menuid', isEqualTo: menuId)
         .snapshots()
@@ -271,8 +277,18 @@ class DatabaseService {
     //return propertCollection.snapshots().map(_propertyListFromSnapshot);
   }
 
+  // get all property item on stream
+  Stream<List<PropertyModel>> properyByOwnerId(String ownerId) {
+    return propertyCollection
+        .where('ownerUid', isEqualTo: ownerId)
+        .snapshots()
+        .map(_propertyListFromSnapshot);
+
+    //return propertCollection.snapshots().map(_propertyListFromSnapshot);
+  }
+
 // get all booking item on stream
-  Stream<List<Booking>> booking(String propsid) {
+  Stream<List<BookingModel>> booking(String propsid) {
     return bookingCollection
         .where('propsId', isEqualTo: propsid)
         .where('bookingStatus', whereIn: ['BREAK', 'APPROVE'])

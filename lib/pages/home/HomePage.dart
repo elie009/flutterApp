@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('HomePage');
     return Scaffold(
       body: StreamProvider<List<MenuModel>>.value(
         value: DatabaseService().getStreamMenu,

@@ -4,13 +4,13 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/UserObj.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:image_picker/image_picker.dart';
 
 File imageFile;
 
 class ImagePickerWidget extends StatefulWidget {
-  UserBase usrobj;
+  UserBaseModel usrobj;
   ImagePickerWidget({this.usrobj});
   @override
   _ImagePickerWidgetState createState() => _ImagePickerWidgetState();

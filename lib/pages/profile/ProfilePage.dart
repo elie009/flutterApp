@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/UserObj.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/add/ProprtyItemPage.dart';
 import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/ImagePicker.dart';
 import 'package:flutter_app/database/temp/DemoDataBase.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../FoodOrderPage.dart';
@@ -67,20 +69,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 width: 150.0,
                                 height: 150.0,
                                 decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: new NetworkImage(
-                                        profileSnapshot.get('image')),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(80.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      blurRadius: 5.0,
-                                      color: Colors.black,
-                                      offset: Offset(5.0, 6.0),
+                                    image: DecorationImage(
+                                      image: new NetworkImage(
+                                          profileSnapshot.get('image')),
+                                      fit: BoxFit.cover,
                                     ),
-                                  ],
-                                ),
+                                    borderRadius: BorderRadius.circular(80.0),
+                                    border: Border.all(
+                                        width: 3, color: whiteColor)),
                               )
                             : Container())
                         : Container()),
@@ -100,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         context: context,
                                         builder: ((builder) =>
                                             ImagePickerWidget(
-                                              usrobj: UserBase(
+                                              usrobj: UserBaseModel(
                                                 profileSnapshot.get('uid'),
                                                 profileSnapshot
                                                     .get('firstName'),
@@ -145,7 +141,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         size: 18.0,
                         color: whiteColor,
                       ),
-                      onTap: () {},
+                      onTap: () {
+                        _data.execute();
+                      },
                     ),
                   ],
                 ),
@@ -301,11 +299,11 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 Container(
                   color: whiteColor,
-                  child: DetailContentMenu(),
+                  child: Carry(),
                 ),
                 Container(
                   color: whiteColor,
-                  child: PostConten(),
+                  child: Inventory(),
                 ), // class name
               ],
             ),
@@ -314,47 +312,47 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 20.0,
             color: Colors.black,
           ),
-          Container(
-            color: Colors.lightGreen,
-            width: MediaQuery.of(context).size.width,
-            height: 130.0,
-            child: Card(
-              // color: Colors.amber,
-              margin: EdgeInsets.symmetric(horizontal: 10.0),
-              elevation: 5.0,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () {
-                        _data.execute();
-                      },
-                      child: Text(
-                        "Abouts",
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.lightBlue,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 7.0,
-                    ),
-                    Text(
-                      "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   color: Colors.lightGreen,
+          //   width: MediaQuery.of(context).size.width,
+          //   height: 130.0,
+          //   child: Card(
+          //     // color: Colors.amber,
+          //     margin: EdgeInsets.symmetric(horizontal: 10.0),
+          //     elevation: 5.0,
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(20.0),
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: <Widget>[
+          //           InkWell(
+          //             onTap: () {
+          //               _data.execute();
+          //             },
+          //             child: Text(
+          //               "Abouts",
+          //               style: TextStyle(
+          //                 fontSize: 20.0,
+          //                 fontWeight: FontWeight.bold,
+          //                 color: Colors.lightBlue,
+          //               ),
+          //             ),
+          //           ),
+          //           SizedBox(
+          //             height: 7.0,
+          //           ),
+          //           Text(
+          //             "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
+          //             style: TextStyle(
+          //               fontSize: 16.0,
+          //               color: Colors.grey,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -402,7 +400,7 @@ class GetClipper extends CustomClipper<Path> {
   }
 }
 
-class PostConten extends StatelessWidget {
+class Carry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -450,7 +448,7 @@ class PostConten extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.only(left: 20),
                             alignment: Alignment.centerRight,
-                            child: AddToCartMenu(),
+                            child: InventoryOption(),
                           )
                         ],
                       )
@@ -464,7 +462,7 @@ class PostConten extends StatelessWidget {
   }
 }
 
-class AddToCartMenu extends StatelessWidget {
+class InventoryOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -496,99 +494,85 @@ class AddToCartMenu extends StatelessWidget {
   }
 }
 
-class DetailContentMenu extends StatelessWidget {
+class Inventory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserBaseModel>(context);
+
+    return Center(
+      child: StreamProvider<List<PropertyModel>>.value(
+        value: DatabaseService().properyByOwnerId(user.uid),
+        initialData: [],
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              CardProperty(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CardProperty extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final items = Provider.of<List<PropertyModel>>(context);
     return Column(
-      children: [
+      children: <Widget>[
         SizedBox(
-          height: 7.0,
-        ),
-        Positioned(
-          width: MediaQuery.of(context).size.width,
-          top: MediaQuery.of(context).size.height / 6.0,
-          // left: 76.0,
-          child: CartItem(
-              productName: textlimiter("sample text only need for it"),
-              productPrice: "\$96.00",
-              productImage: "ic_popular_food_1",
-              productCartQuantity: "2"),
+          height: 7,
         ),
         Container(
-          color: Colors.lightGreen,
+          width: double.infinity,
+          height: 85,
+          decoration: BoxDecoration(boxShadow: [
+            BoxShadow(
+              color: Color(0xFFADAD).withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 1,
+              offset: Offset(0, 1),
+            ),
+          ]),
           child: Card(
-            // color: Colors.amber,
-            margin: EdgeInsets.symmetric(horizontal: 10.0),
-            elevation: 5.0,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "Abouts",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.lightBlue,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 7.0,
-                  ),
-                  Text(
-                    "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+            color: whiteColor,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(5.0),
               ),
+            ),
+            child: Container(
+              margin: EdgeInsets.only(left: 20),
+              alignment: Alignment.centerRight,
+              child: InventoryOption(),
             ),
           ),
         ),
-        Container(
-          color: Colors.lightGreen,
-          width: MediaQuery.of(context).size.width,
-          child: Card(
-            // color: Colors.amber,
-            margin: EdgeInsets.symmetric(horizontal: 10.0),
-            elevation: 5.0,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "Abouts",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.lightBlue,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 7.0,
-                  ),
-                  Text(
-                    "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+        for (PropertyModel i in items)
+          Container(
+            decoration: BoxDecoration(boxShadow: [
+              BoxShadow(
+                color: Color(0xFFADAD).withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 1,
+                offset: Offset(0, 1),
+              ),
+            ]),
+            child: Card(
+              child: Positioned(
+                width: MediaQuery.of(context).size.width,
+                top: MediaQuery.of(context).size.height / 6.0,
+                // left: 76.0,
+                child: CartItem(
+                    productName: textlimiter(i.title),
+                    productPrice: "\$96.00",
+                    productImage: "ic_popular_food_1",
+                    productCartQuantity: "2"),
               ),
             ),
           ),
-        ),
       ],
     );
   }
