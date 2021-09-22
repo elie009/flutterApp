@@ -1,9 +1,10 @@
+import 'package:flutter_app/utils/StaticString.dart';
 import 'package:intl/intl.dart';
 
 final oCcy = new NumberFormat("#,##0.00", "en_US");
 
-String formatCurency(double numbers) {
-  return oCcy.format(numbers);
+String formatCurency(dynamic numbers) {
+  return currency + oCcy.format(numbers);
 }
 
 double toDouble(dynamic number) {

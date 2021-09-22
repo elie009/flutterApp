@@ -7,7 +7,7 @@ import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/authentication/SignUpPage.dart';
 import 'package:flutter_app/service/Auth.dart';
-import 'package:flutter_app/widgets/Loading.dart';
+import 'package:flutter_app/widgets/section/LoadingLoginPart.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

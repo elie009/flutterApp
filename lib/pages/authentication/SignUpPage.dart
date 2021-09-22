@@ -3,7 +3,7 @@ import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/authentication/SignInPage.dart';
 import 'package:flutter_app/service/Auth.dart';
-import 'package:flutter_app/widgets/Loading.dart';
+import 'package:flutter_app/widgets/section/LoadingLoginPart.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignUpPage extends StatefulWidget {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'components/ModalBox.dart';
+import '../components/ModalBox.dart';
 
 class SearchWidget extends StatelessWidget {
   @override
@@ -14,19 +15,19 @@ class SearchWidget extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
             borderSide: BorderSide(
               width: 0,
-              color: Color(0xFFfb3132),
+              color: primaryColor,
               style: BorderStyle.none,
             ),
           ),
           filled: true,
           prefixIcon: Icon(
             Icons.search,
-            color: Color(0xFFfb3132),
+            color: primaryColor,
           ),
           fillColor: Color(0xFFFAFAFA),
           suffixIcon: IconButton(
             icon: Icon(Icons.sort),
-            color: Color(0xFFfb3132),
+            color: primaryColor,
             onPressed: () {
               ModalBox();
               showModalBottomSheet<void>(

@@ -9,7 +9,9 @@ class BodyContent extends StatelessWidget {
     return ListView(
       children: <Widget>[
         PopularFoodsWidget(prefs: null),
-        LabelTitle(title: 'sample title'),
+        LabelTitle(
+          title: 'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww',
+        ),
         LargeItemCard(
             name: "Fried Egg",
             imageUrl: "ic_best_food_8",

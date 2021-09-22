@@ -32,8 +32,9 @@ class PropertyLotModel extends PropertyModel {
     String saleContainPaper,
     String tradableItems,
     String status,
+    String postdate,
   ) : super(numComments, numLike, numDisLike, propid, title, description,
-            imageName, fixPrice, location, menuid, ownerUid, status) {
+            imageName, fixPrice, location, menuid, ownerUid, status, postdate) {
     this.lotSize = lotSize;
     this.perSqm = perSqm;
     this.nearby = nearby;

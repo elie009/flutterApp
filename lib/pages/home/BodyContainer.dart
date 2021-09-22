@@ -4,7 +4,7 @@ import 'package:flutter_app/pages/home/BodyContent.dart';
 import 'package:flutter_app/pages/home/topmenu/TopMenus.dart';
 import 'package:flutter_app/widgets/BestFoodWidget.dart';
 import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
-import 'package:flutter_app/widgets/SearchWidget.dart';
+import 'package:flutter_app/widgets/section/SearchWidget.dart';
 import 'package:flutter_app/widgets/section/CommonPageDisplay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

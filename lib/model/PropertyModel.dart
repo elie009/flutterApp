@@ -11,6 +11,7 @@ class PropertyModel {
   String location; //MD001PLT001011
   String description; //MD001PLT001012
   double fixPrice; //MD001PLT001013
+  String postdate;
 
   PropertyModel.instance(PropertyModel i) {
     this.numComments = i.numComments;
@@ -25,6 +26,7 @@ class PropertyModel {
     this.menuid = i.menuid;
     this.ownerUid = i.ownerUid;
     this.status = i.status;
+    this.postdate = i.postdate;
   }
 
   PropertyModel(
@@ -39,7 +41,8 @@ class PropertyModel {
       String location,
       String menuid,
       String ownerUid,
-      String status) {
+      String status,
+      String postdate) {
     this.numComments = numComments;
     this.numLikes = numLike;
     this.numDisLike = numDisLike;
@@ -52,6 +55,7 @@ class PropertyModel {
     this.menuid = menuid;
     this.ownerUid = ownerUid;
     this.status = status;
+    this.postdate = postdate;
   }
 
   List<String> checkPropertySave() {

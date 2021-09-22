@@ -11,6 +11,7 @@ import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/add/InputPage.dart';
+import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:flutter_app/utils/Utils.dart';
@@ -52,7 +53,8 @@ class _PropertyItemPageState extends State<PropertyItemPage> {
       '',
       '',
       '',
-      '');
+      '',
+      getDateNowMilliSecondStr);
   var inputText = TextEditingController();
   var color = ColorField();
 

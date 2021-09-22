@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/authentication/SignInPage.dart';
-import 'package:flutter_app/widgets/BottomNavBarWidget.dart';
+import 'package:flutter_app/widgets/section/BottomNavBarWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -1,39 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
+import 'package:flutter_app/pages/item/ItemDisplay.dart';
+import 'package:flutter_app/pages/item/Sample.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Utils.dart';
-import 'package:flutter_app/widgets/components/TextLabel.dart';
+import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class ItemCard extends StatelessWidget {
-  const ItemCard(
-      {Key key,
-      @required this.title,
-      @required this.imageUrl,
-      @required this.price,
-      @required this.numberOflikes,
-      @required this.numberOfdislikes,
-      @required this.numberOfComment,
-      @required this.location,
-      this.inputheight})
+  const ItemCard({Key key, @required this.props, this.inputheight})
       : super(key: key);
 
-  final String title;
-  final String imageUrl;
-  final String price;
-  final String numberOfComment;
-  final String numberOflikes;
-  final String numberOfdislikes;
-  final String location;
   final double inputheight;
+
+  final PropertyModel props;
 
   @override
   Widget build(BuildContext context) {
-    print(inputheight);
     return InkWell(
       onTap: () {
-        Navigator.push(context, ScaleRoute(page: FoodDetailsPage()));
+        Navigator.push(
+            context, ScaleRoute(page: ItemDetailsPage(props: props)));
       },
       child: Column(
         children: <Widget>[
@@ -91,7 +80,7 @@ class ItemCard extends StatelessWidget {
                               // 'assets/images/popular_foods/' +
                               //     imageUrl +
                               //     ".png",
-                              imageUrl,
+                              props.imageName,
                             )),
                           )
                         ],
@@ -99,35 +88,51 @@ class ItemCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Container(
-                              alignment: Alignment.bottomLeft,
-                              padding: EdgeInsets.only(left: 5, top: 5),
-                              child: TextLabel(
-                                  text: title,
-                                  style: TextStyle(
-                                      color: Color(0xFF6e6e71),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold))),
-                          Container(
-                            alignment: Alignment.topRight,
-                            padding: EdgeInsets.only(right: 5),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  ScaleRoute(
+                                      page: ItemDetailsPage(props: props)));
+                            },
                             child: Container(
-                              height: 28,
-                              width: 28,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white70,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xFFfae3e2),
-                                      blurRadius: 25.0,
-                                      offset: Offset(0.0, 0.75),
-                                    ),
-                                  ]),
-                              child: Icon(
-                                Icons.flag_outlined,
-                                color: Color(0xFFfb3132),
-                                size: 20,
+                                alignment: Alignment.bottomLeft,
+                                padding: EdgeInsets.only(left: 5, top: 5),
+                                child: TextLabelFade(
+                                    text: props.title,
+                                    style: TextStyle(
+                                        color: Color(0xFF6e6e71),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold))),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  ScaleRoute(
+                                      page: ItemViewDetails(props: props)));
+                            },
+                            child: Container(
+                              alignment: Alignment.topRight,
+                              padding: EdgeInsets.only(right: 5),
+                              child: Container(
+                                height: 28,
+                                width: 28,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white70,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xFFfae3e2),
+                                        blurRadius: 25.0,
+                                        offset: Offset(0.0, 0.75),
+                                      ),
+                                    ]),
+                                child: Icon(
+                                  Icons.flag_outlined,
+                                  color: Color(0xFFfb3132),
+                                  size: 20,
+                                ),
                               ),
                             ),
                           ),
@@ -136,27 +141,43 @@ class ItemCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Container(
-                              alignment: Alignment.bottomLeft,
-                              padding:
-                                  EdgeInsets.only(left: 5, top: 0, right: 0),
-                              child: TextLabel(
-                                  text: '\P ' + formatCurency(toDouble(price)),
-                                  style: TextStyle(
-                                      color: Color(0xFF6e6e71),
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold)))
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  ScaleRoute(
+                                      page: ItemDetailsPage(props: props)));
+                            },
+                            child: Container(
+                                alignment: Alignment.bottomLeft,
+                                padding:
+                                    EdgeInsets.only(left: 5, top: 0, right: 0),
+                                child: TextLabelFade(
+                                    text: '\P ' +
+                                        formatCurency(toDouble(
+                                            props.fixPrice.toString())),
+                                    style: TextStyle(
+                                        color: Color(0xFF6e6e71),
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold))),
+                          )
                         ],
                       ),
-                      Container(
-                        alignment: Alignment.bottomLeft,
-                        padding: EdgeInsets.only(left: 5, top: 5, right: 5),
-                        child: TextLabel(
-                            text: location,
-                            style: TextStyle(
-                                color: Color(0xFF6e6e71),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800)),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(context,
+                              ScaleRoute(page: ItemDetailsPage(props: props)));
+                        },
+                        child: Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.only(left: 5, top: 5, right: 5),
+                          child: TextLabelFade(
+                              text: props.location,
+                              style: TextStyle(
+                                  color: Color(0xFF6e6e71),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800)),
+                        ),
                       ),
                       SizedBox(
                         height: 10,
@@ -179,7 +200,7 @@ class ItemCard extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                    text: numberOfComment,
+                                    text: props.numComments.toString(),
                                     style: TextStyle(
                                         color: primaryColor,
                                         fontSize: 12,
@@ -202,7 +223,7 @@ class ItemCard extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                    text: numberOflikes,
+                                    text: props.numLikes.toString(),
                                     style: TextStyle(
                                         color: primaryColor,
                                         fontSize: 12,
@@ -218,14 +239,14 @@ class ItemCard extends StatelessWidget {
                                   child: Container(
                                     padding: EdgeInsets.only(right: 3.0),
                                     child: Icon(
-                                      Icons.thumb_down_outlined,
+                                      Icons.remove_red_eye_outlined,
                                       size: 14,
                                       color: primaryColor,
                                     ),
                                   ),
                                 ),
                                 TextSpan(
-                                    text: numberOfdislikes,
+                                    text: props.numDisLike.toString(),
                                     style: TextStyle(
                                         color: primaryColor,
                                         fontSize: 12,

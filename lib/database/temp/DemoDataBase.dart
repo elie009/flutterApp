@@ -56,7 +56,7 @@ class PrepareData {
           500000,
           'Cebu City, Cebu',
           '1001',
-          'b7xWeMKk2tYKrHe2sm9zdcWZ0qv1',
+          'nwpxhS8cqDgYw8QtcKKYuQogMf92',
           0.00,
           0.00,
           '',

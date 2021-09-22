@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PropertyCard extends StatefulWidget {
-  
   @override
   _PropertyCardState createState() => _PropertyCardState();
 }
@@ -40,8 +39,8 @@ class Cards extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context,
-            ScaleRoute(page: ItemDetailsPage(props: props, prefs: prefs)));
+        Navigator.push(
+            context, ScaleRoute(page: ItemDetailsPage(props: props)));
         print('this is card item');
       },
       child: Container(

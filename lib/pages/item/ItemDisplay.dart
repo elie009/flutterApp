@@ -5,9 +5,8 @@ import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/ChatModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
-import 'package:flutter_app/pages/item/CarouselSlider.dart';
+import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/pages/item/PopupOffer.dart';
 import 'package:flutter_app/pages/message/inquire/ChatInquire.dart';
 import 'package:flutter_app/utils/Utils.dart';
@@ -17,11 +16,11 @@ import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'component/AddCartMenu.dart';
+
 class ItemDetailsPage extends StatefulWidget {
   PropertyModel props;
-  final SharedPreferences prefs;
-  ItemDetailsPage({Key key, @required this.props, this.prefs})
-      : super(key: key);
+  ItemDetailsPage({Key key, @required this.props}) : super(key: key);
 
   @override
   _ItemDetailsPageState createState() => _ItemDetailsPageState();
@@ -54,9 +53,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                   Icons.business_center,
                   color: Color(0xFF3a3737),
                 ),
-                onPressed: () {
-                  Navigator.push(context, ScaleRoute(page: FoodOrderPage()));
-                })
+                onPressed: () {})
           ],
         ),
         body: Container(
@@ -67,7 +64,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              CarouselDemo(),
+              CarouselComponent(),
               FoodTitleWidget(
                   productName: props.title,
                   productPrice: "P " + oCcy.format(props.fixPrice),
@@ -75,7 +72,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               SizedBox(
                 height: 15,
               ),
-              AddToCartMenu(),
+              ItemMenu(),
               SizedBox(
                 height: 15,
               ),
@@ -114,10 +111,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                   ],
                 ),
               ),
-              BottomMenu(
-                  prefs: widget.prefs,
-                  ownerUid: props.ownerUid,
-                  propsId: props.propid),
+              //BottomMenu(ownerUid: props.ownerUid, propsId: props.propid),
             ],
           ),
         ),
@@ -176,105 +170,6 @@ class FoodTitleWidget extends StatelessWidget {
           ],
         )
       ],
-    );
-  }
-}
-
-class BottomMenu extends StatelessWidget {
-  final SharedPreferences prefs;
-  final String ownerUid;
-  final String propsId;
-
-  BottomMenu({this.prefs, this.ownerUid, this.propsId});
-  @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<UserBaseModel>(context);
-
-    return Container(
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.timelapse,
-                color: Color(0xFF404aff),
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "12pm-3pm",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFa9a9a9),
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.directions,
-                color: Color(0xFF23c58a),
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "3.5 km",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFa9a9a9),
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Icon(
-                Icons.map,
-                color: Color(0xFFff0654),
-                size: 35,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                "Map View",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFa9a9a9),
-                    fontWeight: FontWeight.w300),
-              )
-            ],
-          ),
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {
-                startAsyncInit(user, ownerUid, propsId, context);
-              },
-              icon: Icon(Icons.message),
-              color: Color(0xFFe95959),
-              iconSize: 35,
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Text(
-              "Chat Now",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-          SizedBox()
-        ],
-      ),
     );
   }
 }
@@ -343,76 +238,6 @@ Future startAsyncInit(UserBaseModel user, String ownerUid, String propsId,
         prefs: prefs,
         chatObj: chatObj,
       )));
-}
-
-class AddToCartMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.push(context, ScaleRoute(page: BookingPage()));
-              },
-              icon: Icon(Icons.access_time),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Book",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-          SizedBox(
-            width: 30,
-          ),
-          PopupOffer(),
-          SizedBox(
-            width: 30,
-          ),
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.save_alt),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Save",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-          SizedBox(
-            width: 30,
-          ),
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.emoji_flags_outlined),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Follow",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-        ],
-      ),
-    );
-  }
 }
 
 class DetailContentMenu extends StatelessWidget {

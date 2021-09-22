@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
+import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class LabelTitle extends StatelessWidget {
-  LabelTitle({Key key, @required this.title}) : super(key: key);
+  LabelTitle({Key key, @required this.title, this.style}) : super(key: key);
   final String title;
+  final TextStyle style;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -10,12 +14,15 @@ class LabelTitle extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(
-                fontSize: 20,
-                color: Color(0xFF3a3a3b),
-                fontWeight: FontWeight.w300),
+          TextLabelByLine(
+            text: title,
+            style: style == null
+                ? TextStyle(
+                    color: Color(0xFF3a3a3b),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300)
+                : style,
+            width: 0.9,
           ),
         ],
       ),

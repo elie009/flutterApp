@@ -40,6 +40,8 @@ class _MessagePageState extends State<MessagePage> {
         .userCollection
         .doc(widget.prefs.getString('uid'))
         .collection('contacts');
+    print('------');
+    print(widget.prefs.getString('uid'));
 
     profileReference =
         DatabaseService().userCollection.doc(widget.prefs.getString('uid'));
@@ -56,6 +58,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   generateContactTab() {
+    print('generateContactTab');
     return Column(
       children: <Widget>[
         StreamBuilder<QuerySnapshot>(
@@ -130,6 +133,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Future<void> getProfilePicture() async {
+    print('getProfilePicture');
     final imageFile = File(await ImagePicker.platform
         .pickImage(source: ImageSource.gallery)
         .then((pickedFile) => pickedFile.path));
@@ -145,6 +149,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   generateProfileTab() {
+    print('generateProfileTab');
     return Center(
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -280,6 +285,9 @@ class _MessagePageState extends State<MessagePage> {
                 ),
               ),
               onTap: () async {
+                print('--->');
+                print(doc['contactUid']);
+                print(doc['name']);
                 QuerySnapshot result = await DatabaseService()
                     .chatCollection
                     .where('contact1', isEqualTo: widget.prefs.getString('uid'))
@@ -337,6 +345,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   openContacts() async {
+    print('openContacts');
     Contact contact = await _contactPicker.selectContact();
     if (contact != null) {
       String phoneNumber = contact.phoneNumber.number
@@ -371,6 +380,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   void onTabTapped(int index) {
+    print('onTabTapped');
     setState(() {
       _currentIndex = index;
       switch (_currentIndex) {

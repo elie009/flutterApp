@@ -5,3 +5,5 @@ enum Str {
   CHAT,
   BOOKING,
 }
+
+final String currency = 'PHP ';

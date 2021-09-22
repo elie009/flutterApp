@@ -8,7 +8,7 @@ import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/add/ProprtyItemPage.dart';
 import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/Formatter.dart';
-import 'package:flutter_app/widgets/ImagePicker.dart';
+import 'package:flutter_app/widgets/section/ImagePicker.dart';
 import 'package:flutter_app/database/temp/DemoDataBase.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

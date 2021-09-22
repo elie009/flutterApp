@@ -6,7 +6,6 @@ import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
 import 'package:flutter_app/widgets/card/ItemCard.dart';
 import 'package:flutter_app/widgets/card/LargeItemCard.dart';
-import 'package:flutter_app/widgets/section/LabelTitle.dart';
 import 'package:provider/provider.dart';
 
 class BodyContent extends StatelessWidget {
@@ -24,14 +23,7 @@ class BodyContent extends StatelessWidget {
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
         children: items.map((PropertyModel i) {
-          return ItemCard(
-              title: i.title,
-              imageUrl: i.imageName,
-              price: i.fixPrice.toString(),
-              numberOflikes: i.numLikes.toString(),
-              numberOfdislikes: i.numDisLike.toString(),
-              numberOfComment: i.numComments.toString(),
-              location: i.location);
+          return ItemCard(props: i);
         }).toList(),
       ),
     ));

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
+import 'package:flutter_app/pages/message/ChatHandler.dart';
+import 'package:flutter_app/pages/message/inbox/MessagePage.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +21,7 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
   Widget currentPage;
   HomePage homePage;
   FoodDetailsPage nearByLocationPage;
-  FoodDetailsPage messagePage;
+  MessagePage messagePage;
 
   FoodOrderPage foodOrderPage;
   ProfilePage profilePage;
@@ -37,7 +39,7 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
     print(widget.prefs);
     homePage = HomePage();
     nearByLocationPage = FoodDetailsPage();
-    messagePage = FoodDetailsPage();
+    messagePage = MessagePage(prefs: widget.prefs);
     foodOrderPage = FoodOrderPage();
     profilePage = ProfilePage(prefs: widget.prefs);
     pages = [
