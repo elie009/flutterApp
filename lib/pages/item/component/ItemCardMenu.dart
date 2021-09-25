@@ -1,14 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
+import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
 import 'package:flutter_app/utils/Utils.dart';
+import 'package:provider/provider.dart';
 
 import '../PopupOffer.dart';
 
-class ItemMenu extends StatelessWidget {
+class ItemCardMenu extends StatelessWidget {
+  final PropertyModel props;
+  ItemCardMenu({@required this.props});
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserBaseModel>(context);
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -39,7 +47,9 @@ class ItemMenu extends StatelessWidget {
           ),
           Column(children: <Widget>[
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                chatInspector(user, props, context);
+              },
               icon: Icon(Icons.message_outlined),
               color: primaryColor,
               iconSize: 30,

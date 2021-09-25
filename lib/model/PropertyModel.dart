@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PropertyModel {
   int numComments;
   int numLikes;
@@ -12,6 +14,22 @@ class PropertyModel {
   String description; //MD001PLT001012
   double fixPrice; //MD001PLT001013
   String postdate;
+
+  PropertyModel.snaphot(DocumentSnapshot<Object> value) {
+    this.numComments = value.get("numComments");
+    this.numLikes = value.get("numLikes");
+    this.numDisLike = value.get("numDisLikes");
+    this.propid = value.get("propid");
+    this.title = value.get("title");
+    this.description = value.get("description");
+    this.imageName = value.get("imageName");
+    this.fixPrice = value.get("fixPrice");
+    this.location = value.get("location");
+    this.menuid = value.get("menuid");
+    this.ownerUid = value.get("ownerUid");
+    this.status = value.get("status");
+    this.postdate = value.get("postdate");
+  }
 
   PropertyModel.instance(PropertyModel i) {
     this.numComments = i.numComments;

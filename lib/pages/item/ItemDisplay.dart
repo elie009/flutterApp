@@ -16,7 +16,7 @@ import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'component/AddCartMenu.dart';
+import 'component/ItemCardMenu.dart';
 
 class ItemDetailsPage extends StatefulWidget {
   PropertyModel props;
@@ -64,7 +64,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              CarouselComponent(),
+              //CarouselDemo(),
               FoodTitleWidget(
                   productName: props.title,
                   productPrice: "P " + oCcy.format(props.fixPrice),
@@ -72,7 +72,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               SizedBox(
                 height: 15,
               ),
-              ItemMenu(),
+              //AddToCartMenu(),
               SizedBox(
                 height: 15,
               ),
@@ -111,7 +111,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                   ],
                 ),
               ),
-              //BottomMenu(ownerUid: props.ownerUid, propsId: props.propid),
+              BottomMenu(ownerUid: props.ownerUid, propsId: props.propid),
             ],
           ),
         ),
@@ -124,6 +124,7 @@ class FoodTitleWidget extends StatelessWidget {
   String productName;
   String productPrice;
   String productHost;
+  PropertyModel props;
 
   FoodTitleWidget({
     Key key,
@@ -174,6 +175,104 @@ class FoodTitleWidget extends StatelessWidget {
   }
 }
 
+class BottomMenu extends StatelessWidget {
+  final String ownerUid;
+  final String propsId;
+
+  BottomMenu({this.ownerUid, this.propsId});
+  @override
+  Widget build(BuildContext context) {
+    final user = Provider.of<UserBaseModel>(context);
+
+    return Container(
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              Icon(
+                Icons.timelapse,
+                color: Color(0xFF404aff),
+                size: 35,
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                "12pm-3pm",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFa9a9a9),
+                    fontWeight: FontWeight.w300),
+              )
+            ],
+          ),
+          Column(
+            children: <Widget>[
+              Icon(
+                Icons.directions,
+                color: Color(0xFF23c58a),
+                size: 35,
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                "3.5 km",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFa9a9a9),
+                    fontWeight: FontWeight.w300),
+              )
+            ],
+          ),
+          Column(
+            children: <Widget>[
+              Icon(
+                Icons.map,
+                color: Color(0xFFff0654),
+                size: 35,
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                "Map View",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFa9a9a9),
+                    fontWeight: FontWeight.w300),
+              )
+            ],
+          ),
+          Column(children: <Widget>[
+            IconButton(
+              onPressed: () {
+                startAsyncInit(user, ownerUid, propsId, context);
+              },
+              icon: Icon(Icons.message),
+              color: Color(0xFFe95959),
+              iconSize: 35,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text(
+              "Chat Now",
+              style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w300),
+            )
+          ]),
+          SizedBox()
+        ],
+      ),
+    );
+  }
+}
+
 Map<String, dynamic> _chatData;
 Map<String, dynamic> _userContact;
 ChatModel chatObj;
@@ -217,8 +316,10 @@ Future startAsyncInit(UserBaseModel user, String ownerUid, String propsId,
   _chatData = await DatabaseService().getChatData(user.uid, contactUid);
 
   if (_chatData == null) {
+    String chatId = idChat;
+
     DatabaseService()
-        .addChat(user.uid, ownerUid, propsId)
+        .addChat(user.uid, ownerUid, propsId, chatId)
         .then((documentReference) {
       chatObj = new ChatModel(documentReference.id);
     }).catchError((e) {});
@@ -234,7 +335,7 @@ Future startAsyncInit(UserBaseModel user, String ownerUid, String propsId,
   Navigator.push(
       context,
       ScaleRoute(
-          page: ChatPage(
+          page: ChatInquire(
         prefs: prefs,
         chatObj: chatObj,
       )));

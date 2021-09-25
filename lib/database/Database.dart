@@ -51,6 +51,7 @@ class DatabaseService {
       'menuid': data.menuid,
       'ownerUid': data.ownerUid,
       'status': data.status,
+      'postdate': data.postdate,
     });
   }
 
@@ -129,10 +130,8 @@ class DatabaseService {
     }).toList();
   }
 
-  Future addChat(String uid, String ownerUid, String popsId) async {
-    // chatCollection
-    //     .add({'contact1': uid, 'contact2': ownerUid, 'propId': popsId});
-    String chatId = idChat;
+  Future addChat(
+      String uid, String ownerUid, String popsId, String chatId) async {
     return await chatCollection.doc(chatId).set({
       'chatId': chatId,
       'propId': popsId,
@@ -197,6 +196,7 @@ class DatabaseService {
           doc.get('menuid') ?? '',
           doc.get('ownerUid') ?? '',
           doc.get('status') ?? '',
+          doc.get('postdate') ?? '',
         );
       } catch (e) {
         print(e.toString());
@@ -228,6 +228,23 @@ class DatabaseService {
     }).toList();
   }
 
+  //get item booking from snapshot
+  List<ContactModel> _contactListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      try {
+        return ContactModel(
+          contact1: doc.get('contact1') ?? '',
+          contact2: doc.get('contact2') ?? '',
+          date: doc.get('date') ?? '',
+          propsId: doc.get('propsId') ?? '',
+        );
+      } catch (e) {
+        print(e.toString());
+        return null;
+      }
+    }).toList();
+  }
+
   Future<Map<String, dynamic>> getChatData(
       String uid, String propOwnerUid) async {
     Map<String, dynamic> chatData;
@@ -248,7 +265,7 @@ class DatabaseService {
     var result = await userCollection
         .doc(uid)
         .collection('contacts')
-        .where('uid', isEqualTo: ownerUid)
+        .where('contactUid', isEqualTo: ownerUid)
         .get();
 
     result.docs.forEach((e) {
@@ -287,6 +304,8 @@ class DatabaseService {
     //return propertCollection.snapshots().map(_propertyListFromSnapshot);
   }
 
+  
+
 // get all booking item on stream
   Stream<List<BookingModel>> booking(String propsid) {
     return bookingCollection
@@ -297,11 +316,13 @@ class DatabaseService {
     //return bookingCollection.snapshots().map(_bookingListFromSnapshot);
   }
 
-  Future m(String uid, String propOwnerUid) async {
-    await chatCollection
-        .where('contact1', isEqualTo: uid)
-        .where('contact2', isEqualTo: propOwnerUid)
-        .get();
+// get all booking item on stream
+  Stream<List<ContactModel>> userContact(String userid) {
+    return userCollection
+        .doc(userid)
+        .collection('contacts')
+        .snapshots()
+        .map(_contactListFromSnapshot);
   }
 
   Future deleteAllitem() async {

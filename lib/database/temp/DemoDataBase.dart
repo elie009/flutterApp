@@ -3,6 +3,7 @@ import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class PrepareData {
@@ -65,7 +66,7 @@ class PrepareData {
           '',
           '',
           '',
-          'APPROVE');
+          'APPROVE',getDateNowMilliSecondStr);
 
       await DatabaseService(uid: id).updatePropertyLot(props);
     }

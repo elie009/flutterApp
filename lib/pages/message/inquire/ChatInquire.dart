@@ -6,22 +6,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/ChatModel.dart';
+import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/Utils.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
+import 'package:flutter_app/widgets/card/RowCardInquire.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../FoodOrderPage.dart';
-import '../inbox/GallaryHandler.dart';
+import '../inbox/MessagePage.dart';
 
-class ChatPage extends StatefulWidget {
+class ChatInquire extends StatefulWidget {
   final SharedPreferences prefs;
   final ChatModel chatObj;
+  final PropertyModel props;
+  bool isNewContact;
+  bool isNewChat;
+  CollectionReference chatReference;
 
-  ChatPage({
+  ChatInquire({
     this.prefs,
     this.chatObj,
+    this.props,
+    this.isNewContact,
+    this.isNewChat,
+    this.chatReference,
   });
   @override
   ChatPageState createState() {
@@ -29,37 +38,31 @@ class ChatPage extends StatefulWidget {
   }
 }
 
-class ChatPageState extends State<ChatPage> {
+class ChatPageState extends State<ChatInquire> {
   CollectionReference chatReference;
   final TextEditingController _textController = new TextEditingController();
   bool _isWritting = false;
   CollectionReference contactsReference;
   DocumentReference profileReference;
+  bool newitem;
+  final Radius messageCard = Radius.circular(15.0);
 
   @override
   void initState() {
     super.initState();
-    chatReference = DatabaseService()
-        .chatCollection
-        .doc(widget.chatObj.getChatId)
-        .collection('messages');
+
+    chatReference = widget.chatReference;
+
+    newitem = widget.isNewContact || widget.isNewChat;
   }
 
   List<Widget> generateSenderLayout(DocumentSnapshot documentSnapshot) {
-    print('generateSenderLayout');
-
     return <Widget>[
       new Expanded(
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            new Text(documentSnapshot.get('sender_name'),
-                style: new TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold)),
             new Container(
-              margin: const EdgeInsets.only(top: 5.0),
               child: documentSnapshot.get('image_url') != ''
                   ? InkWell(
                       child: new Container(
@@ -72,60 +75,44 @@ class ChatPageState extends State<ChatPage> {
                         color: Color.fromRGBO(0, 0, 0, 0.2),
                         padding: EdgeInsets.all(5),
                       ),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => GalleryPage(
-                              imagePath: documentSnapshot.get('image_url'),
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () {},
                     )
-                  : new Text(documentSnapshot.get('text')),
+                  : new Container(
+                      padding: EdgeInsets.all(13.0),
+                      margin: EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: messageCard,
+                            bottomLeft: messageCard,
+                            topRight: messageCard),
+                        color: primaryColor,
+                      ),
+                      child: new Text(
+                        documentSnapshot.get('text'),
+                        style: TextStyle(color: whiteColor),
+                      ),
+                    ),
             ),
+            new Text(
+                documentSnapshot.get('time') == null
+                    ? ''
+                    : formatTimeStamp(documentSnapshot.get('time').toDate()),
+                style: new TextStyle(
+                    fontSize: 14.0,
+                    color: grayColor,
+                    fontWeight: FontWeight.w500)),
           ],
         ),
-      ),
-      new Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          new Container(
-              margin: const EdgeInsets.only(left: 8.0),
-              child: new CircleAvatar(
-                backgroundImage:
-                    new NetworkImage(widget.prefs.getString('image')),
-              )),
-        ],
       ),
     ];
   }
 
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
-    print('generateReceiverLayout');
-    print(documentSnapshot.data());
-    print(widget.prefs.getString('image'));
     return <Widget>[
-      new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Container(
-              margin: const EdgeInsets.only(right: 8.0),
-              child: new CircleAvatar(
-                backgroundImage:
-                    new NetworkImage(widget.prefs.getString('owenerImage')),
-              )),
-        ],
-      ),
       new Expanded(
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new Text(documentSnapshot.get('sender_name'),
-                style: new TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold)),
             new Container(
               margin: const EdgeInsets.only(top: 5.0),
               child: documentSnapshot.get('image_url') != ''
@@ -140,19 +127,32 @@ class ChatPageState extends State<ChatPage> {
                         color: Color.fromRGBO(0, 0, 0, 0.2),
                         padding: EdgeInsets.all(5),
                       ),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => GalleryPage(
-                              imagePath:
-                                  'https://images.unsplash.com/photo-1618641986557-1ecd230959aa?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8aW5zdGFncmFatJTIwcHJvZmlsZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80', //documentSnapshot.get('image_url'),
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () {},
                     )
-                  : new Text(documentSnapshot.get('text')),
+                  : new Container(
+                      padding: EdgeInsets.all(8.0),
+                      margin: EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: messageCard,
+                            topRight: messageCard,
+                            bottomRight: messageCard),
+                        color: whiteColor,
+                      ),
+                      child: new Text(
+                        documentSnapshot.get('text'),
+                        style: TextStyle(color: primaryColor),
+                      ),
+                    ),
             ),
+            new Text(
+                documentSnapshot.get('time') == null
+                    ? ''
+                    : formatTimeStamp(documentSnapshot.get('time').toDate()),
+                style: new TextStyle(
+                    fontSize: 14.0,
+                    color: grayColor,
+                    fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -160,7 +160,6 @@ class ChatPageState extends State<ChatPage> {
   }
 
   generateMessages(AsyncSnapshot<QuerySnapshot> snapshot) {
-    print('generateMessages');
     return snapshot.data.docs
         .map<Widget>((doc) => Container(
               margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -177,10 +176,39 @@ class ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        title: Text('title here'),
+        iconTheme: IconThemeData(
+          color: primaryColor, //change your color here
+        ),
+        backgroundColor: whiteColor,
+        title: new Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: new Container(
+                  child: new CircleAvatar(
+                backgroundImage:
+                    new NetworkImage(widget.prefs.getString('owenerImage')),
+              )),
+            ),
+            Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  widget.prefs.getString('ownerName'),
+                  style: TextStyle(color: primaryColor),
+                ))
+          ],
+        ),
+        actions: [
+          Icon(
+            Icons.menu,
+            color: primaryColor,
+          ),
+          SizedBox(width: 20),
+        ],
       ),
       body: Container(
+        color: shadeWhite,
         padding: EdgeInsets.all(5),
         child: new Column(
           children: <Widget>[
@@ -188,26 +216,31 @@ class ChatPageState extends State<ChatPage> {
               width: MediaQuery.of(context).size.width,
               top: MediaQuery.of(context).size.height / 6.0,
               // left: 76.0,
-              child: CartItem(
-                  productName: textlimiter("sample text only need for it"),
-                  productPrice: "\$96.00",
-                  productImage: "ic_popular_food_1",
-                  productCartQuantity: "2"),
+              child: RowCardInquire(props: widget.props),
             ),
-            StreamBuilder<QuerySnapshot>(
-              stream:
-                  chatReference.orderBy('time', descending: true).snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) return new Text("No Chat");
-                return Expanded(
-                  child: new ListView(
-                    reverse: true,
-                    children: generateMessages(snapshot),
-                  ),
-                );
-              },
-            ),
+            (newitem
+                ? Expanded(
+                    child: new ListView(reverse: true, children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: new Row(),
+                    )
+                  ]))
+                : StreamBuilder<QuerySnapshot>(
+                    stream: chatReference
+                        .orderBy('time', descending: true)
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (!snapshot.hasData) return new Text("No Chat");
+                      return Expanded(
+                        child: new ListView(
+                          reverse: true,
+                          children: generateMessages(snapshot),
+                        ),
+                      );
+                    },
+                  )),
             new Divider(height: 1.0),
             new Container(
               decoration: new BoxDecoration(color: Theme.of(context).cardColor),
@@ -288,6 +321,63 @@ class ChatPageState extends State<ChatPage> {
 
   Future<Null> _sendText(String text) async {
     _textController.clear();
+
+    if (widget.isNewContact) {
+      DatabaseService()
+          .userCollection
+          .doc(widget.prefs.getString('uid'))
+          .collection('contacts')
+          .doc(widget.props.propid)
+          .set({
+        'contactUid': widget.props.ownerUid,
+        'propsId': widget.props.propid,
+        'name': widget.prefs.getString('ownerName'),
+        //'contactId': idContact,
+        'lastMessage': text,
+        'datetime': getDateNow,
+        'status': 'UNREAD',
+      }).then((value) {
+        widget.isNewContact = false;
+      });
+    } else {
+      DatabaseService()
+          .userCollection
+          .doc(widget.prefs.getString('uid'))
+          .collection('contacts')
+          .doc(widget.props.propid)
+          .set({
+        'contactUid': widget.props.ownerUid,
+        'propsId': widget.props.propid,
+        'name': widget.prefs.getString('ownerName'),
+        //'contactId': idContact,
+        'lastMessage': text,
+        'datetime': getDateNow,
+        'status': 'READ',
+      });
+    }
+
+    if (widget.isNewChat) {
+      String chatId = idChat;
+
+      DatabaseService()
+          .addChat(widget.prefs.getString('uid'), widget.props.ownerUid,
+              widget.props.propid, chatId)
+          .then((value) {
+        setState(() {
+          chatReference = DatabaseService()
+              .chatCollection
+              .doc(chatId)
+              .collection('messages');
+          newitem = false;
+          widget.isNewChat = false;
+        });
+        _addMessage(text);
+      });
+    }
+    _addMessage(text);
+  }
+
+  void _addMessage(String text) {
     chatReference.add({
       'text': text,
       'sender_id': widget.prefs.getString('uid'),

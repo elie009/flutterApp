@@ -9,8 +9,8 @@ import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:flutter_app/widgets/section/IconText.dart';
 import 'package:provider/provider.dart';
 
-import 'component/AddCartMenu.dart';
-import 'component/ForPropResidence.dart';
+import 'component/ItemCardMenu.dart';
+import 'component/ForPropLot.dart';
 
 class ItemViewDetails extends StatefulWidget {
   ItemViewDetails({Key key, @required this.props}) : super(key: key);
@@ -126,7 +126,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                           ),
                         ),
                         SizedBox(height: 20),
-                        ItemMenu(),
+                        ItemCardMenu(props: widget.props),
                         SizedBox(height: 20),
                         Container(
                           margin:
