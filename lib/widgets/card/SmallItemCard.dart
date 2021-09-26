@@ -1,58 +1,23 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/pages/search/BodyContainer.dart';
-import 'package:flutter_app/pages/search/SearchDisplay.dart';
-import 'package:flutter_app/widgets/card/SmallItemCard.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class TopMenus extends StatefulWidget {
-  @override
-  _TopMenusState createState() => _TopMenusState();
-}
+class SmallItemCard extends StatelessWidget {
+  final String imageUrl = 'ic_burger';
+  final MenuModel menu;
+  final Function onChanged;
 
-class _TopMenusState extends State<TopMenus> {
-  @override
-  Widget build(BuildContext context) {
-    final items = Provider.of<List<MenuModel>>(context);
-
-    return Container(
-        height: 100,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: <Widget>[
-            if (items != null)
-              for (var i in items)
-                SmallItemCard(
-                  menu: i,
-                  onChanged: (String menuid) {
-                    setState(() {
-                      print('>>> ' + menuid);
-                    });
-                  },
-                )
-          ],
-        ));
-  }
-}
-
-class TopMenuTiles extends StatelessWidget {
-  String name = 'Burger';
-  String imageUrl = 'ic_burger';
-  String slug = '';
-  MenuModel menu;
-
-  TopMenuTiles({
+  SmallItemCard({
     Key key,
     @required this.menu,
+    @required this.onChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        //Navigator.push(context, ScaleRoute(page: BodyContainer()));
+        onChanged(menu.dropdownid);
       },
       child: Column(
         children: <Widget>[
@@ -84,7 +49,7 @@ class TopMenuTiles extends StatelessWidget {
                   )),
                 )),
           ),
-          Text(name,
+          Text(menu.name,
               style: TextStyle(
                   color: Color(0xFF6e6e71),
                   fontSize: 14,

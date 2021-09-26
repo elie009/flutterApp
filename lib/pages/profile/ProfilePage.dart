@@ -14,6 +14,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../FoodOrderPage.dart';
+import 'ProfileStats.dart';
+import 'inventory/InventoryOption.dart';
+import 'inventory/InventoryPage.dart';
 
 class ProfilePage extends StatefulWidget {
   final SharedPreferences prefs;
@@ -180,92 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 30.0,
                   color: whiteColor,
                 ),
-                Container(
-                  width: 350.0,
-                  height: 60.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            "45",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            "Follower",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      VerticalDivider(
-                        width: 70.0,
-                        color: whiteColor,
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            "20",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            "Following",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      VerticalDivider(
-                        width: 70.0,
-                        color: whiteColor,
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            "30",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            "Post",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                ProfileStats(),
               ],
             ),
           ),
@@ -290,7 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Tab(
                   text: 'Inventory',
                 ),
-              ], // list of tabs
+              ],
             ),
           ),
           Container(
@@ -304,7 +222,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   color: whiteColor,
                   child: Inventory(),
-                ), // class name
+                ),
               ],
             ),
           ),
@@ -312,47 +230,6 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 20.0,
             color: Colors.black,
           ),
-          // Container(
-          //   color: Colors.lightGreen,
-          //   width: MediaQuery.of(context).size.width,
-          //   height: 130.0,
-          //   child: Card(
-          //     // color: Colors.amber,
-          //     margin: EdgeInsets.symmetric(horizontal: 10.0),
-          //     elevation: 5.0,
-          //     child: Padding(
-          //       padding: const EdgeInsets.all(20.0),
-          //       child: Column(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         children: <Widget>[
-          //           InkWell(
-          //             onTap: () {
-          //               _data.execute();
-          //             },
-          //             child: Text(
-          //               "Abouts",
-          //               style: TextStyle(
-          //                 fontSize: 20.0,
-          //                 fontWeight: FontWeight.bold,
-          //                 color: Colors.lightBlue,
-          //               ),
-          //             ),
-          //           ),
-          //           SizedBox(
-          //             height: 7.0,
-          //           ),
-          //           Text(
-          //             "Any thing you want to write here about yourself you can write that will fetch frome the database ok done.",
-          //             style: TextStyle(
-          //               fontSize: 16.0,
-          //               color: Colors.grey,
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -408,88 +285,7 @@ class Carry extends StatelessWidget {
         SizedBox(
           height: 7.0,
         ),
-        Positioned(
-          width: MediaQuery.of(context).size.width,
-          top: MediaQuery.of(context).size.height / 6.0,
-          // left: 76.0,
-          child: Container(
-            width: double.infinity,
-            height: 85,
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Color(0xFFADAD).withOpacity(0.3),
-                spreadRadius: 1,
-                blurRadius: 1,
-                offset: Offset(0, 1),
-              ),
-            ]),
-            child: Card(
-                color: whiteColor,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
-                ),
-                child: Container(
-                  alignment: Alignment.center,
-                  padding:
-                      EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(left: 20),
-                            alignment: Alignment.centerRight,
-                            child: InventoryOption(),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                )),
-          ),
-        ),
       ],
-    );
-  }
-}
-
-class InventoryOption extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          TextButton.icon(
-            icon: Icon(Icons.calendar_today_outlined, color: primaryColor),
-            label: Text('Manage', style: TextStyle(color: primaryColor)),
-            onPressed: () {},
-          ),
-          SizedBox(width: 50),
-          TextButton.icon(
-            icon: Icon(Icons.add, color: primaryColor),
-            label: Text('Add', style: TextStyle(color: primaryColor)),
-            onPressed: () {
-              Navigator.push(context, ScaleRoute(page: PropertyItemPage()));
-            },
-          ),
-          SizedBox(width: 50),
-          TextButton.icon(
-            icon: Icon(Icons.sort, color: primaryColor),
-            label: Text('Filer', style: TextStyle(color: primaryColor)),
-            onPressed: () {},
-          ),
-        ],
-      ),
     );
   }
 }
@@ -506,74 +302,11 @@ class Inventory extends StatelessWidget {
         child: Container(
           child: Column(
             children: <Widget>[
-              CardProperty(),
+              InventoryPage(),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class CardProperty extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final items = Provider.of<List<PropertyModel>>(context);
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 7,
-        ),
-        Container(
-          width: double.infinity,
-          height: 85,
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
-              color: Color(0xFFADAD).withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: Offset(0, 1),
-            ),
-          ]),
-          child: Card(
-            color: whiteColor,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(5.0),
-              ),
-            ),
-            child: Container(
-              margin: EdgeInsets.only(left: 20),
-              alignment: Alignment.centerRight,
-              child: InventoryOption(),
-            ),
-          ),
-        ),
-        for (PropertyModel i in items)
-          Container(
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Color(0xFFADAD).withOpacity(0.3),
-                spreadRadius: 1,
-                blurRadius: 1,
-                offset: Offset(0, 1),
-              ),
-            ]),
-            child: Card(
-              child: Positioned(
-                width: MediaQuery.of(context).size.width,
-                top: MediaQuery.of(context).size.height / 6.0,
-                // left: 76.0,
-                child: CartItem(
-                    productName: textlimiter(i.title),
-                    productPrice: "\$96.00",
-                    productImage: "ic_popular_food_1",
-                    productCartQuantity: "2"),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }

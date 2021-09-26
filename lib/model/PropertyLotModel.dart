@@ -11,6 +11,8 @@ class PropertyLotModel extends PropertyModel {
   String tradableItems; //MD001PLT001008
   String status;
 
+  
+
   PropertyLotModel(
     int numComments,
     int numLike,

@@ -84,6 +84,7 @@ class PopularFoodItems extends StatelessWidget {
     return ListView(
       scrollDirection: Axis.horizontal,
       children: <Widget>[
+        
         // PropertyModel props = new PropertyModel(numComments, numLike, numDisLike, propid, title, description, imageName, fixPrice, location, menuid, ownerUid, status)
         // ItemCard(
         //     title: "Lot for sale",

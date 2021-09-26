@@ -15,6 +15,22 @@ class PropertyModel {
   double fixPrice; //MD001PLT001013
   String postdate;
 
+  PropertyModel.init() {
+    this.numComments = 0;
+    this.numLikes = 0;
+    this.numDisLike = 0;
+    this.propid = '';
+    this.title = '';
+    this.description = '';
+    this.imageName = '';
+    this.fixPrice = 0.00;
+    this.location = '';
+    this.menuid = '';
+    this.ownerUid = '';
+    this.status = '';
+    this.postdate = '';
+  }
+
   PropertyModel.snaphot(DocumentSnapshot<Object> value) {
     this.numComments = value.get("numComments");
     this.numLikes = value.get("numLikes");

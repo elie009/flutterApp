@@ -10,7 +10,6 @@ import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/item/add/InputPage.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
@@ -154,9 +153,6 @@ class _PropertyItemPageState extends State<PropertyItemPage> {
                                     propItem.menuid = _selectedLocation;
                                     propItem.propid = idPropertyLot;
                                     propItem.ownerUid = user.uid;
-
-                                    SingleItemChecker()
-                                        .addPropertyLot(propItem);
                                   }
                                 });
                               },
@@ -207,9 +203,6 @@ class _PropertyItemPageState extends State<PropertyItemPage> {
                                     propItem.propid = idPropertyLot;
                                     propItem.menuid = _selectedLocation;
                                     propItem.ownerUid = user.uid;
-
-                                    SingleItemChecker()
-                                        .addPropertyLot(propItem);
                                   }
                                 });
                               },

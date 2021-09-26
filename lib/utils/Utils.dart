@@ -9,6 +9,9 @@ final grayColor = Color(0xFFa4a1a1);
 final lightgrayColor = Colors.grey.shade300;
 final blackColor = Colors.black;
 final linkColor = Colors.blueAccent;
+final yelloamber = Colors.amber;
+
+final String defaultProfileImg = 'assets/images/profile/profile.jpeg';
 
 String doubleToString(String number) {
   return number.toString();

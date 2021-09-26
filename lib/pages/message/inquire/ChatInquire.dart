@@ -12,9 +12,9 @@ import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:flutter_app/widgets/card/RowCardInquire.dart';
+import 'package:flutter_app/widgets/components/UserImage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../inbox/MessagePage.dart';
 
 class ChatInquire extends StatefulWidget {
   final SharedPreferences prefs;
@@ -183,14 +183,15 @@ class ChatPageState extends State<ChatInquire> {
         title: new Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: new Container(
-                  child: new CircleAvatar(
-                backgroundImage:
-                    new NetworkImage(widget.prefs.getString('owenerImage')),
-              )),
-            ),
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(20.0),
+            //   child: new Container(
+            //       child: new CircleAvatar(
+            //     backgroundImage:
+            //         new NetworkImage(widget.prefs.getString('owenerImage')),
+            //   )),
+            // ),
+            UserImage(image: widget.prefs.getString('owenerImage')),
             Container(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
