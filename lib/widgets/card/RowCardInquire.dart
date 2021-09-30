@@ -78,7 +78,7 @@ class RowCardInquire extends StatelessWidget {
                             ),
                             Container(
                               child: Text(
-                                formatCurency(props.fixPrice),
+                                props.saleFixPrice.toString(),
                                 style: TextStyle(
                                     fontSize: 18,
                                     color: Color(0xFF3a3a3b),

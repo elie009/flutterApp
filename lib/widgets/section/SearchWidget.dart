@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/ModalBox.dart';

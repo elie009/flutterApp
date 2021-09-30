@@ -5,6 +5,7 @@ import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class DatabaseService {
@@ -22,8 +23,8 @@ class DatabaseService {
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('user');
 
-  final CollectionReference propertyCollection =
-      FirebaseFirestore.instance.collection('property');
+  // final CollectionReference propertyCollection =
+  //     FirebaseFirestore.instance.collection('property');
 
   final CollectionReference properyLottCollection =
       FirebaseFirestore.instance.collection('propertyLot');
@@ -37,23 +38,27 @@ class DatabaseService {
   final CollectionReference mobileCollection =
       FirebaseFirestore.instance.collection('mobiles');
 
-  Future updateProperyData(PropertyModel data) async {
-    return await propertyCollection.doc(data.propid).set({
-      'numComments': data.numComments == null ? 0 : data.numComments,
-      'numLikes': data.numLikes == null ? 0 : data.numLikes,
-      'numDisLikes': data.numDisLike == null ? 0 : data.numDisLike,
-      'propid': data.propid,
-      'title': data.title,
-      'description': data.description,
-      'imageName': data.imageName,
-      'fixPrice': data.fixPrice,
-      'location': data.location,
-      'menuid': data.menuid,
-      'ownerUid': data.ownerUid,
-      'status': data.status,
-      'postdate': data.postdate,
-    });
-  }
+  // Future updateProperyData(PropertyModel data) async {
+  //   return await propertyCollection.doc(data.propid).set({
+  //     'numComments': data.numComments == null ? 0 : data.numComments,
+  //     'numLikes': data.numLikes == null ? 0 : data.numLikes,
+  //     'numDisLikes': data.numViews == null ? 0 : data.numViews,
+  //     'propid': data.propid,
+  //     'title': data.title,
+  //     'description': data.description,
+  //     'imageName': data.imageName,
+  //     'saleFixPrice': data.saleFixPrice,
+  //     'rentFixPrice': data.rentFixPrice,
+  //     'installmentFixPrice': data.installmentFixPrice,
+  //     'location': data.location,
+  //     'menuid': data.menuid,
+  //     'ownerUid': data.ownerUid,
+  //     'status': data.status,
+  //     'postdate': data.postdate,
+  //     'forSwap': data.forSwap,
+  //     'conditionCode': data.conditionCode,
+  //   });
+  // }
 
   Future updateBookingData(BookingModel data) async {
     return await bookingCollection.doc(data.bookId).set({
@@ -92,22 +97,6 @@ class DatabaseService {
       'lastName': usrobj.lastName,
       'image': usrobj.image,
     });
-  }
-
-  Future updatePropertyLot(PropertyLotModel data) async {
-    await properyLottCollection.doc(data.propid).set({
-      'propid': data.propid,
-      'lotSize': data.lotSize,
-      'perSqm': data.perSqm,
-      'nearby': data.nearby,
-      'amenities': data.amenities,
-      'rentBillabletype': data.rentBillabletype,
-      'rentRestrictions': data.rentRestrictions,
-      'saleContainPaper': data.saleContainPaper,
-      'tradableItems': data.tradableItems,
-    });
-
-    return updateProperyData(data);
   }
 
   //get item list from snapshot
@@ -180,10 +169,54 @@ class DatabaseService {
   }
 
 //get item list from snapshot
+  // Future<List<PropertyModel>> propertyListFromSnapshot(String uid) async {
+  //   List<PropertyModel> items;
+
+  //   await DatabaseService()
+  //       .propertyCollection
+  //       .doc(Constants.lotCode)
+  //       .collection(Constants.collectionLot)
+  //       .where('ownerUid', isEqualTo: uid)
+  //       .get()
+  //       .then((value) {
+  //     items = value.docs.map((doc) {
+  //       print(doc.data());
+  //       try {
+  //         return PropertyModel.obj(
+  //           doc.get('numComments') ?? 0,
+  //           doc.get('numLikes') ?? 0,
+  //           doc.get('numDisLikes') ?? 0,
+  //           doc.get('propid') ?? '',
+  //           doc.get('title') ?? '',
+  //           doc.get('description') ?? '',
+  //           doc.get('imageName') ?? '',
+  //           doc.get('saleFixPrice') ?? 0,
+  //           doc.get('rentFixPrice') ?? 0,
+  //           doc.get('installmentFixPrice') ?? 0,
+  //           doc.get('location') ?? '',
+  //           doc.get('menuid') ?? '',
+  //           doc.get('ownerUid') ?? '',
+  //           doc.get('status') ?? '',
+  //           doc.get('postdate') ?? '',
+  //           doc.get('forSwap') ?? false,
+  //           doc.get('conditionCode') ?? -1,
+  //         );
+  //       } catch (e) {
+  //         print(e.toString());
+  //         return null;
+  //       }
+  //     }).toList();
+
+  //     return items;
+  //   });
+  //   return items;
+  // }
+
+//get item list from snapshot
   List<PropertyModel> _propertyListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return PropertyModel(
+        return PropertyModel.obj(
           doc.get('numComments') ?? 0,
           doc.get('numLikes') ?? 0,
           doc.get('numDisLikes') ?? 0,
@@ -191,12 +224,16 @@ class DatabaseService {
           doc.get('title') ?? '',
           doc.get('description') ?? '',
           doc.get('imageName') ?? '',
-          doc.get('fixPrice') ?? 0,
+          doc.get('saleFixPrice') ?? 0,
+          doc.get('rentFixPrice') ?? 0,
+          doc.get('installmentFixPrice') ?? 0,
           doc.get('location') ?? '',
           doc.get('menuid') ?? '',
           doc.get('ownerUid') ?? '',
           doc.get('status') ?? '',
           doc.get('postdate') ?? '',
+          doc.get('forSwap') ?? false,
+          doc.get('conditionCode') ?? -1,
         );
       } catch (e) {
         print(e.toString());
@@ -285,26 +322,34 @@ class DatabaseService {
   }
 
   // get all property item on stream
-  Stream<List<PropertyModel>> properyByMenuId(String menuId) {
-    return propertyCollection
-        .where('menuid', isEqualTo: menuId)
-        .snapshots()
-        .map(_propertyListFromSnapshot);
+  // Stream<List<PropertyModel>> properyByMenuId(String menuId) {
+  //   return propertyCollection
+  //       .where('menuid', isEqualTo: menuId)
+  //       .snapshots()
+  //       .map(_propertyListFromSnapshot);
+  //   //return propertCollection.snapshots().map(_propertyListFromSnapshot);
+  // }
 
-    //return propertCollection.snapshots().map(_propertyListFromSnapshot);
-  }
+// get all property item on stream
+  // Stream<List<PropertyModel>> properyByOwnerId2(
+  //     String ownerId, String menuid, String menu) {
+  //   return propertyCollection
+  //       .doc(menuid)
+  //       .collection(menu)
+  //       .where('ownerUid', isEqualTo: ownerId)
+  //       .snapshots()
+  //       .map(_propertyListFromSnapshot);
+  // }
 
   // get all property item on stream
-  Stream<List<PropertyModel>> properyByOwnerId(String ownerId) {
-    return propertyCollection
-        .where('ownerUid', isEqualTo: ownerId)
-        .snapshots()
-        .map(_propertyListFromSnapshot);
+  // Stream<List<PropertyModel>> properyByOwnerId(String ownerId) {
+  //   return propertyCollection
+  //       .where('ownerUid', isEqualTo: ownerId)
+  //       .snapshots()
+  //       .map(_propertyListFromSnapshot);
 
-    //return propertCollection.snapshots().map(_propertyListFromSnapshot);
-  }
-
-  
+  //   //return propertCollection.snapshots().map(_propertyListFromSnapshot);
+  // }
 
 // get all booking item on stream
   Stream<List<BookingModel>> booking(String propsid) {
@@ -338,4 +383,15 @@ class DatabaseService {
       return false;
     }
   }
+}
+
+abstract class DatabaseServicePropsStructure<T> {
+  getAll() {}
+  getByPropId(String props) {}
+  getByUid(String uid) {}
+  getByMenu(String menuid) {}
+  getByUserMenu(String uid, String menuid) {}
+
+  add(dynamic propsLot) async {}
+  delete(String propsLot) async {}
 }

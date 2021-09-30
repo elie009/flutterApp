@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/item/add/ProprtyItemPage.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/section/ImagePicker.dart';
 import 'package:flutter_app/database/temp/DemoDataBase.dart';
@@ -297,7 +297,7 @@ class Inventory extends StatelessWidget {
 
     return Center(
       child: StreamProvider<List<PropertyModel>>.value(
-        value: DatabaseService().properyByOwnerId(user.uid),
+        value: DatabaseServiceProps().getByUid(user.uid),
         initialData: [],
         child: Container(
           child: Column(

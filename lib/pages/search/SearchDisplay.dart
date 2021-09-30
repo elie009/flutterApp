@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
@@ -27,7 +29,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
 
     return Scaffold(
       body: StreamProvider<List<PropertyModel>>.value(
-        value: DatabaseService().properyByMenuId('1001'),
+        value: DatabaseServiceProps().getByMenu('1001'),
         initialData: null,
         child: Scaffold(
             appBar: AppBar(

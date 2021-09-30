@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 final oCcy = new NumberFormat("#,##0.00", "en_US");
 
 String formatCurency(dynamic numbers) {
-  return currency + oCcy.format(numbers);
+  return currency + oCcy.format('50000');
 }
 
 double toDouble(dynamic number) {

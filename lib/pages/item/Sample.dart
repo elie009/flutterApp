@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Formatter.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:flutter_app/widgets/section/IconText.dart';
@@ -82,7 +82,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                 fontWeight: FontWeight.w500),
                             width: 0.9),
                         TextLabelByLine(
-                            text: formatCurency(widget.props.fixPrice),
+                            text: widget.props.saleFixPrice.toString(),
                             style: TextStyle(
                                 color: blackColor,
                                 fontSize: 25,
@@ -144,7 +144,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                 alignment: Alignment.topRight,
                                 child: Text(widget.props.numLikes.toString() +
                                     ' like  |  ' +
-                                    widget.props.numDisLike.toString() +
+                                    widget.props.numViews.toString() +
                                     " views"),
                               )
                             ],

@@ -5,7 +5,7 @@ import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:provider/provider.dart';
 
 import '../PopupOffer.dart';

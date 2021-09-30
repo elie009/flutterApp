@@ -7,7 +7,7 @@ import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/ChatModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';

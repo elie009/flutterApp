@@ -4,17 +4,18 @@ import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/home/topmenu/TopMenus.dart';
 import 'package:flutter_app/pages/item/itemform/itemlist/PropsResidence.dart';
+import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/pages/search/BodyContainer.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/card/ItemCard.dart';
 import 'package:flutter_app/widgets/card/SmallItemCard.dart';
 import 'package:flutter_app/widgets/components/CheckBox.dart';
 import 'package:flutter_app/widgets/components/CheckBox2.dart';
 import 'package:flutter_app/widgets/section/CommonPageDisplay.dart';
 import 'package:provider/provider.dart';
-
-import 'components/FormITemPage.dart';
 
 class ItemAddFormPage extends StatefulWidget {
   @override
@@ -67,9 +68,15 @@ class _BodyContentState extends State<BodyContent> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserBaseModel>(context);
+
     Map<String, Widget> map = {
-      '1001': FlutterStepperPage(propcheck: propcheck),
-      '1002': PropsResidence(),
+      Constants.lotCode: FormItemPage(
+        propcheck: propcheck,
+        menuCode: Constants.lotCode,
+        user: user,
+      ),
+      Constants.resCode: PropsResidence(),
     };
     var size = MediaQuery.of(context).size;
     final double itemWidth = size.width / 2;
@@ -93,24 +100,24 @@ class _BodyContentState extends State<BodyContent> {
             ),
             Expanded(
               child: LabeledCheckboxCol(
-                label: 'Rentals',
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                value: propcheck.rental,
-                onChanged: (bool newValue) {
-                  setState(() {
-                    propcheck.rental = newValue;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: LabeledCheckboxCol(
                 label: 'Installment',
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 value: propcheck.installment,
                 onChanged: (bool newValue) {
                   setState(() {
                     propcheck.installment = newValue;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: LabeledCheckboxCol(
+                label: 'Rentals',
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                value: propcheck.rental,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    propcheck.rental = newValue;
                   });
                 },
               ),

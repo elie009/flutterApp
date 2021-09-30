@@ -2,11 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 import 'package:flutter_app/widgets/section/SearchWidget.dart';
 import 'package:image_picker/image_picker.dart';
@@ -295,7 +296,7 @@ class _HomePageState extends State<HomeMessagePage> {
                 }
               } else {
                 print('viewpoint 12');
-                DatabaseService()
+                DatabaseServiceProps()
                     .propertyCollection
                     .doc(doc["propsId"])
                     .get()

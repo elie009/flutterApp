@@ -1,8 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
+import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/utils/Formatter.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:provider/provider.dart';
 
 import '../../FoodOrderPage.dart';
@@ -12,6 +19,8 @@ class InventoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = Provider.of<List<PropertyModel>>(context);
+    final user = Provider.of<UserBaseModel>(context);
+
     return Column(
       children: <Widget>[
         SizedBox(
@@ -58,11 +67,33 @@ class InventoryPage extends StatelessWidget {
                 width: MediaQuery.of(context).size.width,
                 top: MediaQuery.of(context).size.height / 6.0,
                 // left: 76.0,
-                child: CartItem(
-                    productName: textlimiter(i.title),
-                    productPrice: "\$96.00",
-                    productImage: "ic_popular_food_1",
-                    productCartQuantity: "2"),
+                child: InkWell(
+                  onTap: () {
+                    PropertyChecking propcheck = PropertyChecking.init();
+                    if (i.saleFixPrice != null || i.saleFixPrice != 0.0)
+                      propcheck.sale = true;
+                    if (i.installmentFixPrice != null ||
+                        i.installmentFixPrice != 0.0)
+                      propcheck.installment = true;
+                    if (i.rentFixPrice != null || i.rentFixPrice != 0.0)
+                      propcheck.rental = true;
+
+                    Navigator.push(
+                        context,
+                        ScaleRoute(
+                            page: FormItemPage(
+                          user: user,
+                          menuCode: i.menuid,
+                          propcheck: propcheck,
+                          props: i,
+                        )));
+                  },
+                  child: CartItem(
+                      productName: textlimiter(i.title),
+                      productPrice: i.saleFixPrice.toString(),
+                      productImage: "ic_popular_food_1",
+                      productCartQuantity: "2"),
+                ),
               ),
             ),
           ),

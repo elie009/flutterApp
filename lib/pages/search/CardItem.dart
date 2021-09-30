@@ -88,7 +88,7 @@ class Cards extends StatelessWidget {
                           flex: 1,
                           fit: FlexFit.loose,
                           child: new Text(
-                            "P " + oCcy.format(props.fixPrice),
+                            "P " + oCcy.format(props.saleFixPrice),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             softWrap: false,

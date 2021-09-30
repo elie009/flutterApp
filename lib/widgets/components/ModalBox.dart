@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 
 class ModalBox extends StatelessWidget {
   final Widget body;
@@ -10,7 +10,7 @@ class ModalBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 200,
-      color: yelloamber,
+      color: yellowamber,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -9,7 +9,7 @@ import 'package:flutter_app/pages/booking/BookingPage.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/pages/item/PopupOffer.dart';
 import 'package:flutter_app/pages/message/inquire/ChatInquire.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
@@ -29,7 +29,6 @@ class ItemDetailsPage extends StatefulWidget {
 class _ItemDetailsPageState extends State<ItemDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBaseModel>(context);
 
     PropertyModel props = widget.props;
     return DefaultTabController(
@@ -67,7 +66,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               //CarouselDemo(),
               FoodTitleWidget(
                   productName: props.title,
-                  productPrice: "P " + oCcy.format(props.fixPrice),
+                  productPrice: "P " + oCcy.format(props.saleFixPrice),
                   productHost: props.location),
               SizedBox(
                 height: 15,

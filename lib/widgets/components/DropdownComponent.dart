@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 
-class DropDownComponent extends StatelessWidget {
-  const DropDownComponent({
+class DropdownComponent extends StatelessWidget {
+  const DropdownComponent({
     Key key,
     @required this.label,
     @required this.value,

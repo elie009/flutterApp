@@ -4,7 +4,7 @@ import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/SingleItemChecker.dart';
 import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/service/CheckBookingDate.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 import 'package:provider/provider.dart';

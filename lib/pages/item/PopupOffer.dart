@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/item/DataTableOffer.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/section/SearchWidget.dart';
 
 class PopupOffer extends StatelessWidget {

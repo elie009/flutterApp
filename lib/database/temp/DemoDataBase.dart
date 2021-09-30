@@ -44,32 +44,32 @@ class PrepareData {
       "Lot data2x",
       "200m lot"
     ];
-    for (String i in list) {
-      String id = idPropertyLot;
-      PropertyLotModel props = PropertyLotModel(
-          0,
-          0,
-          0,
-          id,
-          i,
-          'simple description',
-          "assets/images/bestfood/ic_best_food_8.jpeg",
-          500000,
-          'Cebu City, Cebu',
-          '1001',
-          'nwpxhS8cqDgYw8QtcKKYuQogMf92',
-          0.00,
-          0.00,
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          'APPROVE',getDateNowMilliSecondStr);
+    // for (String i in list) {
+    //   String id = idPropertyLot;
+    //   PropertyLotModel props = PropertyLotModel(
+    //       0,
+    //       0,
+    //       0,
+    //       id,
+    //       i,
+    //       'simple description',
+    //       "assets/images/bestfood/ic_best_food_8.jpeg",
+    //       500000,
+    //       'Cebu City, Cebu',
+    //       '1001',
+    //       'nwpxhS8cqDgYw8QtcKKYuQogMf92',
+    //       0.00,
+    //       0.00,
+    //       '',
+    //       '',
+    //       '',
+    //       '',
+    //       '',
+    //       '',
+    //       'APPROVE',getDateNowMilliSecondStr);
 
-      await DatabaseService(uid: id).updatePropertyLot(props);
-    }
+    //   await DatabaseService(uid: id).updatePropertyLot(props);
+    // }
   }
 
   Future addBookingData() async {

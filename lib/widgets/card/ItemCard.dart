@@ -6,7 +6,7 @@ import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/pages/item/Sample.dart';
 import 'package:flutter_app/utils/Formatter.dart';
-import 'package:flutter_app/utils/Utils.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class ItemCard extends StatelessWidget {
@@ -77,10 +77,9 @@ class ItemCard extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Center(
                                 child: Image.asset(
-                              // 'assets/images/popular_foods/' +
-                              //     imageUrl +
-                              //     ".png",
-                              props.imageName,
+                              props.imageName.isEmpty
+                                  ? Constants.itemCard1img
+                                  : props.imageName,
                             )),
                           )
                         ],
@@ -154,8 +153,9 @@ class ItemCard extends StatelessWidget {
                                     EdgeInsets.only(left: 5, top: 0, right: 0),
                                 child: TextLabelFade(
                                     text: '\P ' +
-                                        formatCurency(toDouble(
-                                            props.fixPrice.toString())),
+                                        // formatCurency(
+                                        //     props.saleFixPrice.toString()),
+                                        props.saleFixPrice.toString(),
                                     style: TextStyle(
                                         color: Color(0xFF6e6e71),
                                         fontSize: 17,
@@ -246,7 +246,7 @@ class ItemCard extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                    text: props.numDisLike.toString(),
+                                    text: props.numViews.toString(),
                                     style: TextStyle(
                                         color: primaryColor,
                                         fontSize: 12,
