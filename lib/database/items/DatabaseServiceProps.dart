@@ -75,30 +75,9 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
   }
 
   @override
-  Future add(dynamic rawdata) async {
-    PropertyModel data = rawdata;
-    return propertyCollection
-        .doc(Constants.lotCode)
-        .collection(Constants.collectionLot)
-        .add({
-      'numComments': data.numComments == null ? 0 : data.numComments,
-      'numLikes': data.numLikes == null ? 0 : data.numLikes,
-      'numViews': data.numViews == null ? 0 : data.numViews,
-      'propid': data.propid,
-      'title': data.title,
-      'description': data.description,
-      'imageName': data.imageName,
-      'saleFixPrice': data.saleFixPrice,
-      'rentFixPrice': data.rentFixPrice,
-      'installmentFixPrice': data.installmentFixPrice,
-      'location': data.location,
-      'menuid': data.menuid,
-      'ownerUid': data.ownerUid,
-      'status': data.status,
-      'postdate': data.postdate,
-      'forSwap': data.forSwap,
-      'conditionCode': data.conditionCode,
-    });
+  add(dynamic rawdata) async {
+    // TODO: implement delete
+    throw UnimplementedError();
   }
 
   @override

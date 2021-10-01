@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextArea.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextFormWithIcon.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/RadioBtn.dart';
 
-import 'lot/FormInfo.dart';
 
 class FormBaseDetails extends StatefulWidget {
   @override

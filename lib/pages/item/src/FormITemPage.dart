@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
 import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';

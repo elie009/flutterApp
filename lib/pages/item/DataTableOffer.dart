@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/pages/item/ItemDisplay.dart';
-import 'package:flutter_app/pages/search/CardItem.dart';
 
 class DataTableOffer extends StatefulWidget {
   @override

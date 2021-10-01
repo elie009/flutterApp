@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
-import 'package:flutter_app/pages/item/ItemDisplay.dart';
 import 'package:flutter_app/pages/item/ItemViewDetails.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';
@@ -22,7 +21,7 @@ class ItemCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context, ScaleRoute(page: ItemDetailsPage(props: props)));
+            context, ScaleRoute(page: ItemViewDetails(props: props)));
       },
       child: Column(
         children: <Widget>[
@@ -92,7 +91,7 @@ class ItemCard extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   ScaleRoute(
-                                      page: ItemDetailsPage(props: props)));
+                                      page: ItemViewDetails(props: props)));
                             },
                             child: Container(
                                 alignment: Alignment.bottomLeft,
@@ -145,7 +144,7 @@ class ItemCard extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   ScaleRoute(
-                                      page: ItemDetailsPage(props: props)));
+                                      page: ItemViewDetails(props: props)));
                             },
                             child: Container(
                                 alignment: Alignment.bottomLeft,
@@ -166,7 +165,7 @@ class ItemCard extends StatelessWidget {
                       InkWell(
                         onTap: () {
                           Navigator.push(context,
-                              ScaleRoute(page: ItemDetailsPage(props: props)));
+                              ScaleRoute(page: ItemViewDetails(props: props)));
                         },
                         child: Container(
                           alignment: Alignment.bottomLeft,
