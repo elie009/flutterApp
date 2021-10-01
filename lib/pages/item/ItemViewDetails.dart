@@ -1,12 +1,9 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
-import 'package:flutter_app/widgets/section/IconText.dart';
 import 'package:provider/provider.dart';
 
 import 'component/ItemCardMenu.dart';

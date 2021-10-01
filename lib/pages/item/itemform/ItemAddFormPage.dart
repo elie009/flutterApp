@@ -3,16 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/home/topmenu/TopMenus.dart';
 import 'package:flutter_app/pages/item/itemform/itemlist/PropsResidence.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
-import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/utils/Constant.dart';
-import 'package:flutter_app/widgets/card/ItemCard.dart';
 import 'package:flutter_app/widgets/card/SmallItemCard.dart';
-import 'package:flutter_app/widgets/components/CheckBox.dart';
 import 'package:flutter_app/widgets/components/CheckBox2.dart';
 import 'package:flutter_app/widgets/section/CommonPageDisplay.dart';
 import 'package:provider/provider.dart';
@@ -77,6 +72,8 @@ class _BodyContentState extends State<BodyContent> {
         user: user,
       ),
       Constants.resCode: PropsResidence(),
+
+      
     };
     var size = MediaQuery.of(context).size;
     final double itemWidth = size.width / 2;

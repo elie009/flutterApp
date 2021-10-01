@@ -100,7 +100,7 @@ class FormLotInfoState extends State<FormLotInfo> {
   static addLotToDB(String menuCode, String userui) async {
     PropertyLotModel props = FormLotInfoState.getModelValue;
     String propid = FormBaseDetailsState.propdetails.propsid == null
-        ? idProperty
+        ? Constants.lotCode + idProperty
         : FormBaseDetailsState.propdetails.propsid;
 
     props.propid = propid;

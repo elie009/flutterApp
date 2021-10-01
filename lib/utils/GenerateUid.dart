@@ -41,9 +41,5 @@ String get idContact {
 }
 
 String get idProperty {
-  return ("lot" + uuid.v4());
-}
-
-String get idPropertyLot {
-  return ("prop" + uuid.v4());
+  return uuid.v4();
 }

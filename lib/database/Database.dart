@@ -2,12 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/MenuModel.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/utils/Constant.dart';
-import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseService {
   final String uid;
@@ -23,10 +19,6 @@ class DatabaseService {
 
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('user');
-
-
-  final CollectionReference properyLottCollection =
-      FirebaseFirestore.instance.collection('propertyLot');
 
   final CollectionReference bookingCollection =
       FirebaseFirestore.instance.collection('booking');
@@ -254,7 +246,6 @@ class DatabaseService {
     return userData;
   }
 
-
 // get all booking item on stream
   Stream<List<BookingModel>> booking(String propsid) {
     return bookingCollection
@@ -286,8 +277,6 @@ class DatabaseService {
       return false;
     }
   }
-
-  
 }
 
 abstract class DatabaseServicePropsStructure<T> {
@@ -297,6 +286,6 @@ abstract class DatabaseServicePropsStructure<T> {
   getByMenu(String menuid) {}
   getByUserMenu(String uid, String menuid) {}
 
-  add(dynamic propsLot) async {}
-  delete(String propsLot) async {}
+  add(dynamic data) async {}
+  delete(String data) async {}
 }
