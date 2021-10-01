@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/search/BodyContent.dart';
 import 'package:flutter_app/widgets/section/SearchWidget.dart';
 import 'package:flutter_app/widgets/section/CommonPageDisplay.dart';
-import 'package:provider/provider.dart';
 
 class BodyContainer extends StatefulWidget {
   @override

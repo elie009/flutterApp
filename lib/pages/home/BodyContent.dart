@@ -10,7 +10,7 @@ class BodyContent extends StatelessWidget {
       children: <Widget>[
         PopularFoodsWidget(prefs: null),
         LabelTitle(
-          title: 'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww',
+          title: 'Hot items',
         ),
         LargeItemCard(
             name: "Fried Egg",

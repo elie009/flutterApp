@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
 import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
@@ -10,7 +11,10 @@ import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/items/FormBaseDetails.dart';
 import 'package:flutter_app/pages/item/src/items/FormComplete.dart';
 import 'package:flutter_app/pages/item/src/items/lot/FormInfo.dart';
+import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/widgets/components/AlertBox.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FormItemPage extends StatefulWidget {
   FormItemPage({this.propcheck, this.menuCode, this.props, this.user});
@@ -112,11 +116,18 @@ class _FormItemPageState extends State<FormItemPage> {
                 }
               });
               if (currentStep == 0) {
-                print('this is complete');
                 if (Constants.lotCode == widget.menuCode) {
                   FormLotInfoState.addLotToDB(widget.menuCode, widget.user.uid);
-                  return;
+                  Navigator.pop(context);
                 }
+
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => AlertBox(
+                          title: 'Successfully',
+                          message: 'Transation are saved',
+                        ));
               }
             },
             onStepCancel: () {
@@ -133,6 +144,11 @@ class _FormItemPageState extends State<FormItemPage> {
       ),
     );
   }
+}
+
+Future backToProfilePage(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  Navigator.push(context, ScaleRoute(page: ProfilePage(prefs: prefs)));
 }
 
 class MapData {

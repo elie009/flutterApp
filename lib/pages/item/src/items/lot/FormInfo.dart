@@ -171,10 +171,7 @@ class FormLotInfoState extends State<FormLotInfo> {
                 optionCategory: propLot.saleOptionCategory,
                 onChangedOptionCategory: (int newValue) {
                   setState(() {
-                    print('---?>');
-                    print(newValue);
                     propLot.saleOptionCategory = newValue;
-                    print(propLot.saleOptionCategory);
                     propLot.saleOptionCategoryStr =
                         Constants.convertTermsCodeToDate(
                             propLot.saleOptionCategory.toString());

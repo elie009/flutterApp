@@ -7,6 +7,7 @@ import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseService {
   final String uid;
@@ -23,8 +24,6 @@ class DatabaseService {
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('user');
 
-  // final CollectionReference propertyCollection =
-  //     FirebaseFirestore.instance.collection('property');
 
   final CollectionReference properyLottCollection =
       FirebaseFirestore.instance.collection('propertyLot');
@@ -37,28 +36,6 @@ class DatabaseService {
 
   final CollectionReference mobileCollection =
       FirebaseFirestore.instance.collection('mobiles');
-
-  // Future updateProperyData(PropertyModel data) async {
-  //   return await propertyCollection.doc(data.propid).set({
-  //     'numComments': data.numComments == null ? 0 : data.numComments,
-  //     'numLikes': data.numLikes == null ? 0 : data.numLikes,
-  //     'numDisLikes': data.numViews == null ? 0 : data.numViews,
-  //     'propid': data.propid,
-  //     'title': data.title,
-  //     'description': data.description,
-  //     'imageName': data.imageName,
-  //     'saleFixPrice': data.saleFixPrice,
-  //     'rentFixPrice': data.rentFixPrice,
-  //     'installmentFixPrice': data.installmentFixPrice,
-  //     'location': data.location,
-  //     'menuid': data.menuid,
-  //     'ownerUid': data.ownerUid,
-  //     'status': data.status,
-  //     'postdate': data.postdate,
-  //     'forSwap': data.forSwap,
-  //     'conditionCode': data.conditionCode,
-  //   });
-  // }
 
   Future updateBookingData(BookingModel data) async {
     return await bookingCollection.doc(data.bookId).set({
@@ -169,50 +146,6 @@ class DatabaseService {
   }
 
 //get item list from snapshot
-  // Future<List<PropertyModel>> propertyListFromSnapshot(String uid) async {
-  //   List<PropertyModel> items;
-
-  //   await DatabaseService()
-  //       .propertyCollection
-  //       .doc(Constants.lotCode)
-  //       .collection(Constants.collectionLot)
-  //       .where('ownerUid', isEqualTo: uid)
-  //       .get()
-  //       .then((value) {
-  //     items = value.docs.map((doc) {
-  //       print(doc.data());
-  //       try {
-  //         return PropertyModel.obj(
-  //           doc.get('numComments') ?? 0,
-  //           doc.get('numLikes') ?? 0,
-  //           doc.get('numDisLikes') ?? 0,
-  //           doc.get('propid') ?? '',
-  //           doc.get('title') ?? '',
-  //           doc.get('description') ?? '',
-  //           doc.get('imageName') ?? '',
-  //           doc.get('saleFixPrice') ?? 0,
-  //           doc.get('rentFixPrice') ?? 0,
-  //           doc.get('installmentFixPrice') ?? 0,
-  //           doc.get('location') ?? '',
-  //           doc.get('menuid') ?? '',
-  //           doc.get('ownerUid') ?? '',
-  //           doc.get('status') ?? '',
-  //           doc.get('postdate') ?? '',
-  //           doc.get('forSwap') ?? false,
-  //           doc.get('conditionCode') ?? -1,
-  //         );
-  //       } catch (e) {
-  //         print(e.toString());
-  //         return null;
-  //       }
-  //     }).toList();
-
-  //     return items;
-  //   });
-  //   return items;
-  // }
-
-//get item list from snapshot
   List<PropertyModel> _propertyListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
@@ -321,35 +254,6 @@ class DatabaseService {
     return userData;
   }
 
-  // get all property item on stream
-  // Stream<List<PropertyModel>> properyByMenuId(String menuId) {
-  //   return propertyCollection
-  //       .where('menuid', isEqualTo: menuId)
-  //       .snapshots()
-  //       .map(_propertyListFromSnapshot);
-  //   //return propertCollection.snapshots().map(_propertyListFromSnapshot);
-  // }
-
-// get all property item on stream
-  // Stream<List<PropertyModel>> properyByOwnerId2(
-  //     String ownerId, String menuid, String menu) {
-  //   return propertyCollection
-  //       .doc(menuid)
-  //       .collection(menu)
-  //       .where('ownerUid', isEqualTo: ownerId)
-  //       .snapshots()
-  //       .map(_propertyListFromSnapshot);
-  // }
-
-  // get all property item on stream
-  // Stream<List<PropertyModel>> properyByOwnerId(String ownerId) {
-  //   return propertyCollection
-  //       .where('ownerUid', isEqualTo: ownerId)
-  //       .snapshots()
-  //       .map(_propertyListFromSnapshot);
-
-  //   //return propertCollection.snapshots().map(_propertyListFromSnapshot);
-  // }
 
 // get all booking item on stream
   Stream<List<BookingModel>> booking(String propsid) {
@@ -358,7 +262,6 @@ class DatabaseService {
         .where('bookingStatus', whereIn: ['BREAK', 'APPROVE'])
         .snapshots()
         .map(_bookingListFromSnapshot);
-    //return bookingCollection.snapshots().map(_bookingListFromSnapshot);
   }
 
 // get all booking item on stream
@@ -383,6 +286,8 @@ class DatabaseService {
       return false;
     }
   }
+
+  
 }
 
 abstract class DatabaseServicePropsStructure<T> {
