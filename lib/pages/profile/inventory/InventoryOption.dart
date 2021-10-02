@@ -5,35 +5,47 @@ import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/profile/inventory/InventoryPage.dart';
 import 'package:flutter_app/utils/Constant.dart';
 
-class InventoryOption extends StatelessWidget {
+class InventoryOption extends StatefulWidget {
+  @override
+  _InventoryOptionState createState() => _InventoryOptionState();
+}
+
+class _InventoryOptionState extends State<InventoryOption> {
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          TextButton.icon(
-            icon: Icon(Icons.calendar_today_outlined, color: primaryColor),
-            label: Text('Manage', style: TextStyle(color: primaryColor)),
-            onPressed: () {},
-          ),
-          SizedBox(width: 50),
-          TextButton.icon(
-            icon: Icon(Icons.add, color: primaryColor),
-            label: Text('Add', style: TextStyle(color: primaryColor)),
-            onPressed: () {
-              //Navigator.push(context, ScaleRoute(page: PropertyItemPage()));
+          _buildButtonColumn(Icons.calendar_today_outlined, 'Manage', () {
+            setState(() {});
+          }),
+          _buildButtonColumn(Icons.add, 'Add', () {
+            setState(() {
               Navigator.push(context, ScaleRoute(page: ItemAddFormPage()));
-            },
-          ),
-          SizedBox(width: 50),
-          TextButton.icon(
-            icon: Icon(Icons.sort, color: primaryColor),
-            label: Text('Filer', style: TextStyle(color: primaryColor)),
-            onPressed: () {},
-          ),
+            });
+          }),
+          _buildButtonColumn(Icons.sort, 'Filer', () {
+            setState(() {});
+          }),
         ],
       ),
+    );
+  }
+
+  Column _buildButtonColumn(IconData icon, String label, Function onChanged) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton.icon(
+          icon: Icon(icon, color: primaryColor),
+          label: Text(label, style: TextStyle(color: primaryColor)),
+          onPressed: () {
+            onChanged();
+          },
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/RotationRoute.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
 import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
@@ -55,7 +57,6 @@ class PopularFoodTitle extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              print('test home');
               Navigator.push(
                   context,
                   ScaleRoute(
@@ -78,87 +79,28 @@ class PopularFoodTitle extends StatelessWidget {
   }
 }
 
+class PopulateList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var items = Provider.of<List<PropertyModel>>(context);
+    items = items == null ? [] : items;
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      children: items.map((PropertyModel i) {
+        return ItemCard(props: i);
+      }).toList(),
+    );
+  }
+}
+
 class PopularFoodItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: <Widget>[
-        
-        // PropertyModel props = new PropertyModel(numComments, numLike, numDisLike, propid, title, description, imageName, fixPrice, location, menuid, ownerUid, status)
-        // ItemCard(
-        //     title: "Lot for sale",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: '150000000.00',
-        //     numberOflikes: '9',
-        //     numberOfdislikes: '1',
-        //     numberOfComment: '13',
-        //     location: "Talisay City, Cebu"),
-        // ItemCard(
-        //     title: "Yuta data data",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "6500.00",
-        //     numberOflikes: "4",
-        //     numberOfdislikes: "0",
-        //     numberOfComment: '5',
-        //     location: "Lapu-Lapu City, Cebu"),
-        // ItemCard(
-        //     title: "For assume Casa mira south",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "500000.00",
-        //     numberOflikes: "4",
-        //     numberOfdislikes: "0",
-        //     numberOfComment: '5',
-        //     location: "Naga City, Cebu"),
-        // ItemCard(
-        //     title: "Lot for rent per SQM",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "50.00",
-        //     numberOflikes: "6",
-        //     numberOfdislikes: "1",
-        //     numberOfComment: '5',
-        //     location: "Lapu-Lapu City, Cebu"),
-        // ItemCard(
-        //     title: "House and lot for assume",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "300000.00",
-        //     numberOflikes: "2",
-        //     numberOfdislikes: "2",
-        //     numberOfComment: '3',
-        //     location: "Lapu-Lapu City, Cebu"),
-        // ItemCard(
-        //     title: "Baratu nga yuta data-data",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "3500.00",
-        //     numberOflikes: "1",
-        //     numberOfdislikes: "0",
-        //     numberOfComment: '2',
-        //     location: "Balamban, Cebu"),
-        // ItemCard(
-        //     title: "House for Rent",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "12000.00",
-        //     numberOflikes: "12",
-        //     numberOfdislikes: "1",
-        //     numberOfComment: '15',
-        //     location: "Cebu City, Cebu"),
-        // ItemCard(
-        //     title: "Condo dool sa ayala center",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "3000000.00",
-        //     numberOflikes: "0",
-        //     numberOfdislikes: "0",
-        //     numberOfComment: '0',
-        //     location: "Cebu City, Cebu"),
-        // ItemCard(
-        //     title: "House and lot",
-        //     imageUrl: "assets/images/popular_foods/ic_popular_food_3.png",
-        //     price: "2500000.00",
-        //     numberOflikes: "8",
-        //     numberOfdislikes: "0",
-        //     numberOfComment: '10',
-        //     location: "Lapu-Lapu City, Cebu"),
-      ],
-    );
+    return Scaffold(
+        body: StreamProvider<List<PropertyModel>>.value(
+      value: DatabaseServiceProps().getAll(),
+      initialData: null,
+      child: PopulateList(),
+    ));
   }
 }

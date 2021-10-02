@@ -1,11 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/utils/Formatter.dart';
-import 'package:flutter_app/widgets/PopularFoodsWidget.dart';
 import 'package:flutter_app/widgets/card/ItemCard.dart';
-import 'package:flutter_app/widgets/card/LargeItemCard.dart';
 import 'package:provider/provider.dart';
 
 class BodyContent extends StatelessWidget {
@@ -13,7 +9,8 @@ class BodyContent extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final double itemWidth = size.width / 2;
-    final items = Provider.of<List<PropertyModel>>(context);
+    var items = Provider.of<List<PropertyModel>>(context);
+    items = items == null ? [] : items;
     return new Scaffold(
         body: new Container(
       child: new GridView.count(

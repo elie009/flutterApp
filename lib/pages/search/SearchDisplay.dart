@@ -31,6 +31,13 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
         initialData: null,
         child: Scaffold(
             appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Color(0xFF3a3737),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
               backgroundColor: Color(0xFFFAFAFA),
               elevation: 0,
               title: Text(
@@ -41,16 +48,6 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
                     fontWeight: FontWeight.w500),
               ),
               brightness: Brightness.light,
-              actions: <Widget>[
-                IconButton(
-                    icon: Icon(
-                      Icons.notifications_none,
-                      color: Color(0xFF3a3737),
-                    ),
-                    onPressed: () async {
-                      await _auth.signOut();
-                    })
-              ],
             ),
             body: BodyContainer()),
       ),

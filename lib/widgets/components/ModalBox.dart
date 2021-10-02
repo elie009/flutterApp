@@ -17,7 +17,7 @@ class ModalBox extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const Text('Modal BottomSheet'),
-            body,
+            body == null ? Container() : body,
             ElevatedButton(
               child: const Text('Close BottomSheet'),
               onPressed: () {

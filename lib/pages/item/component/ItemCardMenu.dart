@@ -10,96 +10,66 @@ import 'package:provider/provider.dart';
 
 import '../PopupOffer.dart';
 
-class ItemCardMenu extends StatelessWidget {
-  final PropertyModel props;
+class ItemCardMenu extends StatefulWidget {
   ItemCardMenu({@required this.props});
+  final PropertyModel props;
+
+  @override
+  _ItemCardMenuState createState() => _ItemCardMenuState();
+}
+
+class _ItemCardMenuState extends State<ItemCardMenu> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserBaseModel>(context);
 
-    return Center(
+    return Container(
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.push(context, ScaleRoute(page: BookingPage()));
-              },
-              icon: Icon(Icons.access_time),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Book",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-          SizedBox(
-            width: 30,
-          ),
-          PopupOffer(),
-          SizedBox(
-            width: 30,
-          ),
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {
-                chatInspector(user, props, context);
-              },
-              icon: Icon(Icons.message_outlined),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Message",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-          SizedBox(
-            width: 30,
-          ),
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.save_alt),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Save",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
-          SizedBox(
-            width: 30,
-          ),
-          Column(children: <Widget>[
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.emoji_flags_outlined),
-              color: primaryColor,
-              iconSize: 30,
-            ),
-            Text(
-              "Follow",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            )
-          ]),
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildButtonColumn(primaryColor, Icons.access_time, 'Book', () {
+            setState(() {
+              Navigator.push(context, ScaleRoute(page: BookingPage()));
+            });
+          }),
+          _buildButtonColumn(
+              primaryColor, Icons.local_offer_outlined, 'Send Offer', () {
+            setState(() {});
+          }),
+          _buildButtonColumn(primaryColor, Icons.message_outlined, 'Message',
+              () {
+            setState(() {
+              chatInspector(user, widget.props, context);
+            });
+          }),
+          _buildButtonColumn(primaryColor, Icons.save_alt, 'Save', () {
+            setState(() {});
+          }),
         ],
       ),
+    );
+  }
+
+  Column _buildButtonColumn(
+      Color color, IconData icon, String label, Function onChanged) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          onPressed: () {
+            onChanged();
+          },
+          icon: Icon(icon),
+          color: primaryColor,
+          iconSize: 30,
+        ),
+        Text(
+          label,
+          style: TextStyle(
+              fontSize: 14, color: color, fontWeight: FontWeight.w400),
+        ),
+      ],
     );
   }
 }

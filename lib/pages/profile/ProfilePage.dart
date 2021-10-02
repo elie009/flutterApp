@@ -1,21 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
-import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/section/ImagePicker.dart';
 import 'package:flutter_app/database/temp/DemoDataBase.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../FoodOrderPage.dart';
 import 'ProfileStats.dart';
-import 'inventory/InventoryOption.dart';
 import 'inventory/InventoryPage.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -69,17 +65,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         ? (profileSnapshot.get('image') != null
                             ? Container(
                                 margin: const EdgeInsets.only(top: 50.0),
-                                width: 150.0,
-                                height: 150.0,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: new NetworkImage(
-                                          profileSnapshot.get('image')),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.circular(80.0),
+                                width: 100.0,
+                                height: 100.0,
+                                decoration: new BoxDecoration(
+                                    shape: BoxShape.circle,
                                     border: Border.all(
-                                        width: 3, color: whiteColor)),
+                                        color: yellowamber,
+                                        width: 3.0,
+                                        style: BorderStyle.solid),
+                                    image: new DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(
+                                            'assets/images/bestfood/ic_best_food_8.jpeg'))),
                               )
                             : Container())
                         : Container()),
@@ -248,12 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 10,
           ),
           SingleChildScrollView(
-            child: Positioned(
-              width: MediaQuery.of(context).size.width,
-              top: MediaQuery.of(context).size.height / 6.0,
-              // left: 76.0,
-              child: generateProfileTab(),
-            ),
+            child: generateProfileTab(),
           ),
         ],
       ),

@@ -44,7 +44,6 @@ Future chatInspector(
     prefs.setString('owenerImage', value.get('image'));
     prefs.setString('ownerName', value.get('firstName'));
   });
-
   Navigator.push(
       context,
       ScaleRoute(

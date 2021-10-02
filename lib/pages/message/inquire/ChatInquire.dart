@@ -50,9 +50,7 @@ class ChatPageState extends State<ChatInquire> {
   @override
   void initState() {
     super.initState();
-
     chatReference = widget.chatReference;
-
     newitem = widget.isNewContact || widget.isNewChat;
   }
 
@@ -213,12 +211,7 @@ class ChatPageState extends State<ChatInquire> {
         padding: EdgeInsets.all(5),
         child: new Column(
           children: <Widget>[
-            Positioned(
-              width: MediaQuery.of(context).size.width,
-              top: MediaQuery.of(context).size.height / 6.0,
-              // left: 76.0,
-              child: RowCardInquire(props: widget.props),
-            ),
+            RowCardInquire(props: widget.props),
             (newitem
                 ? Expanded(
                     child: new ListView(reverse: true, children: <Widget>[

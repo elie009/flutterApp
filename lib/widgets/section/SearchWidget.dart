@@ -29,7 +29,7 @@ class SearchWidget extends StatelessWidget {
             icon: Icon(Icons.sort),
             color: primaryColor,
             onPressed: () {
-              ModalBox();
+              //ModalBox();
               showModalBottomSheet<void>(
                   context: context,
                   builder: (BuildContext context) {

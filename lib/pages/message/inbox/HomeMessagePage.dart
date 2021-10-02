@@ -7,14 +7,11 @@ import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
-import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 import 'package:flutter_app/widgets/section/SearchWidget.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contact_picker/contact_picker.dart';
 
 class HomeMessagePage extends StatefulWidget {
   final SharedPreferences prefs;
@@ -28,7 +25,6 @@ class _HomePageState extends State<HomeMessagePage> {
   String _tabTitle = "Contacts";
   List<Widget> _children = [Container(), Container()];
 
-  final ContactPicker _contactPicker = new ContactPicker();
   CollectionReference contactsReference;
   DocumentReference profileReference;
   DocumentSnapshot profileSnapshot;
@@ -318,40 +314,6 @@ class _HomePageState extends State<HomeMessagePage> {
           ),
         )
         .toList();
-  }
-
-  openContacts() async {
-    Contact contact = await _contactPicker.selectContact();
-    if (contact != null) {
-      String phoneNumber = contact.phoneNumber.number
-          .toString()
-          .replaceAll(new RegExp(r"\s\b|\b\s"), "")
-          .replaceAll(new RegExp(r'[^\w\s]+'), '');
-      if (phoneNumber.length == 10) {
-        phoneNumber = '+91$phoneNumber';
-      }
-      if (phoneNumber.length == 12) {
-        phoneNumber = '+$phoneNumber';
-      }
-      if (phoneNumber.length == 13) {
-        DocumentReference mobileRef = DatabaseService()
-            .mobileCollection
-            .doc(phoneNumber.replaceAll(new RegExp(r'[^\w\s]+'), ''));
-        await mobileRef.get().then((documentReference) {
-          if (documentReference.exists) {
-            contactsReference.add({
-              'uid': documentReference['uid'],
-              'name': contact.fullName,
-              'mobile': phoneNumber.replaceAll(new RegExp(r'[^\w\s]+'), ''),
-            });
-          } else {
-            print('User Not Registered');
-          }
-        }).catchError((e) {});
-      } else {
-        print('Wrong Mobile Number');
-      }
-    }
   }
 
   void onTabTapped(int index) {
