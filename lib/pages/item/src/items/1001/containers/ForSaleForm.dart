@@ -1,22 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextForm.dart';
-import 'package:flutter_app/pages/item/src/items/lot/FormObj.dart';
+import 'package:flutter_app/pages/item/src/items/1001/FormObj.dart';
 import 'package:flutter_app/widgets/components/RadioBtn.dart';
 
 class ForSaleForm extends StatelessWidget implements LotForSaleObj {
   ForSaleForm(
       {this.optionCategory,
       this.onChangedOptionCategory,
+      this.saleAreaSizeVal,
       this.saleControllerFixPrice});
 
   final TextEditingController saleControllerFixPrice;
+  final TextEditingController saleAreaSizeVal;
   final int optionCategory;
   final Function onChangedOptionCategory;
 
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
+      saleAreaSize(),
+      SizedBox(height: 20),
       salePriceOptionsFunc(),
       saleOptionCategory(),
     ]);
@@ -83,6 +87,17 @@ class ForSaleForm extends StatelessWidget implements LotForSaleObj {
           ),
         ),
       ],
+    );
+  }
+
+  @override
+  saleAreaSize() {
+    return InputTextForm(
+      isReadOnly: false,
+      placeholder: "Total Area Size",
+      isText: false,
+      width: double.infinity,
+      value: saleAreaSizeVal,
     );
   }
 }

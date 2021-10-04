@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
+import 'package:flutter_app/model/Property1001Model.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/pages/item/src/items/FormBaseDetails.dart';
-import 'package:flutter_app/pages/item/src/items/lot/containers/ForRentForm.dart';
-import 'package:flutter_app/pages/item/src/items/lot/containers/ForSaleForm.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/ForRentForm.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/ForSaleForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:flutter_app/utils/StaticString.dart';
 import 'package:flutter_app/widgets/components/CheckBox.dart';
 
 class FormLotInfo extends StatefulWidget {
@@ -224,6 +220,7 @@ class FormLotInfoState extends State<FormLotInfo> {
 class FormLotModel {
   String propsId;
   TextEditingController saleControllerFixPrice;
+  TextEditingController saleAreaSizeVal;
   int saleOptionCategory;
   String saleOptionCategoryStr;
   TextEditingController rentControllerFixPrice;
@@ -233,6 +230,7 @@ class FormLotModel {
   String rentTermsOfRentCode;
   int rentOptionCategory;
   String rentOptionCategoryStr;
+  TextEditingController rentAreaSizeVal;
 
   FormLotModel.init() {
     this.saleControllerFixPrice = new TextEditingController();
@@ -244,6 +242,9 @@ class FormLotModel {
 
     this.saleOptionCategory = -1;
     this.saleOptionCategoryStr = '';
+
+    this.saleAreaSizeVal = new TextEditingController();
+    this.rentAreaSizeVal = new TextEditingController();
   }
 
   FormLotModel.snapshot(PropertyLotModel props) {
@@ -251,6 +252,9 @@ class FormLotModel {
     this.rentControllerFixPrice = new TextEditingController();
     this.rentConditions = new TextEditingController();
     this.rentMinContractRangeNum = new TextEditingController();
+
+    this.saleAreaSizeVal = new TextEditingController(); //not yet initializex
+    this.rentAreaSizeVal = new TextEditingController(); //not yet initializex
 
     this.saleControllerFixPrice.text = props.saleFixPrice.toString();
     this.rentControllerFixPrice.text = props.rentFixPrice.toString();
@@ -270,7 +274,9 @@ class FormLotModel {
   }
 
   FormLotModel({
+    this.saleAreaSizeVal,
     this.saleControllerFixPrice,
+    this.rentAreaSizeVal,
     this.rentControllerFixPrice,
     this.rentMinContractRangeNum,
     this.rentMinContractRangeCode,

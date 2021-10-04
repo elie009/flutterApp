@@ -7,7 +7,7 @@ import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:provider/provider.dart';
 
 import 'component/ItemCardMenu.dart';
-import 'component/ForPropLot.dart';
+import 'component/ItemViewBodyContent.dart';
 
 class ItemViewDetails extends StatefulWidget {
   ItemViewDetails({Key key, @required this.props}) : super(key: key);
@@ -156,7 +156,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                 fontWeight: FontWeight.w300),
                             width: 0.9),
                         SizedBox(height: 20),
-                        ForPropResidence(),
+                        ItemViewBodyContent(),
                       ],
                     ),
                   ],

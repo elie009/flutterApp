@@ -1,7 +1,7 @@
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/BookingModel.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
+import 'package:flutter_app/model/Property1001Model.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
@@ -44,33 +44,10 @@ class PrepareData {
       "Lot data2x",
       "200m lot"
     ];
-    // for (String i in list) {
-    //   String id = idPropertyLot;
-    //   PropertyLotModel props = PropertyLotModel(
-    //       0,
-    //       0,
-    //       0,
-    //       id,
-    //       i,
-    //       'simple description',
-    //       "assets/images/bestfood/ic_best_food_8.jpeg",
-    //       500000,
-    //       'Cebu City, Cebu',
-    //       '1001',
-    //       'nwpxhS8cqDgYw8QtcKKYuQogMf92',
-    //       0.00,
-    //       0.00,
-    //       '',
-    //       '',
-    //       '',
-    //       '',
-    //       '',
-    //       '',
-    //       'APPROVE',getDateNowMilliSecondStr);
-
-    //   await DatabaseService(uid: id).updatePropertyLot(props);
-    // }
   }
+
+
+  
 
   Future addBookingData() async {
     List<Map<String, String>> list = [

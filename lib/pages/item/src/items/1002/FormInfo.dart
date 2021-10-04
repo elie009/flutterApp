@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
+import 'package:flutter_app/model/Property1001Model.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/pages/item/src/items/FormBaseDetails.dart';
-import 'package:flutter_app/pages/item/src/items/lot/containers/ForRentForm.dart';
-import 'package:flutter_app/pages/item/src/items/lot/containers/ForSaleForm.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/ForRentForm.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/ForSaleForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:flutter_app/utils/StaticString.dart';
 import 'package:flutter_app/widgets/components/CheckBox.dart';
 
 class FormLotInfo extends StatefulWidget {

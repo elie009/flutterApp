@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/RotationRoute.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
-import 'package:flutter_app/database/items/DatabaseServicePropsLot.dart';
+import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
 import 'package:flutter_app/model/MenuModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';

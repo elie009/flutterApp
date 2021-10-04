@@ -4,9 +4,11 @@ abstract class LotFormRentObj {
   rentTermsOfPaymentFunc() {}
   rentPriceOptionsFunc() {}
   rentOptionCategory() {}
+  rentAreaSize() {}
 }
 
 abstract class LotForSaleObj {
   salePriceOptionsFunc() {}
   saleOptionCategory() {}
+  saleAreaSize() {}
 }

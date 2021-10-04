@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/pages/item/src/items/lot/FormObj.dart';
+import 'package:flutter_app/pages/item/src/items/1001/FormObj.dart';
 import 'package:flutter_app/pages/item/src/items/common/DropdownDateTerm.dart';
 import 'package:flutter_app/pages/item/src/items//common/InputTextArea.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextForm.dart';
@@ -17,6 +17,7 @@ class ForRentForm extends StatelessWidget implements LotFormRentObj {
       this.rentConditions,
       this.optionCategory,
       this.rentTermsOfRentCode,
+      this.rentAreaSizeVal,
       this.rentMinContractRangeCode});
   final Function onChangedTermsOfRent;
   final Function onChangedMinContract;
@@ -24,6 +25,7 @@ class ForRentForm extends StatelessWidget implements LotFormRentObj {
   final TextEditingController rentControllerFixPrice;
   final TextEditingController rentMinContractRangeNum;
   final TextEditingController rentConditions;
+  final TextEditingController rentAreaSizeVal;
   final int optionCategory;
 
   final String rentMinContractRangeCode;
@@ -33,6 +35,8 @@ class ForRentForm extends StatelessWidget implements LotFormRentObj {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        rentAreaSize(),
+        SizedBox(height: 20),
         rentTermsOfPaymentFunc(),
         SizedBox(height: 20),
         rentOptionCategory(),
@@ -157,6 +161,17 @@ class ForRentForm extends StatelessWidget implements LotFormRentObj {
           ),
         ),
       ],
+    );
+  }
+
+  @override
+  rentAreaSize() {
+    return InputTextForm(
+      isReadOnly: false,
+      placeholder: "Total Area Size",
+      isText: false,
+      width: double.infinity,
+      value: rentAreaSizeVal,
     );
   }
 }

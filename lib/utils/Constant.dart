@@ -25,14 +25,15 @@ class Constants {
   static final String lotCode = '1001';
   static final String resCode = '1002';
 
+  static final collectionLot = 'lot';
+  static final collectionRes = 'lot';
+
   static final String itemCard1img =
       'assets/images/bestfood/ic_best_food_8.jpeg';
 
   static String getConditionStr(int code) {
     return code == 1 ? 'NEW' : 'USED';
   }
-
-  static final collectionLot = 'lot';
 
   static List<StrObj> termsDateCode = [
     StrObj(key: '1', value: 'for entile lot'),

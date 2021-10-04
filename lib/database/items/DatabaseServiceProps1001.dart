@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/PropertyLotModel.dart';
+import 'package:flutter_app/model/Property1001Model.dart';
 
 class DatabaseServicePropsLot implements DatabaseServicePropsStructure {
   static final CollectionReference propertyCollection =
@@ -38,6 +38,8 @@ class DatabaseServicePropsLot implements DatabaseServicePropsStructure {
           postdate: doc.get('postdate') ?? '',
           forSwap: doc.get('forSwap') ?? false,
           conditionCode: doc.get('conditionCode') ?? -1,
+          rentAreaSizeVale: doc.get('rentAreaSizeVale') ?? 0,
+          saleAreaSizeVale: doc.get('saleAreaSizeVale') ?? 0,
         );
       } catch (e) {
         print(e.toString());
@@ -95,11 +97,13 @@ class DatabaseServicePropsLot implements DatabaseServicePropsStructure {
       'conditionCode': data.conditionCode,
       'lotSize': data.lotSize,
       'saleLotOption': data.saleLotOption,
+      'saleAreaSizeVale': data.saleAreaSizeVale,
       'rentLotOption': data.rentLotOption,
       'rentAgreement': data.rentAgreement,
       'rentTermsOfPaymentCd': data.rentTermsOfPaymentCd,
       'rentMinContactCd': data.rentMinContactCd,
       'rentMinContactNum': data.rentMinContactNum,
+      'rentAreaSizeVale': data.rentAreaSizeVale,
     });
   }
 
