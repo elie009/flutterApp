@@ -1,12 +1,14 @@
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/pages/item/src/items/1001/FormObj.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextArea.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextForm.dart';
 import 'package:flutter_app/widgets/components/CheckBox.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
+import 'package:pattern_formatter/numeric_formatter.dart';
 
 class FirstForm extends StatelessWidget implements FirstFormObj {
   FirstForm(

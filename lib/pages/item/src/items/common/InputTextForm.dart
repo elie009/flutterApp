@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pattern_formatter/numeric_formatter.dart';
 
 class InputTextForm extends StatelessWidget {
   InputTextForm(
@@ -23,13 +25,23 @@ class InputTextForm extends StatelessWidget {
       child: TextFormField(
         readOnly: isReadOnly,
         keyboardType: isText ? TextInputType.text : TextInputType.number,
+        inputFormatters: isText
+            ? null
+            : [
+                LengthLimitingTextInputFormatter(15),
+                ThousandsFormatter(allowFraction: true),
+              ],
         maxLines: 1,
         decoration: InputDecoration(
-          hintText: placeholder,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          ),
-        ),
+            border: OutlineInputBorder(),
+            isDense: true,
+            labelText: placeholder),
+        // decoration: InputDecoration(
+        //   hintText: placeholder,
+        //   border: OutlineInputBorder(
+        //     borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        //   ),
+        // ),
         // ignore: missing_return
         validator: (resultvalue) {
           if (resultvalue.trim().isEmpty) {

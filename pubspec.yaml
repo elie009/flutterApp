@@ -44,6 +44,8 @@ dependencies:
   photo_view: ^0.4.2 # to view sent and received image in expanded view
   dcdg: ^3.1.1
   custom_radio_grouped_button: any
+  pattern_formatter: ^2.0.0
+
 
 dev_dependencies:
   flutter_test:
