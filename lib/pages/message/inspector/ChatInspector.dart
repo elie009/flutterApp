@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/ChatModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/message/inquire/ChatInquire.dart';
@@ -14,7 +15,7 @@ ChatModel chatObj;
 CollectionReference chatReference = null;
 
 Future chatInspector(
-    UserBaseModel user, PropertyModel props, BuildContext context) async {
+    UserBaseModel user, PropertyItemModel props, BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
   DatabaseService().userCollection.doc(user.uid).get().then((value) {

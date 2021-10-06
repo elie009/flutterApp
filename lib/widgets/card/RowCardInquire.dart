@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/components/Button1.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class RowCardInquire extends StatelessWidget {
-  PropertyModel props;
+  PropertyItemModel props;
   RowCardInquire({
     Key key,
     @required this.props,
@@ -78,7 +79,7 @@ class RowCardInquire extends StatelessWidget {
                             ),
                             Container(
                               child: Text(
-                                props.saleFixPrice.toString(),
+                                props.price.toString(),
                                 style: TextStyle(
                                     fontSize: 18,
                                     color: Color(0xFF3a3a3b),

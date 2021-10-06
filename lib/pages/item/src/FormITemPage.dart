@@ -1,11 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
-import 'package:flutter_app/pages/item/src/items/FormBaseDetails.dart';
+import 'package:flutter_app/pages/item/src/items/1001/FormBaseDetails.dart';
 import 'package:flutter_app/pages/item/src/items/FormComplete.dart';
 import 'package:flutter_app/pages/item/src/items/1001/FormInfo.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
@@ -14,12 +17,14 @@ import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FormItemPage extends StatefulWidget {
-  FormItemPage({this.propcheck, this.menuCode, this.props, this.user});
+  FormItemPage(
+      {this.propcheck, this.menuCode, this.props, this.user, this.catdata});
 
   final PropertyChecking propcheck;
   final String menuCode;
   final UserBaseModel user;
-  final PropertyModel props;
+  final PropertyItemModel props;
+  final CategoryFormModel catdata;
   @override
   _FormItemPageState createState() => _FormItemPageState();
 }
@@ -34,39 +39,37 @@ class _FormItemPageState extends State<FormItemPage> {
     List<MapData> inputdata = [];
     List<MapData> inputSale = [];
     List<MapData> inputRent = [];
+    FormBaseDetailsState.catdata = widget.catdata;
+    FormLotInfoState.catdata = widget.catdata;
 
     if (widget.props != null && isNew) {
       FormBaseDetailsState.propdetails =
           FormDetailsModel.snapshot(widget.props);
 
-      DatabaseServicePropsLot.propertyCollection
+      DatabaseServiceItems.propertyCollection
           .where('propid', isEqualTo: widget.props.propid)
           .get()
           .then((value) {
         Map<String, dynamic> data = value.docs.single.data();
-
-        FormLotInfoState.formatDbLotData(data);
-
-        FormLotInfoState.propLot =
+        //FormLotInfoState.formatDbLotData(data);
+        FormLotInfoState.popItem =
             FormLotModel.snapshot(FormLotInfoState.formatDbLotData(data));
       });
-
       isNew = false;
     }
-
     inputdata.addAll(FormBaseDetailsState.getDataValue);
-    inputSale.addAll(FormLotInfoState.getSaleDataValue);
     inputRent.addAll(FormLotInfoState.getRentDataValue);
     List<Step> steps = [
       Step(
         title: Text('Step 1'),
-        content: FormBaseDetails(),
+        content: FormBaseDetails(propcheck: widget.propcheck),
         state: currentStep == 0 ? StepState.editing : StepState.indexed,
         isActive: true,
       ),
       Step(
         title: Text('Step 2'),
-        content: FormLotInfo(propcheck: widget.propcheck),
+        content:
+            FormLotInfo(propcheck: widget.propcheck, catdata: widget.catdata),
         state: currentStep == 1 ? StepState.editing : StepState.indexed,
         isActive: true,
       ),
@@ -95,6 +98,7 @@ class _FormItemPageState extends State<FormItemPage> {
             type: StepperType.horizontal,
             onStepTapped: (step) {
               setState(() {
+                print('backkkk');
                 currentStep = step;
               });
             },
@@ -113,10 +117,8 @@ class _FormItemPageState extends State<FormItemPage> {
                 }
               });
               if (currentStep == 0) {
-                if (Constants.lotCode == widget.menuCode) {
-                  FormLotInfoState.addLotToDB(widget.menuCode, widget.user.uid);
-                  Navigator.pop(context);
-                }
+                FormLotInfoState.addLotToDB(widget.menuCode, widget.user.uid);
+                Navigator.pop(context);
 
                 showDialog(
                     barrierDismissible: false,

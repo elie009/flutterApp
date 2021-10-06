@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/ChatModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
@@ -19,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ChatInquire extends StatefulWidget {
   final SharedPreferences prefs;
   final ChatModel chatObj;
-  final PropertyModel props;
+  final PropertyItemModel props;
   bool isNewContact;
   bool isNewChat;
   CollectionReference chatReference;

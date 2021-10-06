@@ -26,7 +26,7 @@ class FormCompleteState extends State<FormComplete> {
           Align(
             alignment: Alignment.topLeft,
             child: TextLabelFade(
-                text: "Main Details",
+                text: "Primary Form",
                 style: TextStyle(
                     fontSize: 17,
                     color: primaryColor,
@@ -50,31 +50,7 @@ class FormCompleteState extends State<FormComplete> {
           Align(
             alignment: Alignment.topLeft,
             child: TextLabelFade(
-                text: "Sale Details",
-                style: TextStyle(
-                    fontSize: 17,
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold)),
-          ),
-          for (MapData data in widget.inputSale)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    data.label + " : ",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 10),
-                  Text(data.value, style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ),
-          SizedBox(height: 20),
-          Align(
-            alignment: Alignment.topLeft,
-            child: TextLabelFade(
-                text: "Rental Details",
+                text: "Secondary Form",
                 style: TextStyle(
                     fontSize: 17,
                     color: primaryColor,

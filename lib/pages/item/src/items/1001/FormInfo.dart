@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
-import 'package:flutter_app/model/Property1001Model.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
-import 'package:flutter_app/pages/item/src/items/FormBaseDetails.dart';
-import 'package:flutter_app/pages/item/src/items/1001/containers/ForRentForm.dart';
-import 'package:flutter_app/pages/item/src/items/1001/containers/ForSaleForm.dart';
+import 'package:flutter_app/pages/item/src/items/1001/FormBaseDetails.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/SecondForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
-import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:flutter_app/widgets/components/CheckBox.dart';
 
 class FormLotInfo extends StatefulWidget {
-  FormLotInfo({this.propcheck});
+  FormLotInfo({this.propcheck, this.catdata});
   final PropertyChecking propcheck;
+  final CategoryFormModel catdata;
 
   @override
   State<StatefulWidget> createState() {
@@ -25,78 +24,91 @@ class FormLotInfo extends StatefulWidget {
 class FormLotInfoState extends State<FormLotInfo> {
   static final formKey = GlobalKey<FormState>();
 
-  static FormLotModel propLot = FormLotModel.init();
+  static FormLotModel popItem = FormLotModel.init();
 
-  static PropertyLotModel formatDbLotData(Map<String, dynamic> data) {
-    return PropertyLotModel(
-      lotSize: data['lotSize'] ?? 0,
-      saleLotOption: data['saleLotOption'] ?? 0,
-      saleLotFixPrice: data['saleLotFixPrice'] ?? 0,
-      rentLotOption: data['rentLotOption'] ?? 0,
-      rentLotFixPrice: data['rentLotFixPrice'] ?? 0,
-      rentAgreement: data['rentAgreement'] ?? 0,
-      rentTermsOfPaymentCd: data['rentTermsOfPaymentCd'] ?? 0,
-      rentMinContactCd: data['rentMinContactCd'] ?? 0,
-      rentMinContactNum: data['rentMinContactNum'] ?? 0,
+  static PropertyItemModel formatDbLotData(Map<String, dynamic> data) {
+    return PropertyItemModel(
+      title: data['title'] ?? '',
+      conditionCode: data['conditionCode'] ?? 'foreclosed',
+      priceselectionCode: data['priceselectionCode'] ?? '',
+      price: data['price'] ?? 0.0,
+      description: data['description'] ?? '',
+      ismoreandsameitem: data['ismoreandsameitem'] ?? false,
+      dealmethodCode: data['dealmethodCode'] ?? '',
+      location_cityprovinceCode: data['location_cityprovinceCode'] ?? '',
+      location_streetaddress: data['location_streetaddress'] ?? '',
+      branchCode: data['branchCode'] ?? '',
+      featureCode: data['featureCode'] ?? '',
+      lotarea: data['lotarea'] ?? 0.0,
+      bedroms: data['bedroms'] ?? 0,
+      bathrooms: data['bathrooms'] ?? 0,
+      floorarea: data['floorarea'] ?? 0.0,
+      carspace: data['carspace'] ?? 0,
+      furnishingCode: data['furnishingCode'] ?? '',
+      roomCode: data['roomCode'] ?? '',
       numComments: data['numComments'] ?? 0,
       numLikes: data['numLikes'] ?? 0,
       numViews: data['numViews'] ?? 0,
       propid: data['propid'] ?? '',
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      imageName: data['imageName'] ?? '',
-      saleFixPrice: data['saleFixPrice'] ?? 0,
-      rentFixPrice: data['rentFixPrice'] ?? 0,
-      installmentFixPrice: data['installmentFixPrice'] ?? 0,
-      location: data['location'] ?? '',
       menuid: data['menuid'] ?? '',
       ownerUid: data['ownerUid'] ?? '',
       status: data['status'] ?? '',
-      postdate: data['postdate'] ?? '',
+      imageId: data['imageId'] ?? '',
+      forSale: data['forSale'] ?? false,
+      forRent: data['forRent'] ?? false,
+      forInstallment: data['forInstallment'] ?? false,
       forSwap: data['forSwap'] ?? false,
-      conditionCode: data['conditionCode'] ?? -1,
+      termCode: data['termCode'] ?? '',
     );
   }
 
   static get getSaleDataValue {
-    return [
-      MapData(
-          label: "Price",
-          key: "salePrice",
-          value: propLot.rentMinContractRangeNum == null
-              ? ''
-              : (propLot.saleControllerFixPrice.text +
-                  ' ' +
-                  propLot.saleOptionCategoryStr)),
-    ];
+    // return [
+    //   MapData(
+    //       label: "Price",
+    //       key: "salePrice",
+    //       value: popItem.rentMinContractRangeNum == null
+    //           ? ''
+    //           : (popItem.saleControllerFixPrice.text +
+    //               ' ' +
+    //               popItem.saleOptionCategoryStr)),
+    // ];
   }
 
   static get getModelValue {
-    PropertyLotModel props = new PropertyLotModel(
-      saleLotOption: propLot.saleOptionCategory,
-      lotSize: 0.00,
-      saleLotFixPrice: toDouble(propLot.saleControllerFixPrice.text),
-      rentLotOption: propLot.rentOptionCategory,
-      rentLotFixPrice: toDouble(propLot.rentControllerFixPrice.text),
-      rentAgreement: propLot.rentConditions.text,
-      rentTermsOfPaymentCd: propLot.rentTermsOfRentCode,
-      rentMinContactCd: propLot.rentTermsOfRentCode,
-      rentMinContactNum: toDouble(propLot.rentMinContractRangeNum.text),
-      numComments: 0,
-      numLikes: 0,
-      numViews: 0,
-      saleFixPrice: toDouble(propLot.saleControllerFixPrice.text),
-      rentFixPrice: toDouble(propLot.rentControllerFixPrice.text),
-      installmentFixPrice: 0.00,
-      postdate: getDateNow,
+    PropertyItemModel props = new PropertyItemModel(
+      lotarea: popItem.unitdetails_lotarea.text.isEmpty
+          ? 0.0
+          : toDouble(popItem.unitdetails_lotarea.text),
+      bedroms: popItem.unitdetails_bedroom.text.isEmpty
+          ? 0
+          : toInt(popItem.unitdetails_bedroom.text),
+      bathrooms: popItem.unitdetails_bathroom.text.isEmpty
+          ? 0
+          : toInt(popItem.unitdetails_bathroom.text),
+      floorarea: popItem.unitdetails_floorarea.text.isEmpty
+          ? 0.0
+          : toDouble(popItem.unitdetails_floorarea.text),
+      carspace: popItem.unitdetails_parkingspace.text.isEmpty
+          ? 0
+          : toInt(popItem.unitdetails_parkingspace.text),
+      furnishingCode: popItem.unitdetails_furnish.text.isEmpty
+          ? ''
+          : popItem.unitdetails_furnish.text,
+      roomCode: popItem.unitdetails_room.text.isEmpty
+          ? ''
+          : popItem.unitdetails_room.text,
+      termCode: popItem.unitdetails_termsCODE.isEmpty
+          ? ''
+          : popItem.unitdetails_termsCODE,
     );
     return props;
   }
 
   static addLotToDB(String menuCode, String userui) async {
-    PropertyLotModel props = FormLotInfoState.getModelValue;
+    PropertyItemModel props = FormLotInfoState.getModelValue;
     String propid = FormBaseDetailsState.propdetails.propsid == null
-        ? Constants.lotCode + idProperty
+        ? menuCode + idProperty
         : FormBaseDetailsState.propdetails.propsid;
 
     props.propid = propid;
@@ -104,44 +116,69 @@ class FormLotInfoState extends State<FormLotInfo> {
     props.ownerUid = userui;
     props.status = 'UPLOAD';
     props.title = FormBaseDetailsState.propdetails.title.text;
-    props.imageName = '';
-    props.location = '';
+    props.imageId = '';
+    props.location_cityprovinceCode = '';
+    props.location_streetaddress = '';
     props.description = FormBaseDetailsState.propdetails.description.text;
-    props.conditionCode = FormBaseDetailsState.propdetails.radiovalue;
+    props.price = toDouble(FormBaseDetailsState.propdetails.price.text);
+    props.dealmethodCode = FormBaseDetailsState.propdetails.dealmethod.text;
+    props.ismoreandsameitem = FormBaseDetailsState.propdetails.common_sameitem;
 
-    await DatabaseServicePropsLot().add(props);
+    props.forSale = FormBaseDetailsState.propdetails.isSale;
+    props.forRent = FormBaseDetailsState.propdetails.isRent;
+    props.forInstallment = FormBaseDetailsState.propdetails.isInstallment;
+    props.forSwap = FormBaseDetailsState.propdetails.isSwap;
+    props.conditionCode = FormBaseDetailsState.propdetails.condition.text;
+
+    await DatabaseServiceItems().add(props);
   }
+
+  static CategoryFormModel catdata;
 
   static get getRentDataValue {
     return [
-      MapData(
-          label: "Rate",
-          key: "rentRate",
-          value: propLot.rentControllerFixPrice == null
-              ? ''
-              : (propLot.rentControllerFixPrice.text +
-                  ' ' +
-                  propLot.rentOptionCategoryStr)),
-      MapData(
-          label: "Terms Of Payment",
-          key: "rentTermsOfPayment",
-          value: propLot.rentTermsOfRentCode == null
-              ? ''
-              : convertTermsCodeToDate(propLot.rentTermsOfRentCode)),
-      MapData(
-          label: "Minimun Contract",
-          key: "rentMinContractNum",
-          value: propLot.rentMinContractRangeNum == null
-              ? ''
-              : propLot.rentMinContractRangeNum.text +
-                  ' ' +
-                  convertTermsCodeToDate(propLot.rentMinContractRangeCode)),
-      MapData(
-          label: "Agreement",
-          key: "rentConditions",
-          value: propLot.rentConditions == null
-              ? ''
-              : propLot.rentConditions.text),
+      if (catdata.unitdetails_lotarea != null)
+        MapData(
+            label: "Lot Area",
+            key: "lotarea",
+            value: popItem.unitdetails_lotarea == null
+                ? ''
+                : popItem.unitdetails_lotarea.text),
+      if (catdata.unitdetails_bedroom != null)
+        MapData(
+            label: "Bedrooms",
+            key: "bedrooms",
+            value: popItem.unitdetails_bedroom == null
+                ? ''
+                : popItem.unitdetails_bedroom.text),
+      if (catdata.unitdetails_bathroom != null)
+        MapData(
+            label: "Bathrooms",
+            key: "bathrooms",
+            value: popItem.unitdetails_bathroom == null
+                ? ''
+                : popItem.unitdetails_bathroom.text),
+      if (catdata.unitdetails_floorarea != null)
+        MapData(
+            label: "Floor Area",
+            key: "floorarea",
+            value: popItem.unitdetails_floorarea == null
+                ? ''
+                : popItem.unitdetails_floorarea.text),
+      if (catdata.unitdetails_termsCODE != null)
+        MapData(
+            label: "Term",
+            key: "term",
+            value: popItem.unitdetails_termsCODE.isEmpty
+                ? ''
+                : Constants.termsDateCode[popItem.unitdetails_termsCODE]),
+      if (catdata.unitdetails_furnish_fullyfurnish != null)
+        MapData(
+            label: "Furnishing",
+            key: "furnishing",
+            value: popItem.unitdetails_furnish.text.isEmpty
+                ? ''
+                : Constants.furnishing[popItem.unitdetails_furnish.text]),
     ];
   }
 
@@ -152,64 +189,33 @@ class FormLotInfoState extends State<FormLotInfo> {
       key: formKey,
       child: Column(
         children: <Widget>[
-          LabeledCheckbox(
-            label: 'For sale',
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            value: widget.propcheck.sale,
-            onChanged: (bool newValue) {
+          SecondForm(
+            furnishing: popItem.unitdetails_furnish,
+            brandvalue: popItem.unitdetails_brandCODE,
+            lotarea: popItem.unitdetails_lotarea,
+            bedrooms: popItem.unitdetails_bedroom,
+            bathrooms: popItem.unitdetails_bathroom,
+            floorarea: popItem.unitdetails_floorarea,
+            parkingspace: popItem.unitdetails_parkingspace,
+            onChangedTerm: (val) {
               setState(() {
-                widget.propcheck.sale = newValue;
+                popItem.unitdetails_termsCODE = val;
               });
             },
-          ),
-          if (widget.propcheck.sale)
-            ForSaleForm(
-                optionCategory: propLot.saleOptionCategory,
-                onChangedOptionCategory: (int newValue) {
-                  setState(() {
-                    propLot.saleOptionCategory = newValue;
-                    propLot.saleOptionCategoryStr =
-                        Constants.convertTermsCodeToDate(
-                            propLot.saleOptionCategory.toString());
-                  });
-                },
-                saleControllerFixPrice: propLot.saleControllerFixPrice),
-          SizedBox(height: 30),
-          LabeledCheckbox(
-            label: 'Rentals',
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            value: widget.propcheck.rental,
-            onChanged: (bool newValue) {
+            onChangedFurnish: (val) {
               setState(() {
-                widget.propcheck.rental = newValue;
+                popItem.unitdetails_furnish.text = val;
               });
             },
+            onChangedBrand: (val) {
+              setState(() {
+                popItem.unitdetails_brandCODE = val;
+              });
+            },
+            termsvalue: popItem.unitdetails_termsCODE,
+            propcheck: widget.propcheck,
+            catdata: widget.catdata,
           ),
-          if (widget.propcheck.rental)
-            ForRentForm(
-                onChangedTermsOfRent: (String newValue) {
-                  setState(() {
-                    propLot.rentTermsOfRentCode = newValue;
-                  });
-                },
-                onChangedMinContract: (String newValue) {
-                  setState(() {
-                    propLot.rentMinContractRangeCode = newValue;
-                  });
-                },
-                onChangedOptionCategory: (int newValue) {
-                  setState(() {
-                    propLot.rentOptionCategory = newValue;
-                    propLot.rentOptionCategoryStr =
-                        Constants.convertTermsCodeToDate(newValue.toString());
-                  });
-                },
-                optionCategory: propLot.rentOptionCategory,
-                rentControllerFixPrice: propLot.rentControllerFixPrice,
-                rentMinContractRangeNum: propLot.rentMinContractRangeNum,
-                rentConditions: propLot.rentConditions,
-                rentTermsOfRentCode: propLot.rentTermsOfRentCode,
-                rentMinContractRangeCode: propLot.rentMinContractRangeCode),
           SizedBox(height: 20),
         ],
       ),
@@ -219,68 +225,51 @@ class FormLotInfoState extends State<FormLotInfo> {
 
 class FormLotModel {
   String propsId;
-  TextEditingController saleControllerFixPrice;
-  TextEditingController saleAreaSizeVal;
-  int saleOptionCategory;
-  String saleOptionCategoryStr;
-  TextEditingController rentControllerFixPrice;
-  TextEditingController rentMinContractRangeNum;
-  TextEditingController rentConditions;
-  String rentMinContractRangeCode;
-  String rentTermsOfRentCode;
-  int rentOptionCategory;
-  String rentOptionCategoryStr;
-  TextEditingController rentAreaSizeVal;
+
+  TextEditingController unitdetails_lotarea;
+  TextEditingController unitdetails_bedroom;
+  TextEditingController unitdetails_bathroom;
+  TextEditingController unitdetails_floorarea;
+  TextEditingController unitdetails_parkingspace;
+  TextEditingController unitdetails_furnish;
+  TextEditingController unitdetails_room;
+  String unitdetails_termsCODE;
+  String unitdetails_brandCODE;
 
   FormLotModel.init() {
-    this.saleControllerFixPrice = new TextEditingController();
-    this.rentControllerFixPrice = new TextEditingController();
-    this.rentConditions = new TextEditingController();
-    this.rentMinContractRangeNum = new TextEditingController();
-    this.rentOptionCategory = -1;
-    this.rentOptionCategoryStr = '';
-
-    this.saleOptionCategory = -1;
-    this.saleOptionCategoryStr = '';
-
-    this.saleAreaSizeVal = new TextEditingController();
-    this.rentAreaSizeVal = new TextEditingController();
+    this.unitdetails_lotarea = new TextEditingController();
+    this.unitdetails_bedroom = new TextEditingController();
+    this.unitdetails_bathroom = new TextEditingController();
+    this.unitdetails_floorarea = new TextEditingController();
+    this.unitdetails_parkingspace = new TextEditingController();
+    this.unitdetails_furnish = new TextEditingController();
+    this.unitdetails_room = new TextEditingController();
+    this.unitdetails_termsCODE = '';
+    this.unitdetails_brandCODE = '';
   }
 
-  FormLotModel.snapshot(PropertyLotModel props) {
-    this.saleControllerFixPrice = new TextEditingController();
-    this.rentControllerFixPrice = new TextEditingController();
-    this.rentConditions = new TextEditingController();
-    this.rentMinContractRangeNum = new TextEditingController();
+  FormLotModel.snapshot(PropertyItemModel props) {
+    print('ppppp');
+    this.unitdetails_lotarea = new TextEditingController();
+    this.unitdetails_bedroom = new TextEditingController();
+    this.unitdetails_bathroom = new TextEditingController();
+    this.unitdetails_floorarea = new TextEditingController();
+    this.unitdetails_parkingspace = new TextEditingController();
+    this.unitdetails_furnish = new TextEditingController();
+    this.unitdetails_room = new TextEditingController();
 
-    this.saleAreaSizeVal = new TextEditingController(); //not yet initializex
-    this.rentAreaSizeVal = new TextEditingController(); //not yet initializex
-
-    this.saleControllerFixPrice.text = props.saleFixPrice.toString();
-    this.rentControllerFixPrice.text = props.rentFixPrice.toString();
-    this.rentConditions.text = props.rentAgreement;
-    this.rentMinContractRangeNum.text = props.rentMinContactNum.toString();
-
-    this.rentOptionCategory = props.rentLotOption;
-    this.rentOptionCategoryStr =
-        convertTermsCodeToDate(props.rentLotOption.toString());
-
-    this.saleOptionCategory = props.saleLotOption;
-    this.saleOptionCategoryStr =
-        convertTermsCodeToDate(props.saleLotOption.toString());
-
-    this.rentTermsOfRentCode = props.rentTermsOfPaymentCd;
-    this.rentMinContractRangeCode = props.rentTermsOfPaymentCd;
+    this.unitdetails_lotarea.text = props.lotarea.toString();
+    this.unitdetails_bedroom.text = props.bedroms.toString();
+    this.unitdetails_bathroom.text = props.bathrooms.toString();
+    this.unitdetails_floorarea.text = props.floorarea.toString();
+    this.unitdetails_parkingspace.text = props.carspace.toString();
+    this.unitdetails_furnish.text = props.furnishingCode;
+    this.unitdetails_room.text = props.roomCode;
+    this.unitdetails_termsCODE = props.termCode;
+    this.unitdetails_brandCODE = props.branchCode;
   }
 
   FormLotModel({
-    this.saleAreaSizeVal,
-    this.saleControllerFixPrice,
-    this.rentAreaSizeVal,
-    this.rentControllerFixPrice,
-    this.rentMinContractRangeNum,
-    this.rentMinContractRangeCode,
-    this.rentConditions,
-    this.rentTermsOfRentCode,
+    this.unitdetails_lotarea,
   });
 }

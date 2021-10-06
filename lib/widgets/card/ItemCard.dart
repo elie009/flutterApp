@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/item/ItemViewDetails.dart';
@@ -14,7 +15,7 @@ class ItemCard extends StatelessWidget {
 
   final double inputheight;
 
-  final PropertyModel props;
+  final PropertyItemModel props;
 
   @override
   Widget build(BuildContext context) {
@@ -76,9 +77,9 @@ class ItemCard extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Center(
                                 child: Image.asset(
-                              props.imageName.isEmpty
+                              props.imageId.isEmpty
                                   ? Constants.itemCard1img
-                                  : props.imageName,
+                                  : props.imageId,
                             )),
                           )
                         ],
@@ -154,7 +155,7 @@ class ItemCard extends StatelessWidget {
                                     text: '\P ' +
                                         // formatCurency(
                                         //     props.saleFixPrice.toString()),
-                                        props.saleFixPrice.toString(),
+                                        props.price.toString(),
                                     style: TextStyle(
                                         color: Color(0xFF6e6e71),
                                         fontSize: 17,
@@ -171,7 +172,7 @@ class ItemCard extends StatelessWidget {
                           alignment: Alignment.bottomLeft,
                           padding: EdgeInsets.only(left: 5, top: 5, right: 5),
                           child: TextLabelFade(
-                              text: props.location,
+                              text: props.location_streetaddress,
                               style: TextStyle(
                                   color: Color(0xFF6e6e71),
                                   fontSize: 12,

@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 
 class SmallItemCard extends StatelessWidget {
   final String imageUrl = 'ic_burger';
-  final MenuModel menu;
+  final CategoryModel category;
   final Function onChanged;
 
   SmallItemCard({
     Key key,
-    @required this.menu,
+    @required this.category,
     @required this.onChanged,
   }) : super(key: key);
 
@@ -17,7 +17,7 @@ class SmallItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        onChanged(menu.dropdownid);
+        onChanged(category.catid);
       },
       child: Column(
         children: <Widget>[
@@ -49,7 +49,7 @@ class SmallItemCard extends StatelessWidget {
                   )),
                 )),
           ),
-          Text(menu.name,
+          Text(category.title,
               style: TextStyle(
                   color: Color(0xFF6e6e71),
                   fontSize: 14,

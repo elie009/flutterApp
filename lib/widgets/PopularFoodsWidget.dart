@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/RotationRoute.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
@@ -82,11 +83,13 @@ class PopularFoodTitle extends StatelessWidget {
 class PopulateList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var items = Provider.of<List<PropertyModel>>(context);
+    var items = Provider.of<List<PropertyItemModel>>(context);
     items = items == null ? [] : items;
     return ListView(
       scrollDirection: Axis.horizontal,
-      children: items.map((PropertyModel i) {
+      children: items.map((PropertyItemModel i) {
+        print('item is null');
+        print(i == null);
         return ItemCard(props: i);
       }).toList(),
     );
@@ -97,8 +100,8 @@ class PopularFoodItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamProvider<List<PropertyModel>>.value(
-      value: DatabaseServiceProps().getAll(),
+        body: StreamProvider<List<PropertyItemModel>>.value(
+      value: DatabaseServiceItems().getAll(),
       initialData: null,
       child: PopulateList(),
     ));

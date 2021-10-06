@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
@@ -288,8 +290,8 @@ class Inventory extends StatelessWidget {
     final user = Provider.of<UserBaseModel>(context);
 
     return Center(
-      child: StreamProvider<List<PropertyModel>>.value(
-        value: DatabaseServiceProps().getByUid(user.uid),
+      child: StreamProvider<List<PropertyItemModel>>.value(
+        value: DatabaseServiceItems().getByUid(user.uid),
         initialData: [],
         child: Container(
           child: Column(

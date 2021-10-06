@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
@@ -56,8 +57,6 @@ class _HomePageState extends State<HomeMessagePage> {
   }
 
   generateContactTab(UserBaseModel user) {
-    print('viewpoint PA');
-    print(contactsReference.snapshots());
     return Column(
       children: <Widget>[
         SearchWidget(),
@@ -297,7 +296,8 @@ class _HomePageState extends State<HomeMessagePage> {
                     .doc(doc["propsId"])
                     .get()
                     .then((value) {
-                  PropertyModel props = new PropertyModel.snaphot(value);
+                  PropertyItemModel props =
+                      new PropertyItemModel.snapshot(value);
                   chatInspector(user, props, context);
                 });
                 // Navigator.of(context).push(

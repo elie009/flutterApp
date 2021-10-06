@@ -42,7 +42,8 @@ dependencies:
   shared_preferences: ^0.5.3+1 # for storing user credentials persistence
   firebase_storage: ^10.0.3 # to send image to user for that we need to store image on server
   photo_view: ^0.4.2 # to view sent and received image in expanded view
-
+  dcdg: ^3.1.1
+  custom_radio_grouped_button: any
 
 dev_dependencies:
   flutter_test:

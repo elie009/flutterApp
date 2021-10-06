@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
@@ -26,7 +27,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
     final AuthService _auth = AuthService();
 
     return Scaffold(
-      body: StreamProvider<List<PropertyModel>>.value(
+      body: StreamProvider<List<PropertyItemModel>>.value(
         value: DatabaseServiceProps().getByMenu('1001'),
         initialData: null,
         child: Scaffold(

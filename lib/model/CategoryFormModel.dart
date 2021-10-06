@@ -1,7 +1,7 @@
 class CategoryFormModel {
   String categoryid;
   String popsid;
-  String title;
+  bool title;
   bool condition_brandnew;
   bool condition_likebrandnew;
   bool condition_wellused;
@@ -11,22 +11,20 @@ class CategoryFormModel {
   bool condition_preowned;
   bool condition_foreclosed;
   bool condition_used;
-  bool priceselect_forsale;
-  bool priceselect_forfree;
-  double priceinput_price;
-  String description;
+  bool priceinput_price;
+  bool description;
   bool ismoreandsameitem;
   bool deal_meetup;
   bool deal_delivery;
-  String brandCODE;
-  String location_cityproviceCODE;
-  String location_streetaddress;
-  double unitdetails_lotarea;
-  String unitdetails_termsCODE;
-  int unitdetails_bedroom;
-  int unitdetails_bathroom;
-  double unitdetails_floorarea;
-  int unitdetails_parkingspace;
+  bool brandCODE;
+  bool location_cityproviceCODE;
+  bool location_streetaddress;
+  bool unitdetails_lotarea;
+  bool unitdetails_termsCODE;
+  bool unitdetails_bedroom;
+  bool unitdetails_bathroom;
+  bool unitdetails_floorarea;
+  bool unitdetails_parkingspace;
   bool unitdetails_furnish_unfurnish;
   bool unitdetails_furnish_semifurnish;
   bool unitdetails_furnish_fullyfurnish;
@@ -46,8 +44,6 @@ class CategoryFormModel {
     this.condition_preowned,
     this.condition_foreclosed,
     this.condition_used,
-    this.priceselect_forsale,
-    this.priceselect_forfree,
     this.priceinput_price,
     this.description,
     this.ismoreandsameitem,

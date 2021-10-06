@@ -7,11 +7,13 @@ String formatCurency(dynamic numbers) {
   return currency + oCcy.format('50000');
 }
 
-double toDouble(dynamic number) {
+double toDouble(String number) {
+  if (number == null || number.isEmpty) return null;
   return double.parse(number);
 }
 
 int toInt(String number) {
+  if (number == null || number.isEmpty) return null;
   return int.parse(number);
 }
 

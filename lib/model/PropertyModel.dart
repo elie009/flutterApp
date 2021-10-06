@@ -16,7 +16,7 @@ class PropertyModel {
   double rentFixPrice; //MD001PLT001013
   double installmentFixPrice; //MD001PLT001013
   bool forSwap;
-  int conditionCode;
+  String conditionCode;
 
   String postdate;
 
@@ -38,7 +38,7 @@ class PropertyModel {
     this.postdate = '';
     this.forSwap = false;
     // ignore: unnecessary_statements
-    this.conditionCode - 1;
+    this.conditionCode ='';
   }
 
   PropertyModel.snaphot(DocumentSnapshot<Object> value) {
@@ -97,7 +97,7 @@ class PropertyModel {
     String status,
     String postdate,
     bool forSwap,
-    int conditionCode,
+    String conditionCode,
   ) {
     this.numComments = numComments;
     this.numLikes = numLike;

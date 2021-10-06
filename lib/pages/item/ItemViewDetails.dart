@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
@@ -11,7 +12,7 @@ import 'component/ItemViewBodyContent.dart';
 
 class ItemViewDetails extends StatefulWidget {
   ItemViewDetails({Key key, @required this.props}) : super(key: key);
-  PropertyModel props;
+  PropertyItemModel props;
   @override
   _ItemViewDetailsState createState() => _ItemViewDetailsState();
 }
@@ -79,7 +80,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                 fontWeight: FontWeight.w500),
                             width: 0.9),
                         TextLabelByLine(
-                            text: widget.props.saleFixPrice.toString(),
+                            text: widget.props.price.toString(),
                             style: TextStyle(
                                 color: blackColor,
                                 fontSize: 25,
@@ -87,7 +88,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                             width: 0.9),
                         SizedBox(height: 10),
                         TextLabelByLine(
-                            text: widget.props.location,
+                            text: widget.props.location_streetaddress,
                             style: TextStyle(
                                 color: blackColor,
                                 fontSize: 20,

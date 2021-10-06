@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
-import 'package:flutter_app/pages/profile/inventory/InventoryPage.dart';
 import 'package:flutter_app/utils/Constant.dart';
 
 class InventoryOption extends StatefulWidget {

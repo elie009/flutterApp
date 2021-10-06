@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/pages/home/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:flutter_app/database/Database.dart';
@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamProvider<List<MenuModel>>.value(
+      body: StreamProvider<List<CategoryModel>>.value(
         value: DatabaseService().getStreamMenu,
         initialData: null,
         child: Scaffold(

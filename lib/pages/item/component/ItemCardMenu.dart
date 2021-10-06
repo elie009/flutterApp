@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
@@ -12,7 +13,7 @@ import '../PopupOffer.dart';
 
 class ItemCardMenu extends StatefulWidget {
   ItemCardMenu({@required this.props});
-  final PropertyModel props;
+  final PropertyItemModel props;
 
   @override
   _ItemCardMenuState createState() => _ItemCardMenuState();
