@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +39,7 @@ class _FormItemPageState extends State<FormItemPage> {
   @override
   Widget build(BuildContext context) {
     List<MapData> inputdata = [];
-    List<MapData> inputSale = [];
-    List<MapData> inputRent = [];
+    List<MapData> secondForm = [];
     FormBaseDetailsState.catdata = widget.catdata;
     FormLotInfoState.catdata = widget.catdata;
 
@@ -57,8 +58,10 @@ class _FormItemPageState extends State<FormItemPage> {
       });
       isNew = false;
     }
+    List<File> uploadMedia = FormBaseDetailsState.getUploadMedia;
+    if (uploadMedia.length > 1) print('xxxx');
     inputdata.addAll(FormBaseDetailsState.getDataValue);
-    inputRent.addAll(FormLotInfoState.getRentDataValue);
+    secondForm.addAll(FormLotInfoState.getRentDataValue);
     List<Step> steps = [
       Step(
         title: Text('Step 1'),
@@ -75,7 +78,7 @@ class _FormItemPageState extends State<FormItemPage> {
       ),
       Step(
         title: Text('Complete'),
-        content: FormComplete(inputdata, inputSale, inputRent),
+        content: FormComplete(inputdata, secondForm),
         state: StepState.complete,
         isActive: true,
       ),

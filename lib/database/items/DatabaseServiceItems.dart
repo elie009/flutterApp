@@ -80,8 +80,6 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
   @override
   Future add(dynamic rawdata) {
     PropertyItemModel data = rawdata;
-    print('@@@@@@@');
-    print(data.dealmethodCode);
     return propertyCollection.doc(data.propid).set({
       'title': data.title,
       'conditionCode': data.conditionCode,

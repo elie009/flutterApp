@@ -6,10 +6,9 @@ import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class FormComplete extends StatefulWidget {
-  var inputdata = List<MapData>();
-  var inputSale = List<MapData>();
-  var inputRent = List<MapData>();
-  FormComplete(this.inputdata, this.inputSale, this.inputRent);
+  var firstForm = List<MapData>();
+  var secondForm = List<MapData>();
+  FormComplete(this.firstForm, this.secondForm);
 
   @override
   State<StatefulWidget> createState() {
@@ -32,7 +31,7 @@ class FormCompleteState extends State<FormComplete> {
                     color: primaryColor,
                     fontWeight: FontWeight.bold)),
           ),
-          for (MapData data in widget.inputdata)
+          for (MapData data in widget.firstForm)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -56,7 +55,7 @@ class FormCompleteState extends State<FormComplete> {
                     color: primaryColor,
                     fontWeight: FontWeight.bold)),
           ),
-          for (MapData data in widget.inputRent)
+          for (MapData data in widget.secondForm)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

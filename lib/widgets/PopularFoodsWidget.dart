@@ -28,7 +28,7 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
       width: double.infinity,
       child: Column(
         children: <Widget>[
-          PopularFoodTitle(prefs: widget.prefs),
+          PopularFoodTitle(),
           Expanded(
             child: PopularFoodItems(),
           )
@@ -39,9 +39,6 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
 }
 
 class PopularFoodTitle extends StatelessWidget {
-  final SharedPreferences prefs;
-  PopularFoodTitle({this.prefs});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -63,7 +60,6 @@ class PopularFoodTitle extends StatelessWidget {
                   ScaleRoute(
                       page: SearchDisplayPage(
                     menuId: '1001',
-                    prefs: prefs,
                   )));
             },
             child: Text(
@@ -88,8 +84,6 @@ class PopulateList extends StatelessWidget {
     return ListView(
       scrollDirection: Axis.horizontal,
       children: items.map((PropertyItemModel i) {
-        print('item is null');
-        print(i == null);
         return ItemCard(props: i);
       }).toList(),
     );

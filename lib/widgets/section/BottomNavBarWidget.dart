@@ -1,9 +1,12 @@
+import 'package:circle_bottom_navigation/circle_bottom_navigation.dart';
+import 'package:circle_bottom_navigation/widgets/tab_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/message/inbox/HomeMessagePage.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,90 +18,72 @@ class BottomNavBarWidget extends StatefulWidget {
 }
 
 class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
-  int _selectedIndex = 0;
-  List<Widget> pages;
-  Widget currentPage;
-  HomePage homePage;
-  FoodDetailsPage nearByLocationPage;
-  HomeMessagePage messagePage;
-
-  FoodOrderPage foodOrderPage;
-  ProfilePage profilePage;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      currentPage = pages[index];
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    print(widget.prefs);
-    homePage = HomePage();
-    nearByLocationPage = FoodDetailsPage();
-    messagePage = HomeMessagePage(prefs: widget.prefs);
-    foodOrderPage = FoodOrderPage();
-    profilePage = ProfilePage(prefs: widget.prefs);
-    pages = [
-      homePage,
-      nearByLocationPage,
-      messagePage,
-      foodOrderPage,
-      profilePage
-    ];
-    currentPage = homePage;
-  }
+  int currentPage = 0;
+  final double barHeight = 50;
+  final double circleSize = 50;
+  final double fontSize = 12;
+  final double iconSize = 25;
 
   @override
   Widget build(BuildContext context) {
-    print('BottomNavBarWidget');
+    final List<Widget> _pages = [
+      HomePage(),
+      FoodDetailsPage(),
+      FoodOrderPage(),
+      HomeMessagePage(prefs: widget.prefs),
+      ProfilePage(prefs: widget.prefs)
+    ];
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text(
-              'Home',
-              style: TextStyle(color: Color(0xFF2c2b2b)),
-            ),
+      body: _pages[currentPage],
+      bottomNavigationBar: CircleBottomNavigation(
+        circleColor: primaryColor,
+        barHeight: barHeight,
+        circleSize: circleSize,
+        initialSelection: currentPage,
+        inactiveIconColor: Colors.grey,
+        textColor: Colors.black,
+        //hasElevationShadows: false,
+        tabs: [
+          TabData(
+            icon: Icons.home_outlined,
+            iconSize: iconSize,
+            title: 'Home',
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.near_me),
-            title: Text(
-              'Near By',
-              style: TextStyle(color: Color(0xFF2c2b2b)),
-            ),
+          TabData(
+            icon: Icons.assignment_turned_in_outlined,
+            iconSize: iconSize,
+            title: 'Interest',
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message_outlined),
-            title: Text(
-              'Message',
-              style: TextStyle(color: Color(0xFF2c2b2b)),
-            ),
+          TabData(
+            icon: Icons.attach_money,
+            iconSize: iconSize,
+            title: 'Trade',
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard),
-            title: Text(
-              'Cart',
-              style: TextStyle(color: Color(0xFF2c2b2b)),
-            ),
+          TabData(
+            icon: Icons.message_outlined,
+            iconSize: iconSize,
+            title: 'Message',
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.user),
-            title: Text(
-              'Account',
-              style: TextStyle(color: Color(0xFF2c2b2b)),
-            ),
+          TabData(
+            icon: FontAwesomeIcons.user,
+            iconSize: iconSize,
+            title: 'Account',
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
           ),
         ],
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-        currentIndex: _selectedIndex,
+        onTabChangedListener: (index) => setState(() {
+          currentPage = index;
+        }),
       ),
-      body: currentPage,
     );
   }
 }

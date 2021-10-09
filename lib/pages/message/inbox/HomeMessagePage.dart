@@ -60,7 +60,7 @@ class _HomePageState extends State<HomeMessagePage> {
     return Column(
       children: <Widget>[
         SearchWidget(),
-        Expanded(
+        Container(
           child: StreamBuilder<QuerySnapshot>(
             stream: contactsReference.snapshots(),
             builder:
@@ -334,11 +334,14 @@ class _HomePageState extends State<HomeMessagePage> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserBaseModel>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_tabTitle),
+    return Container(
+      padding: EdgeInsets.only(top: 30),
+      child: Scaffold(
+        // appBar: AppBar(
+        //   title: Text(_tabTitle),
+        // ),
+        body: generateContactTab(user),
       ),
-      body: generateContactTab(user),
     );
   }
 }

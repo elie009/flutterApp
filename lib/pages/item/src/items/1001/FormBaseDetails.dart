@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
@@ -21,6 +23,10 @@ class FormBaseDetailsState extends State<FormBaseDetails> {
   static FormDetailsModel propdetails = FormDetailsModel.init();
 
   static CategoryFormModel catdata;
+
+  static get getUploadMedia {
+    return propdetails.uploadmedia;
+  }
 
   static get getDataValue {
     bool hascondition = (catdata.condition_brandnew != null ||
@@ -71,6 +77,14 @@ class FormBaseDetailsState extends State<FormBaseDetails> {
       child: Column(
         children: <Widget>[
           FirstForm(
+            uploadedMedia: propdetails.uploadmedia,
+            onChangeUpload: (newValue) {
+              setState(() {
+                propdetails.uploadmedia = newValue;
+                print('xxxxxxxxxx');
+                print(propdetails.uploadmedia);
+              });
+            },
             common_price: propdetails.price,
             common_dealmethod: propdetails.dealmethod,
             common_condition: propdetails.condition,
@@ -102,6 +116,7 @@ class FormDetailsModel {
   TextEditingController dealmethod;
   TextEditingController price;
 
+  List<File> uploadmedia = [null];
   bool isSale;
   bool isRent;
   bool isInstallment;

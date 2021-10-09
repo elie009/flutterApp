@@ -30,7 +30,7 @@ dependencies:
   firebase_core: ^1.7.0
   provider: ^5.0.0
   flutter_spinkit: "^4.1.2"
-  image_picker:
+  image_picker: 0.8.4+2
   uuid: 3.0.4
   crypto_font_icons: ^0.1.0+1
   typicons_flutter: ^0.2.1
@@ -40,16 +40,24 @@ dependencies:
 
 
   shared_preferences: ^0.5.3+1 # for storing user credentials persistence
-  firebase_storage: ^10.0.3 # to send image to user for that we need to store image on server
+  firebase_storage: ^10.0.4 # to send image to user for that we need to store image on server
   photo_view: ^0.4.2 # to view sent and received image in expanded view
   dcdg: ^3.1.1
   custom_radio_grouped_button: any
   pattern_formatter: ^2.0.0
+  video_player: ^2.2.0
+  circle_bottom_navigation: ^1.0.0
+  multi_image_picker: ^4.7.12
+  permission_handler: ^8.1.5
+
+
+  #file_picker: ^3.0.1
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
 
 

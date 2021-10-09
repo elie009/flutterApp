@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/filehandler/upload.dart';
 import 'package:flutter_app/utils/Constant.dart';
 
 class InventoryOption extends StatefulWidget {
@@ -17,7 +18,9 @@ class _InventoryOptionState extends State<InventoryOption> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           _buildButtonColumn(Icons.calendar_today_outlined, 'Manage', () {
-            setState(() {});
+            setState(() {
+              Navigator.push(context, ScaleRoute(page: MyHomePage()));
+            });
           }),
           _buildButtonColumn(Icons.add, 'Add', () {
             setState(() {

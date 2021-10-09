@@ -10,8 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchDisplayPage extends StatefulWidget {
   String menuId;
-  final SharedPreferences prefs;
-  SearchDisplayPage({Key key, @required this.menuId, this.prefs})
+  SearchDisplayPage({Key key, @required this.menuId})
       : super(key: key);
 
   @override
