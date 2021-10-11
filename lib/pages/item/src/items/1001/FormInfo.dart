@@ -1,14 +1,23 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/FileModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/pages/item/src/items/1001/FormBaseDetails.dart';
 import 'package:flutter_app/pages/item/src/items/1001/containers/SecondForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 
 class FormLotInfo extends StatefulWidget {
   FormLotInfo({this.propcheck, this.catdata});
@@ -62,19 +71,6 @@ class FormLotInfoState extends State<FormLotInfo> {
     );
   }
 
-  static get getSaleDataValue {
-    // return [
-    //   MapData(
-    //       label: "Price",
-    //       key: "salePrice",
-    //       value: popItem.rentMinContractRangeNum == null
-    //           ? ''
-    //           : (popItem.saleControllerFixPrice.text +
-    //               ' ' +
-    //               popItem.saleOptionCategoryStr)),
-    // ];
-  }
-
   static get getModelValue {
     PropertyItemModel props = new PropertyItemModel(
       lotarea: popItem.unitdetails_lotarea.text.isEmpty
@@ -105,8 +101,102 @@ class FormLotInfoState extends State<FormLotInfo> {
     return props;
   }
 
+  static List<String> imageUrls = <String>[];
+
+  Future<File> testCompressAndGetFile(String absolute, String targetPath) async {
+    var result = await FlutterImageCompress.compressAndGetFile(
+        absolute, targetPath,
+        quality: 88,
+        rotate: 180,
+      );
+
+    print(result.lengthSync());
+
+    return result;
+  }
+
+  static Future postImage(Asset imageFile, String filename) async {
+    double imageDesiredWidth = 300;
+    double getAspectRatio(double originalSize, double desiredSize) =>
+        desiredSize / originalSize;
+    final aspectRatio =
+        getAspectRatio(imageFile.originalWidth.toDouble(), imageDesiredWidth);
+
+    
+    int w = (imageFile.originalWidth * aspectRatio).round();
+    int h = (imageFile.originalHeight * aspectRatio).round();
+    imageFile.getByteData(quality: 80);
+
+    Reference reference = FirebaseStorage.instance.ref().child(filename);
+    UploadTask uploadTask =
+        reference.putData((await imageFile.getByteData()).buffer.asUint8List());
+    TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() {
+      print(reference.getDownloadURL());
+    });
+    print(storageTaskSnapshot.ref.getDownloadURL());
+    return storageTaskSnapshot.ref.getDownloadURL();
+  }
+
+  static Future deleteImage(String fileid, String propid) async {
+    Reference reference = FirebaseStorage.instance.ref().child(fileid);
+    return reference.delete();
+  }
+
+  static void uploadImages(List<dynamic> images, PropertyItemModel props) {
+    var primaImg = '';
+    try {
+      for (var imageFile in images) {
+        String fileid = idFile;
+        if (imageFile is StrObj) {
+          primaImg = primaImg.isEmpty ? imageFile.value : primaImg;
+          fileid = imageFile.key;
+
+          if (imageFile.stat == "DELETE") {
+            deleteImage(fileid, props.propid).then((value) {
+              DatabaseServiceItems.propertyCollection
+                  .doc(props.propid)
+                  .collection('media')
+                  .doc(fileid)
+                  .delete()
+                  .then((value) async {
+                props.imageId = primaImg;
+                await DatabaseServiceItems().add(props);
+              });
+            });
+          }
+        }
+
+        if (imageFile is Asset)
+          postImage(imageFile, fileid).then((downloadUrl) {
+            imageUrls.add(downloadUrl.toString());
+            primaImg = primaImg.isEmpty ? downloadUrl.toString() : primaImg;
+            DatabaseServiceItems.propertyCollection
+                .doc(props.propid)
+                .collection('media')
+                .doc(fileid)
+                .set({
+              'urls': downloadUrl.toString(),
+              'filename': imageFile.name,
+              'fileid': fileid,
+              'status': 'APPROVE',
+              'uploaddate': getDateNow
+            }).then((value) async {
+              props.imageId = primaImg;
+              await DatabaseServiceItems().add(props);
+            });
+            //}
+          }).catchError((err) {
+            print(err);
+          });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   static addLotToDB(String menuCode, String userui) async {
     PropertyItemModel props = FormLotInfoState.getModelValue;
+
     String propid = FormBaseDetailsState.propdetails.propsid == null
         ? menuCode + idProperty
         : FormBaseDetailsState.propdetails.propsid;
@@ -130,7 +220,9 @@ class FormLotInfoState extends State<FormLotInfo> {
     props.forSwap = FormBaseDetailsState.propdetails.isSwap;
     props.conditionCode = FormBaseDetailsState.propdetails.condition.text;
 
-    await DatabaseServiceItems().add(props);
+    await DatabaseServiceItems().add(props).then((value) {
+      uploadImages(FormBaseDetailsState.propdetails.loopitems, props);
+    });
   }
 
   static CategoryFormModel catdata;
@@ -249,7 +341,6 @@ class FormLotModel {
   }
 
   FormLotModel.snapshot(PropertyItemModel props) {
-    print('ppppp');
     this.unitdetails_lotarea = new TextEditingController();
     this.unitdetails_bedroom = new TextEditingController();
     this.unitdetails_bathroom = new TextEditingController();

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/home/BodyContent.dart';
 import 'package:flutter_app/pages/home/topmenu/TopMenus.dart';
+import 'package:flutter_app/service/Auth.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/ModalBox.dart';
 import 'package:flutter_app/widgets/section/SearchWidget.dart';
@@ -17,6 +18,8 @@ class BodyContainer extends StatefulWidget {
 }
 
 class _BodyContainer extends State<BodyContainer> {
+  final AuthService _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,12 +51,8 @@ class _BodyContainer extends State<BodyContainer> {
               child: IconButton(
                 icon: Icon(FontAwesomeIcons.bell),
                 color: primaryColor,
-                onPressed: () {
-                  showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return ModalBox();
-                      });
+                onPressed: () async {
+                  await _auth.signOut();
                 },
               ),
             ),

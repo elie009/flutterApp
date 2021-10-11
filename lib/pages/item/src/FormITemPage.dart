@@ -16,6 +16,7 @@ import 'package:flutter_app/pages/item/src/items/1001/FormInfo.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/AlertBox.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FormItemPage extends StatefulWidget {
@@ -35,6 +36,26 @@ class _FormItemPageState extends State<FormItemPage> {
   var currentStep = 0;
   bool isNew = true;
 
+  Future<dynamic> getData(String propsid) async {
+    DatabaseServiceItems.propertyCollection
+        .doc(propsid)
+        .collection('media')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        setState(() {
+          var e = StrObj(
+              stat: 'GET',
+              key: element.data()['fileid'],
+              value: element.data()['urls']);
+          FormBaseDetailsState.propdetails.loopitems.add(e);
+          // FormBaseDetailsState.propdetails.loopitems
+          //     .add(element.data()['urls']);
+        });
+      });
+    });
+  }
+
   List<MapData> inputdata;
   @override
   Widget build(BuildContext context) {
@@ -46,6 +67,7 @@ class _FormItemPageState extends State<FormItemPage> {
     if (widget.props != null && isNew) {
       FormBaseDetailsState.propdetails =
           FormDetailsModel.snapshot(widget.props);
+      getData(widget.props.propid);
 
       DatabaseServiceItems.propertyCollection
           .where('propid', isEqualTo: widget.props.propid)
@@ -58,7 +80,7 @@ class _FormItemPageState extends State<FormItemPage> {
       });
       isNew = false;
     }
-    List<File> uploadMedia = FormBaseDetailsState.getUploadMedia;
+    List<Asset> uploadMedia = FormBaseDetailsState.getUploadMedia;
     if (uploadMedia.length > 1) print('xxxx');
     inputdata.addAll(FormBaseDetailsState.getDataValue);
     secondForm.addAll(FormLotInfoState.getRentDataValue);

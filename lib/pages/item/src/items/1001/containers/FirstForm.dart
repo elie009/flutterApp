@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/pages/item/src/items/1001/FormObj.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextArea.dart';
@@ -10,19 +11,22 @@ import 'package:flutter_app/pages/item/src/items/common/InputTextForm.dart';
 import 'package:flutter_app/widgets/card/UploadFileCard.dart';
 import 'package:flutter_app/widgets/components/CheckBox.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 
 class FirstForm extends StatelessWidget implements FirstFormObj {
   FirstForm(
       {this.common_price,
       this.onChangeUpload,
-      this.uploadedMedia,
+      this.uploadmedia,
       this.onChanged,
       this.common_title,
       this.catdata,
       this.common_condition,
+      this.loopitems,
       this.onChangedCondtion,
       this.common_sameitem,
       this.common_dealmethod,
+      this.propsid,
       this.common_description});
 
   final TextEditingController common_price;
@@ -35,7 +39,9 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
   final Function onChangedCondtion;
   final bool common_sameitem;
   final Function onChangeUpload;
-  final List<File> uploadedMedia;
+  final List<Asset> uploadmedia;
+  final List<dynamic> loopitems;
+  final String propsid;
 
   final CategoryFormModel catdata;
 
@@ -63,12 +69,11 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         Container(
           height: 150,
           width: double.infinity,
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: UploadFileCard(itemStoreMedia: uploadedMedia, onChangeUpload: onChangeUpload),
-              )
-            ],
+          child: UploadFileCard(
+            loopitems: loopitems,
+            uploadmedia: uploadmedia,
+            onChangeUpload: onChangeUpload,
+            propsid: propsid,
           ),
         ),
       ],

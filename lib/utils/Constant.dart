@@ -65,7 +65,6 @@ class Constants {
     'unfurnished': 'Unfurnished',
     'semifurnished': 'Semi Furnished',
     'fullyfurnished': 'Fully Furnished',
-
   };
 
   // static String convertTermsCodeToDate(String code) {
@@ -80,5 +79,6 @@ class Constants {
 class StrObj {
   String key;
   String value;
-  StrObj({this.key, this.value});
+  String stat;
+  StrObj({this.key, this.value, this.stat});
 }

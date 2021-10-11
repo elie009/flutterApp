@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 
-class MultipleImageDemo extends StatefulWidget {
+class MyApp extends StatefulWidget {
   @override
-  _MultipleImageDemoState createState() => _MultipleImageDemoState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class _MultipleImageDemoState extends State<MultipleImageDemo> {
+class _MyAppState extends State<MyApp> {
   List<Asset> images = <Asset>[];
+  String _error = 'No Error Dectected';
 
   @override
   void initState() {
@@ -36,10 +35,13 @@ class _MultipleImageDemoState extends State<MultipleImageDemo> {
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
-        enableCamera: true,
+        maxImages: 2,
+        enableCamera: false,
         selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        cupertinoOptions: CupertinoOptions(
+          takePhotoIcon: "chat",
+          doneButtonTitle: "Fatto",
+        ),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
           actionBarTitle: "Example App",
@@ -52,34 +54,34 @@ class _MultipleImageDemoState extends State<MultipleImageDemo> {
       error = e.toString();
     }
 
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
       images = resultList;
-      // _error = error;
+      _error = error;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Multiple Picker Image'),
-      ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Plugin example app'),
+        ),
+        body: Column(
           children: <Widget>[
-            //Center(child: Text('Error: $_error')),
+            Center(child: Text('Error: $_error')),
             ElevatedButton(
               child: Text("Pick images"),
               onPressed: loadAssets,
             ),
             Expanded(
               child: buildGridView(),
-            ),
+            )
           ],
         ),
       ),

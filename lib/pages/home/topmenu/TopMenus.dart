@@ -29,6 +29,12 @@ class _TopMenusState extends State<TopMenus> {
                   onChanged: (String menuid) {
                     setState(() {
                       print('>>> ' + menuid);
+                      Navigator.push(
+                          context,
+                          ScaleRoute(
+                              page: SearchDisplayPage(
+                            menuId: menuid,
+                          )));
                     });
                   },
                 )

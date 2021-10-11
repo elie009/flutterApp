@@ -10,8 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchDisplayPage extends StatefulWidget {
   String menuId;
-  SearchDisplayPage({Key key, @required this.menuId})
-      : super(key: key);
+  SearchDisplayPage({Key key, @required this.menuId}) : super(key: key);
 
   @override
   _SearchDisplayPageState createState() => _SearchDisplayPageState();
@@ -27,7 +26,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
 
     return Scaffold(
       body: StreamProvider<List<PropertyItemModel>>.value(
-        value: DatabaseServiceProps().getByMenu('1001'),
+        value: DatabaseServiceProps().getByMenu(widget.menuId),
         initialData: null,
         child: Scaffold(
             appBar: AppBar(

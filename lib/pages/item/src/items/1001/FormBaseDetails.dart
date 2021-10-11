@@ -8,6 +8,7 @@ import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/pages/item/src/items/1001/containers/FirstForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 
 class FormBaseDetails extends StatefulWidget {
   FormBaseDetails({this.propcheck});
@@ -77,12 +78,12 @@ class FormBaseDetailsState extends State<FormBaseDetails> {
       child: Column(
         children: <Widget>[
           FirstForm(
-            uploadedMedia: propdetails.uploadmedia,
+            loopitems: propdetails.loopitems,
+            propsid: propdetails.propsid,
+            uploadmedia: propdetails.uploadmedia,
             onChangeUpload: (newValue) {
               setState(() {
                 propdetails.uploadmedia = newValue;
-                print('xxxxxxxxxx');
-                print(propdetails.uploadmedia);
               });
             },
             common_price: propdetails.price,
@@ -116,7 +117,8 @@ class FormDetailsModel {
   TextEditingController dealmethod;
   TextEditingController price;
 
-  List<File> uploadmedia = [null];
+  List<Asset> uploadmedia = <Asset>[];
+  List<dynamic> loopitems = <dynamic>[];
   bool isSale;
   bool isRent;
   bool isInstallment;
@@ -159,6 +161,7 @@ class FormDetailsModel {
     this.isRent = props.forRent;
     this.isInstallment = props.forInstallment;
     this.isSwap = props.forSwap;
+    this.uploadmedia = <Asset>[];
   }
 
   FormDetailsModel({

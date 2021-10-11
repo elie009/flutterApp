@@ -62,7 +62,7 @@ class InventoryPage extends StatelessWidget {
                 offset: Offset(0, 1),
               ),
             ]),
-            child: Card(
+            child: Container(
               child: InkWell(
                 onTap: () {
                   PropertyChecking propcheck = PropertyChecking.init();
@@ -77,7 +77,7 @@ class InventoryPage extends StatelessWidget {
                 child: CartItem(
                     productName: textlimiter(i.title),
                     productPrice: i.price.toString(),
-                    productImage: "ic_popular_food_1",
+                    imageId: i.imageId,
                     productCartQuantity: "2"),
               ),
             ),

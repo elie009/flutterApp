@@ -1,79 +1,98 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/pages/item/src/items/1001/containers/filehandler/mutli.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/ModalBox.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:video_player/video_player.dart';
 
 class UploadFileCard extends StatefulWidget {
-  final List<File> itemStoreMedia;
+  final String propsid;
+  final List<Asset> uploadmedia;
   final Function onChangeUpload;
-  UploadFileCard({this.onChangeUpload, this.itemStoreMedia});
+  UploadFileCard(
+      {this.loopitems, this.onChangeUpload, this.uploadmedia, this.propsid});
+  List<dynamic> loopitems;
 
   @override
   _UploadFileCardState createState() => _UploadFileCardState();
 }
 
 class _UploadFileCardState extends State<UploadFileCard> {
-  File _cameraVideo;
-  static File _image;
-  List<File> items = [null];
-
   ImagePicker picker = ImagePicker();
   VideoPlayerController _cameraVideoPlayerController;
 
-  String _error = 'No Error Dectected';
-  List<Asset> images = <Asset>[];
-
   @override
   Widget build(BuildContext context) {
-    items = items == null ? [] : items;
-    items = widget.itemStoreMedia == null ? items : widget.itemStoreMedia;
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: items.map((i) {
-        int index = items.indexOf(i);
-        return InkWell(
+    widget.loopitems = widget.loopitems == null ? [] : widget.loopitems;
+    return Row(
+      children: <Widget>[
+        InkWell(
           onTap: () {
             loadAssets();
-            // showModalBottomSheet<void>(
-            //     context: context,
-            //     builder: (BuildContext context) {
-            //       return ModalBox(
-            //         isCloseDisplay: false,
-            //         body: modalContainer(),
-            //         //body:pickImages(),
-            //       );
-            //     });
           },
-          child: Column(
-            children: [
-              Container(
-                height: 150,
-                width: 130,
-                child: Card(
-                  child: index == 0
-                      ? Icon(Icons.add, size: 30, color: primaryColor)
-                      : Center(child: Image.file(i)),
+          child: Container(
+              height: 150,
+              width: 130,
+              child:
+                  Card(child: Icon(Icons.add, size: 30, color: primaryColor))),
+        ),
+        Expanded(
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: widget.loopitems.map((i) {
+              int index = widget.loopitems.indexOf(i);
+              if (i is StrObj) if (i.stat == 'DELETE') return Container();
+              return InkWell(
+                onTap: () {
+                  showModalBottomSheet<void>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return ModalBox(
+                          isCloseDisplay: false,
+                          body: modalContainer(index),
+                        );
+                      });
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 150,
+                      width: 130,
+                      child: Card(
+                        child: Center(
+                          child: i is Asset
+                              ? AssetThumb(
+                                  asset: widget.loopitems[index],
+                                  height: 300,
+                                  width: 300,
+                                )
+                              : Image.network(
+                                  widget.loopitems[index].value,
+                                  fit: BoxFit.fitWidth,
+                                ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
+              );
+            }).toList(),
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 
-  modalContainer() {
+  modalContainer(int index) {
     return Column(
       children: [
-        showImgMediaOption(),
-        SizedBox(
-          height: 10,
-        ),
         Row(
           children: [
             SizedBox(
@@ -84,8 +103,17 @@ class _UploadFileCardState extends State<UploadFileCard> {
                 style: ElevatedButton.styleFrom(
                     primary: Colors.blue, padding: EdgeInsets.all(10)),
                 icon: Icon(Icons.camera_alt_outlined),
-                onPressed: () {},
-                label: Text('Image'),
+                onPressed: () {
+                  setState(() {
+                    if (widget.loopitems[index] is StrObj) {
+                      widget.loopitems[index].stat = 'DELETE';
+                    } else {
+                      widget.loopitems.removeAt(index);
+                    }
+                    Navigator.pop(context);
+                  });
+                },
+                label: Text('Delete'),
               ),
             ),
             SizedBox(
@@ -96,8 +124,10 @@ class _UploadFileCardState extends State<UploadFileCard> {
                 style: ElevatedButton.styleFrom(
                     primary: Colors.blue, padding: EdgeInsets.all(10)),
                 icon: Icon(Icons.play_circle_fill_outlined),
-                onPressed: () {},
-                label: Text('Video'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                label: Text('Cancel'),
               ),
             ),
             SizedBox(
@@ -109,78 +139,18 @@ class _UploadFileCardState extends State<UploadFileCard> {
     );
   }
 
-  showImgMediaOption() {
-    return Row(
-      children: [
-        SizedBox(
-          width: 10,
-        ),
-        Expanded(
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-                primary: Colors.blue, padding: EdgeInsets.all(10)),
-            icon: Icon(Icons.camera),
-            onPressed: () {
-              _pickImageFromGallery();
-            },
-            label: Text('Camera'),
-          ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Expanded(
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-                primary: Colors.blue, padding: EdgeInsets.all(10)),
-            icon: Icon(Icons.play_circle_fill_outlined),
-            onPressed: () {},
-            label: Text('Galery'),
-          ),
-        ),
-        SizedBox(
-          width: 10,
-        )
-      ],
-    );
-  }
-
-  // This funcion will helps you to pick a Video File from Camera
-  _pickVideoFromCamera() async {
-    PickedFile pickedFile = await picker.getVideo(source: ImageSource.camera);
-
-    _cameraVideo = File(pickedFile.path);
-
-    _cameraVideoPlayerController = VideoPlayerController.file(_cameraVideo)
-      ..initialize().then((_) {
-        setState(() {});
-        _cameraVideoPlayerController.play();
-      });
-  }
-
-  _pickImageFromGallery() async {
-    PickedFile pickedFile =
-        await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
-
-    File image = File(pickedFile.path);
-
-    setState(() {
-      _image = image;
-      items.add(_image);
-      widget.onChangeUpload(items);
-    });
-  }
-
   Future<void> loadAssets() async {
     List<Asset> resultList = <Asset>[];
-    String error = 'No Error Detected';
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
-        enableCamera: true,
-        selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        maxImages: 2,
+        enableCamera: false,
+        //selectedAssets: loopitems,
+        cupertinoOptions: CupertinoOptions(
+          takePhotoIcon: "chat",
+          doneButtonTitle: "Fatto",
+        ),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
           actionBarTitle: "Example App",
@@ -190,14 +160,14 @@ class _UploadFileCardState extends State<UploadFileCard> {
         ),
       );
     } on Exception catch (e) {
-      error = e.toString();
+      print(e.toString());
     }
 
     if (!mounted) return;
 
     setState(() {
-      images = resultList;
-      // _error = error;
+      widget.loopitems.addAll(resultList);
+      widget.onChangeUpload(resultList);
     });
   }
 }
