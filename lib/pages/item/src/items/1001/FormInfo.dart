@@ -103,34 +103,33 @@ class FormLotInfoState extends State<FormLotInfo> {
 
   static List<String> imageUrls = <String>[];
 
-  Future<File> testCompressAndGetFile(String absolute, String targetPath) async {
-    var result = await FlutterImageCompress.compressAndGetFile(
-        absolute, targetPath,
-        quality: 88,
-        rotate: 180,
-      );
-
-    print(result.lengthSync());
-
-    return result;
-  }
-
   static Future postImage(Asset imageFile, String filename) async {
-    double imageDesiredWidth = 300;
     double getAspectRatio(double originalSize, double desiredSize) =>
         desiredSize / originalSize;
-    final aspectRatio =
-        getAspectRatio(imageFile.originalWidth.toDouble(), imageDesiredWidth);
 
-    
-    int w = (imageFile.originalWidth * aspectRatio).round();
-    int h = (imageFile.originalHeight * aspectRatio).round();
-    imageFile.getByteData(quality: 80);
+    var aspectRatio = getAspectRatio(imageFile.originalWidth.toDouble(), 1300);
+    int W = (imageFile.originalWidth * aspectRatio).round();
+    int H = (imageFile.originalHeight * aspectRatio).round();
+
+    aspectRatio = getAspectRatio(imageFile.originalWidth.toDouble(), 300);
+    int thumbW = (imageFile.originalWidth * aspectRatio).round();
+    int thumbH = (imageFile.originalHeight * aspectRatio).round();
+
+    Reference thumbreference =
+        FirebaseStorage.instance.ref().child("THUMB" + filename);
+    UploadTask thumbuploadTask = thumbreference.putData(
+        (await imageFile.getThumbByteData(thumbW, thumbH, quality: 80))
+            .buffer
+            .asUint8List());
+
+    TaskSnapshot storageTaskSnapshot = await thumbuploadTask.whenComplete(() {
+      print(thumbreference.getDownloadURL());
+    });
 
     Reference reference = FirebaseStorage.instance.ref().child(filename);
-    UploadTask uploadTask =
-        reference.putData((await imageFile.getByteData()).buffer.asUint8List());
-    TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() {
+    UploadTask uploadTask = reference.putData(
+        (await imageFile.getByteData(quality: 50)).buffer.asUint8List());
+    await uploadTask.whenComplete(() {
       print(reference.getDownloadURL());
     });
     print(storageTaskSnapshot.ref.getDownloadURL());
@@ -138,6 +137,7 @@ class FormLotInfoState extends State<FormLotInfo> {
   }
 
   static Future deleteImage(String fileid, String propid) async {
+    FirebaseStorage.instance.ref().child("THUMB" + fileid).delete();
     Reference reference = FirebaseStorage.instance.ref().child(fileid);
     return reference.delete();
   }
@@ -145,14 +145,20 @@ class FormLotInfoState extends State<FormLotInfo> {
   static void uploadImages(List<dynamic> images, PropertyItemModel props) {
     var primaImg = '';
     try {
-      for (var imageFile in images) {
+      // images.map((imageFile) {
+      //   // get index
+      //   var index = images.indexOf(imageFile);
+      // }).toList();
+      images.map((imageFile) {
         String fileid = idFile;
+        var index = images.indexOf(imageFile);
         if (imageFile is StrObj) {
-          primaImg = primaImg.isEmpty ? imageFile.value : primaImg;
           fileid = imageFile.key;
 
           if (imageFile.stat == "DELETE") {
             deleteImage(fileid, props.propid).then((value) {
+              primaImg = primaImg.isEmpty ? primaImg : primaImg;
+              if (images.length == 1) primaImg = '';
               DatabaseServiceItems.propertyCollection
                   .doc(props.propid)
                   .collection('media')
@@ -188,7 +194,7 @@ class FormLotInfoState extends State<FormLotInfo> {
           }).catchError((err) {
             print(err);
           });
-      }
+      }).toList();
     } catch (e) {
       print(e.toString());
     }

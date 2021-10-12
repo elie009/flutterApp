@@ -59,7 +59,7 @@ class SecondForm extends StatelessWidget implements SecondFormObj {
       buttonTextStyle: ButtonTextStyle(
           selectedColor: Colors.white,
           unSelectedColor: Colors.black,
-          textStyle: TextStyle(fontSize: 16)),
+          textStyle: TextStyle(fontSize: 14)),
       radioButtonValue: (value) {
         onChangedFurnish(value);
       },
@@ -69,7 +69,7 @@ class SecondForm extends StatelessWidget implements SecondFormObj {
       enableButtonWrap: true,
       enableShape: true,
       horizontal: false,
-      width: 150,
+      width: 140,
       absoluteZeroSpacing: false,
     );
   }

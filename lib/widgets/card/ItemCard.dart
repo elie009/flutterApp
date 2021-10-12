@@ -75,17 +75,24 @@ class ItemCard extends StatelessWidget {
                           ),
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Center(
-                              child: props.imageId.isEmpty
-                                  ? Image.asset(
-                                      props.imageId.isEmpty
-                                          ? Constants.itemCard1img
-                                          : props.imageId,
-                                    )
-                                  : Image.network(
-                                      props.imageId,
-                                      fit: BoxFit.fitWidth,
-                                    ),
+                            child: Container(
+                              width: 300,
+                              height: 150,
+                              child: Center(
+                                child: props.imageId.isEmpty
+                                    ? Image.asset(
+                                        props.imageId.isEmpty
+                                            ? Constants.itemCard1img
+                                            : props.imageId,
+                                      )
+                                    : Image.network(
+                                        props.imageId,
+                                        //fit: BoxFit.cover,
+                                        // height: double.infinity,
+                                        // width: double.infinity,
+                                        alignment: Alignment.center,
+                                      ),
+                              ),
                             ),
                           )
                         ],
