@@ -36,12 +36,7 @@ class InputTextForm extends StatelessWidget {
             border: OutlineInputBorder(),
             isDense: true,
             labelText: placeholder),
-        // decoration: InputDecoration(
-        //   hintText: placeholder,
-        //   border: OutlineInputBorder(
-        //     borderRadius: BorderRadius.all(Radius.circular(10.0)),
-        //   ),
-        // ),
+      
         // ignore: missing_return
         validator: (resultvalue) {
           if (resultvalue.trim().isEmpty) {

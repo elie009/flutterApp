@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/pages/item/src/FormITemPage.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormLandingPage.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchDisplayPage extends StatefulWidget {
   String menuId;
@@ -26,7 +24,7 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
 
     return Scaffold(
       body: StreamProvider<List<PropertyItemModel>>.value(
-        value: DatabaseServiceProps().getByMenu(widget.menuId),
+        value: DatabaseServiceItems().getByMenu(widget.menuId),
         initialData: null,
         child: Scaffold(
             appBar: AppBar(

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 
-class DatabaseCommonProps {
+class DatabaseCategory {
   final CollectionReference categoryCollection =
       FirebaseFirestore.instance.collection('category');
 
@@ -93,12 +94,71 @@ class DatabaseCommonProps {
     }).toList();
   }
 
-  Stream<List<CategoryFormModel>> getStreamCategoryForm(
+  Stream<List<CategoryFormModel>> getCategoryForm(
       String catcode, String action) {
     return categoryCollection
         .doc(catcode)
         .collection(action)
         .snapshots()
         .map(_categoryFormListFromSnapshot);
+  }
+
+  Future updateCategory(CategoryModel categoryitem) async {
+    return await categoryCollection.doc(categoryitem.catid).set({
+      'catid': categoryitem.catid,
+      'title': categoryitem.title,
+      'status': categoryitem.status,
+      'issale': categoryitem.issale,
+      'isrent': categoryitem.isrent,
+      'isswap': categoryitem.isswap,
+      'isinstallment': categoryitem.isinstallment,
+      'dateadded': categoryitem.dateadded,
+      'iconapp': categoryitem.iconapp,
+      'iconweb': categoryitem.iconweb,
+      'headcategory': categoryitem.headcategory
+    });
+  }
+
+  Future deleteCategory() async {
+    try {
+      var snapshots = await categoryCollection.get();
+      for (var doc in snapshots.docs) {
+        await doc.reference.delete();
+      }
+      return true;
+    } catch (error) {
+      print("Error: Delete all speciality item with error message " +
+          error.toString());
+      return false;
+    }
+  }
+
+  //get item list from snapshot
+  List<CategoryModel> _categoryListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      try {
+        return CategoryModel(
+          catid: doc.get('catid') ?? '',
+          title: doc.get('title') ?? '',
+          status: doc.get('status') ?? '',
+          issale: doc.get('issale') ?? false,
+          isrent: doc.get('isrent') ?? false,
+          isinstallment: doc.get('isinstallment') ?? false,
+          isswap: doc.get('isswap') ?? false,
+          dateadded: doc.get('dateadded') ?? '',
+          iconapp: doc.get('iconapp') ?? '',
+          iconweb: doc.get('iconweb') ?? '',
+          headcategory: doc.get('headcategory') ?? '',
+        );
+      } catch (e) {
+        print(e.toString());
+        return null;
+      }
+    }).toList();
+  }
+
+  //get all menu item on stream
+  Stream<List<CategoryModel>> get getAllCategory {
+    return categoryCollection.snapshots().map(_categoryListFromSnapshot);
   }
 }

@@ -3,10 +3,13 @@ import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 
 class DatabaseServiceItems implements DatabaseServicePropsStructure {
+  final CollectionReference propertyCollectionGlobal =
+      FirebaseFirestore.instance.collection('property');
+
   static final CollectionReference propertyCollection =
       FirebaseFirestore.instance.collection('property');
 
-  List<PropertyItemModel> _LotPropertyList(QuerySnapshot snapshot) {
+  List<PropertyItemModel> _PropertyList(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
         return PropertyItemModel(
@@ -54,7 +57,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
     return propertyCollection
         .where('ownerUid', isEqualTo: ownerId)
         .snapshots()
-        .map(_LotPropertyList);
+        .map(_PropertyList);
   }
 
   @override
@@ -62,7 +65,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
     return propertyCollection
         .where('propid', isEqualTo: propid)
         .snapshots()
-        .map(_LotPropertyList);
+        .map(_PropertyList);
   }
 
   // get all property item on stream
@@ -72,7 +75,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
         .where('ownerUid', isEqualTo: ownerId)
         .where('menuid', isEqualTo: menuid)
         .snapshots()
-        .map(_LotPropertyList);
+        .map(_PropertyList);
   }
 
   @override
@@ -121,13 +124,15 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
 
   @override
   getAll() {
-    return propertyCollection.snapshots().map(_LotPropertyList);
+    return propertyCollection.snapshots().map(_PropertyList);
   }
 
   @override
   getByMenu(String menuid) {
-    // TODO: implement getByMenu
-    throw UnimplementedError();
+    return propertyCollection
+        .where('menuid', isEqualTo: menuid)
+        .snapshots()
+        .map(_PropertyList);
   }
 
   @override
@@ -135,7 +140,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
     return propertyCollection
         .where('ownerUid', isEqualTo: uid)
         .snapshots()
-        .map(_LotPropertyList);
+        .map(_PropertyList);
   }
 
   @override

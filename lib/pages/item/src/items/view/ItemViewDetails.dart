@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
@@ -10,8 +10,8 @@ import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:provider/provider.dart';
 
-import 'component/ItemCardMenu.dart';
-import 'component/ItemViewBodyContent.dart';
+import '../../../component/ItemCardMenu.dart';
+import '../../../component/ItemViewBodyContent.dart';
 
 class ItemViewDetails extends StatefulWidget {
   ItemViewDetails({Key key, @required this.props}) : super(key: key);
@@ -88,7 +88,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     } else if (forSwap) {
       action = 'swap';
     }
-    DatabaseCommonProps.categoryCollectionGlobal
+    DatabaseCategory.categoryCollectionGlobal
         .doc(menuid)
         .collection(action)
         .get()

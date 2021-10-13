@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
-import 'package:flutter_app/pages/item/src/FormITemPage.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormLandingPage.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/card/RowSmallCard.dart';
@@ -96,25 +96,25 @@ Future categoryInspector(String catcode, PropertyChecking action,
   action.swap = props.forSwap;
 
   if (action.sale)
-    reference = DatabaseCommonProps()
+    reference = DatabaseCategory()
         .categoryCollection
         .doc(catcode)
         .collection('sale');
 
   if (action.rental)
-    reference = DatabaseCommonProps()
+    reference = DatabaseCategory()
         .categoryCollection
         .doc(catcode)
         .collection('rent');
 
   if (action.installment)
-    reference = DatabaseCommonProps()
+    reference = DatabaseCategory()
         .categoryCollection
         .doc(catcode)
         .collection('installment');
 
   if (action.swap)
-    reference = DatabaseCommonProps()
+    reference = DatabaseCategory()
         .categoryCollection
         .doc(catcode)
         .collection('swap');
@@ -174,7 +174,7 @@ Future categoryInspector(String catcode, PropertyChecking action,
       Navigator.push(
           context,
           ScaleRoute(
-              page: FormItemPage(
+              page: FormLandingPage(
             catdata: catdata,
             user: user,
             menuCode: catcode,

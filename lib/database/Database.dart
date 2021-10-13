@@ -1,20 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/model/ContactModel.dart';
-import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 
 class DatabaseService {
   final String uid;
   DatabaseService({this.uid});
-
-  Future deleteItemData() async {
-    return await categoryCollection.doc(uid).delete();
-  }
-
-  final CollectionReference categoryCollection =
-      FirebaseFirestore.instance.collection('category');
 
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('user');
@@ -25,10 +17,9 @@ class DatabaseService {
   final CollectionReference chatCollection =
       FirebaseFirestore.instance.collection('chats');
 
-  final CollectionReference mobileCollection =
-      FirebaseFirestore.instance.collection('mobiles');
 
-  Future updateBookingData(BookingModel data) async {
+
+  Future updateBooking(BookingModel data) async {
     return await bookingCollection.doc(data.bookId).set({
       'fromYear': data.fromYear,
       'fromMonth': data.fromMonth,
@@ -41,22 +32,6 @@ class DatabaseService {
       'userId': data.userId,
       'bookingStatus': data.bookingStatus,
       'bookDate': DateTime.now().toString(),
-    });
-  }
-
-  Future updateCategoryData(CategoryModel categoryitem) async {
-    return await categoryCollection.doc(categoryitem.catid).set({
-      'catid': categoryitem.catid,
-      'title': categoryitem.title,
-      'status': categoryitem.status,
-      'issale': categoryitem.issale,
-      'isrent': categoryitem.isrent,
-      'isswap': categoryitem.isswap,
-      'isinstallment': categoryitem.isinstallment,
-      'dateadded': categoryitem.dateadded,
-      'iconapp': categoryitem.iconapp,
-      'iconweb': categoryitem.iconweb,
-      'headcategory': categoryitem.headcategory
     });
   }
 
@@ -102,34 +77,7 @@ class DatabaseService {
     });
   }
 
-  //get item list from snapshot
-  List<CategoryModel> _categoryListFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.docs.map((doc) {
-      try {
-        return CategoryModel(
-          catid: doc.get('catid') ?? '',
-          title: doc.get('title') ?? '',
-          status: doc.get('status') ?? '',
-          issale: doc.get('issale') ?? false,
-          isrent: doc.get('isrent') ?? false,
-          isinstallment: doc.get('isinstallment') ?? false,
-          isswap: doc.get('isswap') ?? false,
-          dateadded: doc.get('dateadded') ?? '',
-          iconapp: doc.get('iconapp') ?? '',
-          iconweb: doc.get('iconweb') ?? '',
-          headcategory: doc.get('headcategory') ?? '',
-        );
-      } catch (e) {
-        print(e.toString());
-        return null;
-      }
-    }).toList();
-  }
-
-  // get all menu item on stream
-  Stream<List<CategoryModel>> get getStreamMenu {
-    return categoryCollection.snapshots().map(_categoryListFromSnapshot);
-  }
+  
 
   //get item list from snapshot
   List<ContactModel> _contactsFromSnapshot(QuerySnapshot snapshot) {
@@ -273,19 +221,6 @@ class DatabaseService {
         .map(_contactListFromSnapshot);
   }
 
-  Future deleteAllitem() async {
-    try {
-      var snapshots = await categoryCollection.get();
-      for (var doc in snapshots.docs) {
-        await doc.reference.delete();
-      }
-      return true;
-    } catch (error) {
-      print("Error: Delete all speciality item with error message " +
-          error.toString());
-      return false;
-    }
-  }
 }
 
 abstract class DatabaseServicePropsStructure<T> {

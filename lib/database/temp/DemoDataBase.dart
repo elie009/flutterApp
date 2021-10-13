@@ -1,5 +1,5 @@
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/BookingModel.dart';
@@ -15,9 +15,9 @@ class PrepareData {
     print('your in the demo database');
   }
 
-  Future clearAll() async {
-    await DatabaseService(uid: '9uJd3K6rT3cEPmRb6G7xN6NBPCV2').deleteAllitem();
-  }
+  // Future clearAll() async {
+  //   await DatabaseService(uid: '9uJd3K6rT3cEPmRb6G7xN6NBPCV2').deleteAllitem();
+  // }
 
   String menuid = idMenu;
 
@@ -35,7 +35,7 @@ class PrepareData {
         iconweb: '',
         headcategory: 'NONE');
 
-    await DatabaseService().updateCategoryData(lot);
+    await DatabaseCategory().updateCategory(lot);
 
     var hal = CategoryModel(
         catid: '1002',
@@ -50,7 +50,7 @@ class PrepareData {
         iconweb: '',
         headcategory: 'NONE');
 
-    await DatabaseService().updateCategoryData(hal);
+    await DatabaseCategory().updateCategory(hal);
   }
 
   Future addCategoryCollection() async {
@@ -82,7 +82,7 @@ class PrepareData {
       unitdetails_furnish_unfurnish: true,
       unitdetails_termsCODE: true,
     );
-    await DatabaseCommonProps().setCategoryForm(datarent, 'rent');
+    await DatabaseCategory().setCategoryForm(datarent, 'rent');
 
     // var datasale = CategoryFormModel(
     //   categoryid: '1001',
@@ -119,7 +119,7 @@ class PrepareData {
       condition_preowned: true,
       condition_foreclosed: true,
     );
-    await DatabaseCommonProps().setCategoryForm(datasale, 'sale');
+    await DatabaseCategory().setCategoryForm(datasale, 'sale');
   }
 
   Future addBookingData() async {
@@ -211,7 +211,7 @@ class PrepareData {
         e['bookingStatus'].toString(),
       );
       await DatabaseService(uid: e['bookId'].toString())
-          .updateBookingData(props);
+          .updateBooking(props);
     });
   }
 }

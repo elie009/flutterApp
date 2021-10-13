@@ -1,36 +1,32 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
-import 'package:flutter_app/model/FileModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
-import 'package:flutter_app/pages/item/src/FormITemPage.dart';
-import 'package:flutter_app/pages/item/src/items/1001/FormBaseDetails.dart';
-import 'package:flutter_app/pages/item/src/items/1001/containers/SecondForm.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormLandingPage.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormBaseDetails.dart';
+import 'package:flutter_app/pages/item/src/items/add/containers/SecondForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 
-class FormLotInfo extends StatefulWidget {
-  FormLotInfo({this.propcheck, this.catdata});
+class FormUploader extends StatefulWidget {
+  FormUploader({this.propcheck, this.catdata});
   final PropertyChecking propcheck;
   final CategoryFormModel catdata;
 
   @override
   State<StatefulWidget> createState() {
-    return FormLotInfoState();
+    return FormUploaderState();
   }
 }
 
-class FormLotInfoState extends State<FormLotInfo> {
+class FormUploaderState extends State<FormUploader> {
   static final formKey = GlobalKey<FormState>();
 
   static FormLotModel popItem = FormLotModel.init();
@@ -197,7 +193,7 @@ class FormLotInfoState extends State<FormLotInfo> {
   }
 
   static addLotToDB(String menuCode, String userui) async {
-    PropertyItemModel props = FormLotInfoState.getModelValue;
+    PropertyItemModel props = FormUploaderState.getModelValue;
 
     String propid = FormBaseDetailsState.propdetails.propsid == null
         ? menuCode + idProperty

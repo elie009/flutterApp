@@ -2,16 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/item/itemform/itemlist/PropsResidence.dart';
-import 'package:flutter_app/pages/item/src/FormITemPage.dart';
-import 'package:flutter_app/pages/item/src/items/1001/FormBaseDetails.dart';
-import 'package:flutter_app/pages/item/src/items/1001/FormInfo.dart';
-import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormLandingPage.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormBaseDetails.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormUploader.dart';
 import 'package:flutter_app/widgets/card/SmallItemCard.dart';
 import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:flutter_app/widgets/components/CheckBox2.dart';
@@ -28,7 +25,7 @@ class _ItemAddFormPageState extends State<ItemAddFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: StreamProvider<List<CategoryModel>>.value(
-      value: DatabaseService().getStreamMenu,
+      value: DatabaseCategory().getAllCategory,
       initialData: [],
       child: Scaffold(
         appBar: AppBar(
@@ -71,14 +68,6 @@ class _BodyContentState extends State<BodyContent> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserBaseModel>(context);
 
-    Map<String, Widget> map = {
-      Constants.lotCode: FormItemPage(
-        propcheck: propcheck,
-        menuCode: Constants.lotCode,
-        user: user,
-      ),
-      Constants.resCode: PropsResidence(),
-    };
     var size = MediaQuery.of(context).size;
     final double itemWidth = size.width / 2;
     final items = Provider.of<List<CategoryModel>>(context);
@@ -169,28 +158,22 @@ Future categoryInspector(String catcode, PropertyChecking action,
     UserBaseModel user, BuildContext context) async {
   if (action.sale || action.rental || action.installment || action.swap) {
     if (action.sale)
-      reference = DatabaseCommonProps()
-          .categoryCollection
-          .doc(catcode)
-          .collection('sale');
+      reference =
+          DatabaseCategory().categoryCollection.doc(catcode).collection('sale');
 
     if (action.rental)
-      reference = DatabaseCommonProps()
-          .categoryCollection
-          .doc(catcode)
-          .collection('rent');
+      reference =
+          DatabaseCategory().categoryCollection.doc(catcode).collection('rent');
 
     if (action.installment)
-      reference = DatabaseCommonProps()
+      reference = DatabaseCategory()
           .categoryCollection
           .doc(catcode)
           .collection('installment');
 
     if (action.swap)
-      reference = DatabaseCommonProps()
-          .categoryCollection
-          .doc(catcode)
-          .collection('swap');
+      reference =
+          DatabaseCategory().categoryCollection.doc(catcode).collection('swap');
 
     reference.snapshots().forEach((element) {
       element.docs.forEach((element) {
@@ -231,11 +214,11 @@ Future categoryInspector(String catcode, PropertyChecking action,
         );
 
         FormBaseDetailsState.propdetails = FormDetailsModel.init();
-        FormLotInfoState.popItem = FormLotModel.init();
+        FormUploaderState.popItem = FormLotModel.init();
         Navigator.push(
             context,
             ScaleRoute(
-                page: FormItemPage(
+                page: FormLandingPage(
               propcheck: action,
               menuCode: catcode,
               user: user,

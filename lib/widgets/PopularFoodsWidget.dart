@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/RotationRoute.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
-import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

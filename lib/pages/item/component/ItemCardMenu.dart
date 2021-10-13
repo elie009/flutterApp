@@ -9,7 +9,7 @@ import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:provider/provider.dart';
 
-import '../PopupOffer.dart';
+import '../src/items/view/PopupOffer.dart';
 
 class ItemCardMenu extends StatefulWidget {
   ItemCardMenu({@required this.props});

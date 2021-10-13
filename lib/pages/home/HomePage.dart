@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/pages/home/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamProvider<List<CategoryModel>>.value(
-        value: DatabaseService().getStreamMenu,
+        value: DatabaseCategory().getAllCategory,
         initialData: null,
         child: Scaffold(
           body: BodyContainer(prefs: widget.prefs),

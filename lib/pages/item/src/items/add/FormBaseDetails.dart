@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
-import 'package:flutter_app/pages/item/src/FormITemPage.dart';
-import 'package:flutter_app/pages/item/src/items/1001/containers/FirstForm.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormLandingPage.dart';
+import 'package:flutter_app/pages/item/src/items/add/containers/FirstForm.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 

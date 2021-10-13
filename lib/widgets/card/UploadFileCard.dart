@@ -1,11 +1,7 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
-import 'package:flutter_app/pages/item/src/items/1001/containers/filehandler/mutli.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/ModalBox.dart';
 import 'package:image_picker/image_picker.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/database/SingleItemChecker.dart';
 import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/service/CheckBookingDate.dart';
 import 'package:flutter_app/utils/Constant.dart';
@@ -140,7 +139,7 @@ class _BookedDatesState extends State<BookedDates> {
                             if (endbook != null) {
                               endbook.bookingStatus = 'CANCEL';
                               endbook.bookId = isSelected;
-                              SingleItemChecker().updateBooking(endbook);
+                              DatabaseService().updateBooking(endbook);
                             }
 
                             Navigator.pop(context, 'OK');
@@ -186,7 +185,7 @@ class _BookedDatesState extends State<BookedDates> {
                             print(endbook);
 
                             if (endbook != null)
-                              SingleItemChecker().addBooking(endbook);
+                              DatabaseService().updateBooking(endbook);
 
                             Navigator.pop(context, 'OK');
                           },
