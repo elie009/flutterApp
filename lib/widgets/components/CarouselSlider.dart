@@ -4,39 +4,51 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class CarouselComponent extends StatelessWidget {
+  List<String> listimage;
+  CarouselComponent({this.listimage});
   CarouselController buttonCarouselController = CarouselController();
 
   @override
-  Widget build(BuildContext context) => Column(children: <Widget>[
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      if (listimage.isEmpty)
         CarouselSlider(
-          options: CarouselOptions(aspectRatio: 1),
-          items: [
-            "assets/images/bestfood/ic_best_food_8.jpeg",
-            "assets/images/bestfood/ic_best_food_9.jpeg",
-            "assets/images/bestfood/ic_best_food_10.jpeg"
-          ].map((i) {
+          options: CarouselOptions(
+            height: 300,
+            viewportFraction: 1.0,
+            enlargeCenterPage: false,
+          ),
+          items: ["assets/images/bestfood/ic_best_food_8.jpeg"].map((i) {
             return Builder(
               builder: (BuildContext context) {
                 return Container(
-                  child:
-                      Image.asset(i, fit: BoxFit.fill, width: double.infinity),
-                );
-
-                // Card(
-                //   //semanticContainer: true,
-                //   clipBehavior: Clip.antiAliasWithSaveLayer,
-                //   child: Image.asset(
-                //     i,
-                //   ),
-                //   shape: RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.circular(3.0),
-                //   ),
-                //   elevation: 1,
-                //   //margin: EdgeInsets.all(5),
-                // );
+                    child: Image.asset(
+                  i,
+                  //fit: BoxFit.fitWidth,
+                ));
+              },
+            );
+          }).toList(),
+        ),
+      if (!listimage.isEmpty)
+        CarouselSlider(
+          options: CarouselOptions(
+            height: 300,
+            viewportFraction: 1.0,
+            enlargeCenterPage: false,
+          ),
+          items: listimage.map((i) {
+            return Builder(
+              builder: (BuildContext context) {
+                return Container(
+                    child: Image.network(
+                  i,
+                  fit: BoxFit.fitWidth,
+                ));
               },
             );
           }).toList(),
         )
-      ]);
+    ]);
+  }
 }

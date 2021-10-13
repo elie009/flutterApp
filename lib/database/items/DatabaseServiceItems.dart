@@ -6,8 +6,6 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
   static final CollectionReference propertyCollection =
       FirebaseFirestore.instance.collection('property');
 
-  //get item list from snapshot
-  // ignore: non_constant_identifier_names
   List<PropertyItemModel> _LotPropertyList(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {

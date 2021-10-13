@@ -145,10 +145,6 @@ class FormLotInfoState extends State<FormLotInfo> {
   static void uploadImages(List<dynamic> images, PropertyItemModel props) {
     var primaImg = '';
     try {
-      // images.map((imageFile) {
-      //   // get index
-      //   var index = images.indexOf(imageFile);
-      // }).toList();
       images.map((imageFile) {
         String fileid = idFile;
         var index = images.indexOf(imageFile);

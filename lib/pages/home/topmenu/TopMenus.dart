@@ -18,7 +18,7 @@ class _TopMenusState extends State<TopMenus> {
     final items = Provider.of<List<CategoryModel>>(context);
 
     return Container(
-        height: 100,
+        height: 90,
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: <Widget>[
@@ -28,7 +28,6 @@ class _TopMenusState extends State<TopMenus> {
                   category: i,
                   onChanged: (String menuid) {
                     setState(() {
-                      print('>>> ' + menuid);
                       Navigator.push(
                           context,
                           ScaleRoute(

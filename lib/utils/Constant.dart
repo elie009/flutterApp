@@ -67,13 +67,7 @@ class Constants {
     'fullyfurnished': 'Fully Furnished',
   };
 
-  // static String convertTermsCodeToDate(String code) {
-  //   String resultValue = '';
-  //   termsDateCode.forEach((element) {
-  //     if (element.key == code) resultValue = element.value;
-  //   });
-  //   return resultValue;
-  // }
+ 
 }
 
 class StrObj {

@@ -24,7 +24,7 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 350,
+      height: 320,
       width: double.infinity,
       child: Column(
         children: <Widget>[
@@ -42,12 +42,15 @@ class PopularFoodTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      padding: EdgeInsets.only(
+        left: 10,
+        right: 10,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Text(
-            "Popluar Foods",
+            "Popluar",
             style: TextStyle(
                 fontSize: 20,
                 color: Color(0xFF3a3a3b),

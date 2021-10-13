@@ -49,8 +49,6 @@ class _FormItemPageState extends State<FormItemPage> {
               key: element.data()['fileid'],
               value: element.data()['urls']);
           FormBaseDetailsState.propdetails.loopitems.add(e);
-          // FormBaseDetailsState.propdetails.loopitems
-          //     .add(element.data()['urls']);
         });
       });
     });

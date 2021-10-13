@@ -9,12 +9,7 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
 
   //get item list from snapshot
   List<PropertyItemModel> _PropertyList(QuerySnapshot snapshot) {
-    print('ppppp');
-    print(snapshot == null);
-
     return snapshot.docs.map((doc) {
-      print('mmmmmmm');
-      print(doc.exists);
       try {
         return PropertyItemModel(
           title: doc.get('title') ?? '',

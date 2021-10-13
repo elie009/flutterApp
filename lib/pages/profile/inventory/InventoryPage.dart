@@ -5,15 +5,13 @@ import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/widgets/card/RowSmallCard.dart';
 import 'package:provider/provider.dart';
-
-import '../../FoodOrderPage.dart';
 import 'InventoryOption.dart';
 
 class InventoryPage extends StatelessWidget {
@@ -74,7 +72,7 @@ class InventoryPage extends StatelessWidget {
 
                   categoryInspector(i.menuid, propcheck, user, context, i);
                 },
-                child: CartItem(
+                child: RowSmallCard(
                     productName: textlimiter(i.title),
                     productPrice: i.price.toString(),
                     imageId: i.imageId,
@@ -90,11 +88,7 @@ class InventoryPage extends StatelessWidget {
 CollectionReference reference;
 Future categoryInspector(String catcode, PropertyChecking action,
     UserBaseModel user, BuildContext context, PropertyItemModel props) async {
-  print('mmmm');
-  print(action.sale);
-  print(action.rental);
-  print(action.installment);
-  print(action.swap);
+ 
 
   action.sale = props.forSale;
   action.rental = props.forRent;

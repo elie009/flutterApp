@@ -17,6 +17,18 @@ class ItemCard extends StatelessWidget {
 
   final PropertyItemModel props;
 
+  snip(String text) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: primaryColor,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      padding: const EdgeInsets.all(3.0),
+      child: Text(text),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -87,9 +99,6 @@ class ItemCard extends StatelessWidget {
                                       )
                                     : Image.network(
                                         props.imageId,
-                                        //fit: BoxFit.cover,
-                                        // height: double.infinity,
-                                        // width: double.infinity,
                                         alignment: Alignment.center,
                                       ),
                               ),
@@ -132,7 +141,7 @@ class ItemCard extends StatelessWidget {
                                 width: 28,
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white70,
+                                    color: yellowamber,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color(0xFFfae3e2),
@@ -141,8 +150,8 @@ class ItemCard extends StatelessWidget {
                                       ),
                                     ]),
                                 child: Icon(
-                                  Icons.flag_outlined,
-                                  color: Color(0xFFfb3132),
+                                  Icons.message,
+                                  color: whiteColor,
                                   size: 20,
                                 ),
                               ),
@@ -165,13 +174,10 @@ class ItemCard extends StatelessWidget {
                                 padding:
                                     EdgeInsets.only(left: 5, top: 0, right: 0),
                                 child: TextLabelFade(
-                                    text: '\P ' +
-                                        // formatCurency(
-                                        //     props.saleFixPrice.toString()),
-                                        props.price.toString(),
+                                    text: formatCurency(props.price.toString()),
                                     style: TextStyle(
                                         color: Color(0xFF6e6e71),
-                                        fontSize: 17,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold))),
                           )
                         ],
@@ -199,35 +205,17 @@ class ItemCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(width: 1),
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                WidgetSpan(
-                                  child: Container(
-                                    padding: EdgeInsets.only(right: 3.0),
-                                    child: Icon(
-                                      Icons.message,
-                                      size: 14,
-                                      color: primaryColor,
-                                    ),
-                                  ),
-                                ),
-                                TextSpan(
-                                    text: props.numComments.toString(),
-                                    style: TextStyle(
-                                        color: primaryColor,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800)),
-                              ],
-                            ),
-                          ),
+                          if (props.forSale) snip('sale'),
+                          if (props.forRent) snip('rent'),
+                          if (props.forInstallment) snip('installment'),
+                          if (props.forSwap) snip('swap'),
                           SizedBox(width: 5),
                           RichText(
                             text: TextSpan(
                               children: [
                                 WidgetSpan(
                                   child: Container(
-                                    padding: EdgeInsets.only(right: 3.0),
+                                    padding: EdgeInsets.only(right: 2.0),
                                     child: Icon(
                                       Icons.thumb_up_outlined,
                                       size: 14,

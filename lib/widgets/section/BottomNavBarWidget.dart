@@ -2,7 +2,6 @@ import 'package:circle_bottom_navigation/circle_bottom_navigation.dart';
 import 'package:circle_bottom_navigation/widgets/tab_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
-import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/message/inbox/HomeMessagePage.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
@@ -29,7 +28,7 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
     final List<Widget> _pages = [
       HomePage(),
       FoodDetailsPage(),
-      FoodOrderPage(),
+      HomePage(),
       HomeMessagePage(prefs: widget.prefs),
       ProfilePage(prefs: widget.prefs)
     ];

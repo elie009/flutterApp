@@ -5,6 +5,9 @@ class DatabaseCommonProps {
   final CollectionReference categoryCollection =
       FirebaseFirestore.instance.collection('category');
 
+  static final CollectionReference categoryCollectionGlobal =
+      FirebaseFirestore.instance.collection('category');
+
   Future setCategoryForm(CategoryFormModel form, String action) async {
     return await categoryCollection
         .doc(form.categoryid)
@@ -98,6 +101,4 @@ class DatabaseCommonProps {
         .snapshots()
         .map(_categoryFormListFromSnapshot);
   }
-
-  
 }

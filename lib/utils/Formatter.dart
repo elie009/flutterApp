@@ -5,7 +5,8 @@ final oCcy = new NumberFormat("#,##0.00", "en_US");
 
 final $searchForValue = ',';
 String formatCurency(dynamic numbers) {
-  return currency + oCcy.format('50000');
+  numbers = numbers is String ? toDouble(numbers) : numbers;
+  return currency + oCcy.format(numbers);
 }
 
 double toDouble(String number) {

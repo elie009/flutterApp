@@ -4,12 +4,11 @@ import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/components/Button1.dart';
-import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
-class RowCardInquire extends StatelessWidget {
+class RowMediumCard extends StatelessWidget {
   PropertyItemModel props;
-  RowCardInquire({
+  RowMediumCard({
     Key key,
     @required this.props,
   }) : super(key: key);

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +42,10 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     _transTween = Tween(begin: Offset(-10, 40), end: Offset(-10, 0))
         .animate(_TextAnimationController);
 
+    getData(widget.props.propid);
+    getCategory(widget.props.menuid, widget.props.forRent, widget.props.forSale,
+        widget.props.forInstallment, widget.props.forSwap);
+    ;
     super.initState();
   }
 
@@ -52,12 +59,91 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     }
   }
 
+  List<String> listimage = [];
+  Future<dynamic> getData(String propsid) async {
+    DatabaseServiceItems.propertyCollection
+        .doc(propsid)
+        .collection('media')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        setState(() {
+          listimage.add(element.data()['urls']);
+        });
+      });
+    });
+  }
+
+  CategoryFormModel catmodel = new CategoryFormModel();
+  Future<dynamic> getCategory(String menuid, bool forRent, bool forSale,
+      bool forInstallment, bool forSwap) async {
+    String action;
+
+    if (forRent) {
+      action = 'rent';
+    } else if (forSale) {
+      action = 'sale';
+    } else if (forInstallment) {
+      action = 'installment';
+    } else if (forSwap) {
+      action = 'swap';
+    }
+    DatabaseCommonProps.categoryCollectionGlobal
+        .doc(menuid)
+        .collection(action)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        setState(() {
+          catmodel = CategoryFormModel(
+            categoryid: element.data()['categoryid'],
+            popsid: element.data()['popsid'],
+            title: element.data()['title'],
+            condition_brandnew: element.data()['condition_brandnew'],
+            condition_likebrandnew: element.data()['condition_likebrandnew'],
+            condition_wellused: element.data()['condition_wellused'],
+            condition_heavilyused: element.data()['condition_heavilyused'],
+            condition_new: element.data()['condition_new'],
+            condition_preselling: element.data()['condition_preselling'],
+            condition_preowned: element.data()['condition_preowned'],
+            condition_foreclosed: element.data()['condition_foreclosed'],
+            condition_used: element.data()['condition_used'],
+            priceinput_price: element.data()['priceinput_price'],
+            description: element.data()['description'],
+            ismoreandsameitem: element.data()['ismoreandsameitem'],
+            deal_meetup: element.data()['deal_meetup'],
+            deal_delivery: element.data()['deal_delivery'],
+            brandCODE: element.data()['brandCODE'],
+            location_cityproviceCODE:
+                element.data()['location_cityproviceCODE'],
+            location_streetaddress: element.data()['location_streetaddress'],
+            unitdetails_lotarea: element.data()['unitdetails_lotarea'],
+            unitdetails_termsCODE: element.data()['unitdetails_termsCODE'],
+            unitdetails_bedroom: element.data()['unitdetails_bedroom'],
+            unitdetails_bathroom: element.data()['unitdetails_bathroom'],
+            unitdetails_floorarea: element.data()['unitdetails_floorarea'],
+            unitdetails_parkingspace:
+                element.data()['unitdetails_parkingspace'],
+            unitdetails_furnish_unfurnish:
+                element.data()['unitdetails_furnish_unfurnish'],
+            unitdetails_furnish_semifurnish:
+                element.data()['unitdetails_furnish_semifurnish'],
+            unitdetails_furnish_fullyfurnish:
+                element.data()['unitdetails_furnish_fullyfurnish'],
+            unitdetails_room_private:
+                element.data()['unitdetails_room_private'],
+            unitdetails_room_shared: element.data()['unitdetails_room_shared'],
+          );
+        });
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserBaseModel>(context);
-
     return Scaffold(
-      backgroundColor: Color(0xFFEEEEEE),
+      backgroundColor: whiteColor,
       body: NotificationListener<ScrollNotification>(
         onNotification: _scrollListener,
         child: Container(
@@ -68,7 +154,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
               SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
-                    CarouselComponent(),
+                    CarouselComponent(listimage: listimage),
                     Column(
                       children: [
                         SizedBox(height: 20),
@@ -80,7 +166,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                 fontWeight: FontWeight.w500),
                             width: 0.9),
                         TextLabelByLine(
-                            text: widget.props.price.toString(),
+                            text: formatCurency(widget.props.price.toString()),
                             style: TextStyle(
                                 color: blackColor,
                                 fontSize: 25,
@@ -157,7 +243,8 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                 fontWeight: FontWeight.w300),
                             width: 0.9),
                         SizedBox(height: 20),
-                        ItemViewBodyContent(),
+                        ItemViewBodyContent(
+                            catmodel: catmodel, props: widget.props),
                       ],
                     ),
                   ],
@@ -180,6 +267,19 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                             fontWeight: FontWeight.bold,
                             fontSize: 16),
                       ),
+                    ),
+                    leading: MaterialButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      color: whiteColor,
+                      textColor: primaryColor,
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 24,
+                      ),
+                      padding: EdgeInsets.all(16),
+                      shape: CircleBorder(),
                     ),
                     iconTheme: IconThemeData(
                       color: _iconColorTween.value,

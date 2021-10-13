@@ -50,19 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _pickVideo() async {
     PickedFile pickedFile = await picker.getVideo(source: ImageSource.gallery);
 
-    // File imageFile = File(await ImagePicker()
-    //     .getVideo(source: ImageSource.gallery)
-    //     .then((pickedFile) => pickedFile.path));
-
-    // Reference storageReference =
-    //     FirebaseStorage.instance.ref().child('profiles/1001');
-    // UploadTask uploadTask = storageReference.putFile(imageFile);
-
-    // await uploadTask;
-    // String fileUrl = await storageReference.getDownloadURL();
-
-    // print(fileUrl);
-
     _video = File(pickedFile.path);
 
     _videoPlayerController = VideoPlayerController.file(_video)
