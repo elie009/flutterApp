@@ -67,8 +67,8 @@ class _SignInPageState extends State<SignInPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Container(
-                              width: 230,
-                              height: 100,
+                              width: 300,
+                              //height: 100,
                               alignment: Alignment.center,
                               child: Image.asset(
                                 "assets/images/menus/ic_food_express.png",

@@ -15,15 +15,19 @@ class InputTextArea extends StatelessWidget {
         minLines: 5,
         maxLines: 7,
         decoration: InputDecoration(
-          prefixIcon: const Icon(
-            Icons.home,
-            color: Colors.grey,
-          ),
-          hintText: placeholder,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          ),
-        ),
+            border: OutlineInputBorder(),
+            isDense: true,
+            labelText: placeholder),
+        // decoration: InputDecoration(
+        //   prefixIcon: const Icon(
+        //     Icons.home,
+        //     color: Colors.grey,
+        //   ),
+        //   hintText: placeholder,
+        //   border: OutlineInputBorder(
+        //     borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        //   ),
+        // ),
         controller: value,
       ),
     );

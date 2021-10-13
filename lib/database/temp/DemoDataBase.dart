@@ -1,16 +1,16 @@
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/BookingModel.dart';
-import 'package:flutter_app/model/Property1001Model.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
 
 class PrepareData {
   void execute() {
     //clearAll();
-    //addMenuData();
-    addProperyData();
+    //addCategoryData();
+    addCategoryCollection();
     //addBookingData();
     print('your in the demo database');
   }
@@ -21,33 +21,106 @@ class PrepareData {
 
   String menuid = idMenu;
 
-  Future addMenuData() async {
-    await DatabaseService(uid: menuid).updateMenuData(MenuModel(
-        menuid: menuid,
-        name: 'Residential',
-        description: 'simple description',
-        imageAppName: '',
-        imageWebName: 'NA',
-        dropdownid: ''));
+  Future addCategoryData() async {
+    var lot = CategoryModel(
+        catid: '1001',
+        title: 'Lot',
+        status: 'APPROVE',
+        issale: true,
+        isrent: true,
+        isinstallment: true,
+        isswap: true,
+        dateadded: getDateNow,
+        iconapp: '',
+        iconweb: '',
+        headcategory: 'NONE');
+
+    await DatabaseService().updateCategoryData(lot);
+
+    var hal = CategoryModel(
+        catid: '1002',
+        title: 'House & Lot',
+        status: 'APPROVE',
+        issale: true,
+        isrent: true,
+        isinstallment: true,
+        isswap: true,
+        dateadded: getDateNow,
+        iconapp: '',
+        iconweb: '',
+        headcategory: 'NONE');
+
+    await DatabaseService().updateCategoryData(hal);
   }
 
-  Future addProperyData() async {
-    final list = [
-      "Lot for sale",
-      "Yuta data-data",
-      "Farm lot for rent",
-      "Condo for Sale",
-      "House and lot for sale",
-      "House for sale casamira",
-      "Townhouse for sale",
-      "For assume House and lot",
-      "Lot data2x",
-      "200m lot"
-    ];
+  Future addCategoryCollection() async {
+    // var datarent = CategoryFormModel(
+    //   categoryid: '1001',
+    //   title: true,
+    //   description: true,
+    //   priceinput_price: true,
+    //   location_cityproviceCODE: true,
+    //   location_streetaddress: true,
+    //   unitdetails_lotarea: true,
+    //   unitdetails_termsCODE: true,
+    // );
+    var datarent = CategoryFormModel(
+      categoryid: '1002',
+      title: true,
+      description: true,
+      priceinput_price: true,
+      ismoreandsameitem: true,
+      location_cityproviceCODE: true,
+      location_streetaddress: true,
+      unitdetails_lotarea: true,
+      unitdetails_bedroom: true,
+      unitdetails_bathroom: true,
+      unitdetails_floorarea: true,
+      unitdetails_parkingspace: true,
+      unitdetails_furnish_fullyfurnish: true,
+      unitdetails_furnish_semifurnish: true,
+      unitdetails_furnish_unfurnish: true,
+      unitdetails_termsCODE: true,
+    );
+    await DatabaseCommonProps().setCategoryForm(datarent, 'rent');
+
+    // var datasale = CategoryFormModel(
+    //   categoryid: '1001',
+    //   title: true,
+    //   description: true,
+    //   priceinput_price: true,
+    //   location_cityproviceCODE: true,
+    //   location_streetaddress: true,
+    //   unitdetails_lotarea: true,
+    //   condition_new: true,
+    //   condition_preselling: true,
+    //   condition_preowned: true,
+    //   condition_foreclosed: true,
+    // );
+
+    var datasale = CategoryFormModel(
+      categoryid: '1002',
+      title: true,
+      description: true,
+      priceinput_price: true,
+      ismoreandsameitem: true,
+      location_cityproviceCODE: true,
+      location_streetaddress: true,
+      unitdetails_lotarea: true,
+      unitdetails_bedroom: true,
+      unitdetails_bathroom: true,
+      unitdetails_floorarea: true,
+      unitdetails_parkingspace: true,
+      unitdetails_furnish_fullyfurnish: true,
+      unitdetails_furnish_semifurnish: true,
+      unitdetails_furnish_unfurnish: true,
+      condition_new: true,
+      condition_preselling: true,
+      condition_preowned: true,
+      condition_foreclosed: true,
+    );
+    await DatabaseCommonProps().setCategoryForm(datasale, 'sale');
   }
-
-
-  
 
   Future addBookingData() async {
     List<Map<String, String>> list = [

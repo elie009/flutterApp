@@ -1,35 +1,51 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/database/Database.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/utils/Constant.dart';
 
 class DatabaseServiceProps implements DatabaseServicePropsStructure {
   final CollectionReference propertyCollection =
       FirebaseFirestore.instance.collection('property');
 
   //get item list from snapshot
-  List<PropertyModel> _PropertyList(QuerySnapshot snapshot) {
+  List<PropertyItemModel> _PropertyList(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return PropertyModel(
+        return PropertyItemModel(
+          title: doc.get('title') ?? '',
+          conditionCode: doc.get('conditionCode') ?? '',
+          priceselectionCode: doc.get('priceselectionCode') ?? '',
+          price: doc.get('price') ?? 0.0,
+          description: doc.get('description') ?? '',
+          ismoreandsameitem: doc.get('ismoreandsameitem') ?? false,
+          dealmethodCode: doc.get('dealmethodCode') ?? '',
+          location_cityprovinceCode: doc.get('location_cityprovinceCode') ?? '',
+          location_streetaddress: doc.get('location_streetaddress') ?? '',
+          branchCode: doc.get('branchCode') ?? '',
+          featureCode: doc.get('featureCode') ?? '',
+          lotarea: doc.get('lotarea') ?? 0.0,
+          bedroms: doc.get('bedroms') ?? 0,
+          bathrooms: doc.get('bathrooms') ?? 0,
+          floorarea: doc.get('floorarea') ?? 0.0,
+          carspace: doc.get('carspace') ?? 0,
+          furnishingCode: doc.get('furnishingCode') ?? '',
+          roomCode: doc.get('roomCode') ?? '',
           numComments: doc.get('numComments') ?? 0,
           numLikes: doc.get('numLikes') ?? 0,
           numViews: doc.get('numViews') ?? 0,
           propid: doc.get('propid') ?? '',
-          title: doc.get('title') ?? '',
-          description: doc.get('description') ?? '',
-          imageName: doc.get('imageName') ?? '',
-          saleFixPrice: doc.get('saleFixPrice') ?? 0,
-          rentFixPrice: doc.get('rentFixPrice') ?? 0,
-          installmentFixPrice: doc.get('installmentFixPrice') ?? 0,
-          location: doc.get('location') ?? '',
           menuid: doc.get('menuid') ?? '',
           ownerUid: doc.get('ownerUid') ?? '',
           status: doc.get('status') ?? '',
-          postdate: doc.get('postdate') ?? '',
-          conditionCode: doc.get('conditionCode') ?? -1,
+          imageId: doc.get('imageId') ?? '',
+          forSale: doc.get('forSale') ?? false,
+          forRent: doc.get('forRent') ?? false,
+          forInstallment: doc.get('forInstallment') ?? false,
+          forSwap: doc.get('forSwap') ?? false,
+          termCode: doc.get('termCode') ?? '',
         );
       } catch (e) {
+        print('wwwwwwww');
         print(e.toString());
         return null;
       }
@@ -37,7 +53,7 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
   }
 
   // get all property item on stream
-  Stream<List<PropertyModel>> getPropery(String ownerId) {
+  Stream<List<PropertyItemModel>> getPropery(String ownerId) {
     return propertyCollection
         .where('ownerUid', isEqualTo: ownerId)
         .snapshots()
@@ -45,7 +61,7 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
   }
 
   // get all property item on stream
-  Stream<List<PropertyModel>> getAllPropery(String ownerId, String menuid) {
+  Stream<List<PropertyItemModel>> getAllPropery(String ownerId, String menuid) {
     return propertyCollection
         .where('ownerUid', isEqualTo: ownerId)
         .where('menuid', isEqualTo: menuid)
@@ -54,12 +70,13 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
   }
 
   @override
-  Stream<List<PropertyModel>> getAll() {
+  Stream<List<PropertyItemModel>> getAll() {
+    print('oooooo');
     return propertyCollection.snapshots().map(_PropertyList);
   }
 
   @override
-  Stream<List<PropertyModel>> getByUid(String uid) {
+  Stream<List<PropertyItemModel>> getByUid(String uid) {
     return propertyCollection
         .where('ownerUid', isEqualTo: uid)
         .snapshots()
@@ -67,7 +84,7 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
   }
 
   @override
-  Stream<List<PropertyModel>> getByMenu(String menuid) {
+  Stream<List<PropertyItemModel>> getByMenu(String menuid) {
     return propertyCollection
         .where('menuid', isEqualTo: menuid)
         .snapshots()
@@ -87,7 +104,7 @@ class DatabaseServiceProps implements DatabaseServicePropsStructure {
   }
 
   @override
-  Stream<List<PropertyModel>> getByPropId(String propid) {
+  Stream<List<PropertyItemModel>> getByPropId(String propid) {
     return propertyCollection
         .where('propid', isEqualTo: propid)
         .snapshots()

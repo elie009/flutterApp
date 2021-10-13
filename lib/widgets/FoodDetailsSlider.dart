@@ -1,6 +1,7 @@
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 
+
 class FoodDetailsSlider extends StatelessWidget {
   String slideImage1;
   String slideImage2;

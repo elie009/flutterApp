@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
@@ -56,12 +57,10 @@ class _HomePageState extends State<HomeMessagePage> {
   }
 
   generateContactTab(UserBaseModel user) {
-    print('viewpoint PA');
-    print(contactsReference.snapshots());
     return Column(
       children: <Widget>[
         SearchWidget(),
-        Expanded(
+        Container(
           child: StreamBuilder<QuerySnapshot>(
             stream: contactsReference.snapshots(),
             builder:
@@ -297,7 +296,8 @@ class _HomePageState extends State<HomeMessagePage> {
                     .doc(doc["propsId"])
                     .get()
                     .then((value) {
-                  PropertyModel props = new PropertyModel.snaphot(value);
+                  PropertyItemModel props =
+                      new PropertyItemModel.snapshot(value);
                   chatInspector(user, props, context);
                 });
                 // Navigator.of(context).push(
@@ -334,11 +334,14 @@ class _HomePageState extends State<HomeMessagePage> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserBaseModel>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_tabTitle),
+    return Container(
+      padding: EdgeInsets.only(top: 30),
+      child: Scaffold(
+        // appBar: AppBar(
+        //   title: Text(_tabTitle),
+        // ),
+        body: generateContactTab(user),
       ),
-      body: generateContactTab(user),
     );
   }
 }

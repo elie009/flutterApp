@@ -1,13 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/database/items/DatabaseCommonProps.dart';
+import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/itemform/itemlist/PropsResidence.dart';
 import 'package:flutter_app/pages/item/src/FormITemPage.dart';
+import 'package:flutter_app/pages/item/src/items/1001/FormBaseDetails.dart';
+import 'package:flutter_app/pages/item/src/items/1001/FormInfo.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/card/SmallItemCard.dart';
+import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:flutter_app/widgets/components/CheckBox2.dart';
 import 'package:flutter_app/widgets/section/CommonPageDisplay.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +27,7 @@ class _ItemAddFormPageState extends State<ItemAddFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamProvider<List<MenuModel>>.value(
+        body: StreamProvider<List<CategoryModel>>.value(
       value: DatabaseService().getStreamMenu,
       initialData: [],
       child: Scaffold(
@@ -72,12 +78,10 @@ class _BodyContentState extends State<BodyContent> {
         user: user,
       ),
       Constants.resCode: PropsResidence(),
-
-      
     };
     var size = MediaQuery.of(context).size;
     final double itemWidth = size.width / 2;
-    final items = Provider.of<List<MenuModel>>(context);
+    final items = Provider.of<List<CategoryModel>>(context);
     return new Scaffold(
         body: Column(
       children: [
@@ -143,12 +147,12 @@ class _BodyContentState extends State<BodyContent> {
             controller: new ScrollController(keepScrollOffset: false),
             shrinkWrap: true,
             scrollDirection: Axis.vertical,
-            children: items.map((MenuModel i) {
+            children: items.map((CategoryModel i) {
               return SmallItemCard(
-                menu: i,
+                category: i,
                 onChanged: (String code) {
                   setState(() {
-                    Navigator.push(context, ScaleRoute(page: map[code]));
+                    categoryInspector(code, propcheck, user, context);
                   });
                 },
               );
@@ -157,6 +161,97 @@ class _BodyContentState extends State<BodyContent> {
         ),
       ],
     ));
+  }
+}
+
+CollectionReference reference;
+Future categoryInspector(String catcode, PropertyChecking action,
+    UserBaseModel user, BuildContext context) async {
+  if (action.sale || action.rental || action.installment || action.swap) {
+    if (action.sale)
+      reference = DatabaseCommonProps()
+          .categoryCollection
+          .doc(catcode)
+          .collection('sale');
+
+    if (action.rental)
+      reference = DatabaseCommonProps()
+          .categoryCollection
+          .doc(catcode)
+          .collection('rent');
+
+    if (action.installment)
+      reference = DatabaseCommonProps()
+          .categoryCollection
+          .doc(catcode)
+          .collection('installment');
+
+    if (action.swap)
+      reference = DatabaseCommonProps()
+          .categoryCollection
+          .doc(catcode)
+          .collection('swap');
+
+    reference.snapshots().forEach((element) {
+      element.docs.forEach((element) {
+        var catdata = CategoryFormModel(
+          title: element.get('title'),
+          popsid: '',
+          condition_brandnew: element.get('condition_brandnew'),
+          condition_likebrandnew: element.get('condition_likebrandnew'),
+          condition_wellused: element.get('condition_wellused'),
+          condition_heavilyused: element.get('condition_heavilyused'),
+          condition_new: element.get('condition_new'),
+          condition_preselling: element.get('condition_preselling'),
+          condition_preowned: element.get('condition_preowned'),
+          condition_foreclosed: element.get('condition_foreclosed'),
+          condition_used: element.get('condition_used'),
+          priceinput_price: element.get('priceinput_price'),
+          description: element.get('description'),
+          ismoreandsameitem: element.get('ismoreandsameitem'),
+          deal_meetup: element.get('deal_meetup'),
+          deal_delivery: element.get('deal_delivery'),
+          brandCODE: element.get('brandCODE'),
+          location_cityproviceCODE: element.get('location_cityproviceCODE'),
+          location_streetaddress: element.get('location_streetaddress'),
+          unitdetails_lotarea: element.get('unitdetails_lotarea'),
+          unitdetails_termsCODE: element.get('unitdetails_termsCODE'),
+          unitdetails_bedroom: element.get('unitdetails_bedroom'),
+          unitdetails_bathroom: element.get('unitdetails_bathroom'),
+          unitdetails_floorarea: element.get('unitdetails_floorarea'),
+          unitdetails_parkingspace: element.get('unitdetails_parkingspace'),
+          unitdetails_furnish_unfurnish:
+              element.get('unitdetails_furnish_unfurnish'),
+          unitdetails_furnish_semifurnish:
+              element.get('unitdetails_furnish_semifurnish'),
+          unitdetails_furnish_fullyfurnish:
+              element.get('unitdetails_furnish_fullyfurnish'),
+          unitdetails_room_private: element.get('unitdetails_room_private'),
+          unitdetails_room_shared: element.get('unitdetails_room_shared'),
+        );
+
+        FormBaseDetailsState.propdetails = FormDetailsModel.init();
+        FormLotInfoState.popItem = FormLotModel.init();
+        Navigator.push(
+            context,
+            ScaleRoute(
+                page: FormItemPage(
+              propcheck: action,
+              menuCode: catcode,
+              user: user,
+              catdata: catdata,
+            )));
+      });
+    });
+  } else {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => AlertBox(
+              title: 'Warning',
+              message: 'Please select action type',
+            ));
+    return;
   }
 }
 

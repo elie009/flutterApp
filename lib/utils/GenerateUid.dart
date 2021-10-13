@@ -24,6 +24,14 @@ String get idMenu {
  * Generate a v4 (random) id
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
+String get idFile {
+  return "FILE" + DateTime.now().millisecondsSinceEpoch.toString();
+}
+
+/* 
+ * Generate a v4 (random) id
+ * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
+ */
 String get idBooking {
   return ("book" + uuid.v4());
 }

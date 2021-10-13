@@ -35,24 +35,44 @@ class Constants {
     return code == 1 ? 'NEW' : 'USED';
   }
 
-  static List<StrObj> termsDateCode = [
-    StrObj(key: '1', value: 'for entile lot'),
-    StrObj(key: '2', value: 'per sqm'),
-    StrObj(key: '3', value: 'per hectares'),
-    StrObj(key: '4', value: 'other options'),
-  ];
+  static Map<String, String> conditions = {
+    'brandnew': 'Brand New',
+    'likenew': 'Like New',
+    'wellused': 'Well Used',
+    'heavilyused': 'Heavily Used',
+    'new': 'New',
+    'used': 'Used',
+    'preselling': 'Pre-Selling',
+    'preowned': 'Pre-Owned',
+    'foreclosed': 'Foreclosed',
+  };
 
-  static String convertTermsCodeToDate(String code) {
-    String resultValue = '';
-    termsDateCode.forEach((element) {
-      if (element.key == code) resultValue = element.value;
-    });
-    return resultValue;
-  }
+  static Map<String, String> dealmethod = {
+    'meetup': 'Meet up',
+    'delivery': 'Delivery',
+  };
+
+  static Map<String, String> termsDateCode = {
+    'A01001': 'Hours',
+    'A01002': 'Days',
+    'A01003': 'Weeks',
+    'A01004': 'Months',
+    'A01005': 'Years',
+    'A01006': 'Others',
+  };
+
+  static Map<String, String> furnishing = {
+    'unfurnished': 'Unfurnished',
+    'semifurnished': 'Semi Furnished',
+    'fullyfurnished': 'Fully Furnished',
+  };
+
+ 
 }
 
 class StrObj {
   String key;
   String value;
-  StrObj({this.key, this.value});
+  String stat;
+  StrObj({this.key, this.value, this.stat});
 }

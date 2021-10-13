@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/widgets/card/ItemCard.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,7 @@ class BodyContent extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final double itemWidth = size.width / 2;
-    var items = Provider.of<List<PropertyModel>>(context);
+    var items = Provider.of<List<PropertyItemModel>>(context);
     items = items == null ? [] : items;
     return new Scaffold(
         body: new Container(
@@ -19,7 +20,7 @@ class BodyContent extends StatelessWidget {
         controller: new ScrollController(keepScrollOffset: false),
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
-        children: items.map((PropertyModel i) {
+        children: items.map((PropertyItemModel i) {
           return ItemCard(props: i);
         }).toList(),
       ),

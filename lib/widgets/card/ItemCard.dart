@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/item/ItemViewDetails.dart';
@@ -14,7 +15,19 @@ class ItemCard extends StatelessWidget {
 
   final double inputheight;
 
-  final PropertyModel props;
+  final PropertyItemModel props;
+
+  snip(String text) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: primaryColor,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      padding: const EdgeInsets.all(3.0),
+      child: Text(text),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +87,22 @@ class ItemCard extends StatelessWidget {
                           ),
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Center(
-                                child: Image.asset(
-                              props.imageName.isEmpty
-                                  ? Constants.itemCard1img
-                                  : props.imageName,
-                            )),
+                            child: Container(
+                              width: 300,
+                              height: 150,
+                              child: Center(
+                                child: props.imageId.isEmpty
+                                    ? Image.asset(
+                                        props.imageId.isEmpty
+                                            ? Constants.itemCard1img
+                                            : props.imageId,
+                                      )
+                                    : Image.network(
+                                        props.imageId,
+                                        alignment: Alignment.center,
+                                      ),
+                              ),
+                            ),
                           )
                         ],
                       ),
@@ -118,7 +141,7 @@ class ItemCard extends StatelessWidget {
                                 width: 28,
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white70,
+                                    color: yellowamber,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color(0xFFfae3e2),
@@ -127,8 +150,8 @@ class ItemCard extends StatelessWidget {
                                       ),
                                     ]),
                                 child: Icon(
-                                  Icons.flag_outlined,
-                                  color: Color(0xFFfb3132),
+                                  Icons.message,
+                                  color: whiteColor,
                                   size: 20,
                                 ),
                               ),
@@ -151,13 +174,10 @@ class ItemCard extends StatelessWidget {
                                 padding:
                                     EdgeInsets.only(left: 5, top: 0, right: 0),
                                 child: TextLabelFade(
-                                    text: '\P ' +
-                                        // formatCurency(
-                                        //     props.saleFixPrice.toString()),
-                                        props.saleFixPrice.toString(),
+                                    text: formatCurency(props.price.toString()),
                                     style: TextStyle(
                                         color: Color(0xFF6e6e71),
-                                        fontSize: 17,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold))),
                           )
                         ],
@@ -171,7 +191,7 @@ class ItemCard extends StatelessWidget {
                           alignment: Alignment.bottomLeft,
                           padding: EdgeInsets.only(left: 5, top: 5, right: 5),
                           child: TextLabelFade(
-                              text: props.location,
+                              text: props.location_streetaddress,
                               style: TextStyle(
                                   color: Color(0xFF6e6e71),
                                   fontSize: 12,
@@ -185,35 +205,17 @@ class ItemCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(width: 1),
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                WidgetSpan(
-                                  child: Container(
-                                    padding: EdgeInsets.only(right: 3.0),
-                                    child: Icon(
-                                      Icons.message,
-                                      size: 14,
-                                      color: primaryColor,
-                                    ),
-                                  ),
-                                ),
-                                TextSpan(
-                                    text: props.numComments.toString(),
-                                    style: TextStyle(
-                                        color: primaryColor,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800)),
-                              ],
-                            ),
-                          ),
+                          if (props.forSale) snip('sale'),
+                          if (props.forRent) snip('rent'),
+                          if (props.forInstallment) snip('installment'),
+                          if (props.forSwap) snip('swap'),
                           SizedBox(width: 5),
                           RichText(
                             text: TextSpan(
                               children: [
                                 WidgetSpan(
                                   child: Container(
-                                    padding: EdgeInsets.only(right: 3.0),
+                                    padding: EdgeInsets.only(right: 2.0),
                                     child: Icon(
                                       Icons.thumb_up_outlined,
                                       size: 14,
