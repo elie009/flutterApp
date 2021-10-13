@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/database/database.dart';
 import 'package:flutter_app/model/ContactModel.dart';
 import 'package:flutter_app/model/ChatModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/GenerateUid.dart';
-import 'package:flutter_app/widgets/card/RowCardInquire.dart';
+import 'package:flutter_app/widgets/card/RowMediumCard.dart';
 import 'package:flutter_app/widgets/components/UserImage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ChatInquire extends StatefulWidget {
   final SharedPreferences prefs;
   final ChatModel chatObj;
-  final PropertyModel props;
+  final PropertyItemModel props;
   bool isNewContact;
   bool isNewChat;
   CollectionReference chatReference;
@@ -211,7 +212,7 @@ class ChatPageState extends State<ChatInquire> {
         padding: EdgeInsets.all(5),
         child: new Column(
           children: <Widget>[
-            RowCardInquire(props: widget.props),
+            RowMediumCard(props: widget.props),
             (newitem
                 ? Expanded(
                     child: new ListView(reverse: true, children: <Widget>[

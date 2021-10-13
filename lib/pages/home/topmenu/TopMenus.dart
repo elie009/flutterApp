@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
 import 'package:flutter_app/widgets/card/SmallItemCard.dart';
@@ -15,20 +15,25 @@ class TopMenus extends StatefulWidget {
 class _TopMenusState extends State<TopMenus> {
   @override
   Widget build(BuildContext context) {
-    final items = Provider.of<List<MenuModel>>(context);
+    final items = Provider.of<List<CategoryModel>>(context);
 
     return Container(
-        height: 100,
+        height: 90,
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: <Widget>[
             if (items != null)
               for (var i in items)
                 SmallItemCard(
-                  menu: i,
+                  category: i,
                   onChanged: (String menuid) {
                     setState(() {
-                      print('>>> ' + menuid);
+                      Navigator.push(
+                          context,
+                          ScaleRoute(
+                              page: SearchDisplayPage(
+                            menuId: menuid,
+                          )));
                     });
                   },
                 )
@@ -41,7 +46,7 @@ class TopMenuTiles extends StatelessWidget {
   String name = 'Burger';
   String imageUrl = 'ic_burger';
   String slug = '';
-  MenuModel menu;
+  CategoryModel menu;
 
   TopMenuTiles({
     Key key,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/search/BodyContainer.dart';
 import 'package:flutter_app/service/Auth.dart';
@@ -9,9 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchDisplayPage extends StatefulWidget {
   String menuId;
-  final SharedPreferences prefs;
-  SearchDisplayPage({Key key, @required this.menuId, this.prefs})
-      : super(key: key);
+  SearchDisplayPage({Key key, @required this.menuId}) : super(key: key);
 
   @override
   _SearchDisplayPageState createState() => _SearchDisplayPageState();
@@ -26,8 +25,8 @@ class _SearchDisplayPageState extends State<SearchDisplayPage> {
     final AuthService _auth = AuthService();
 
     return Scaffold(
-      body: StreamProvider<List<PropertyModel>>.value(
-        value: DatabaseServiceProps().getByMenu('1001'),
+      body: StreamProvider<List<PropertyItemModel>>.value(
+        value: DatabaseServiceProps().getByMenu(widget.menuId),
         initialData: null,
         child: Scaffold(
             appBar: AppBar(

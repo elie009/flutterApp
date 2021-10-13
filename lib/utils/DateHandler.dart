@@ -32,25 +32,15 @@ String formatTimeStamp(DateTime datetime) {
   return format.format(datetime).toString();
 }
 
-List<DropdropValue> termsDateCode = [
-  DropdropValue(key: 'A01001', value: 'Hours'),
-  DropdropValue(key: 'A01002', value: 'Days'),
-  DropdropValue(key: 'A01003', value: 'Weeks'),
-  DropdropValue(key: 'A01004', value: 'Months'),
-  DropdropValue(key: 'A01005', value: 'Years'),
-  DropdropValue(key: 'A01006', value: 'Others'),
-];
 
-String convertTermsCodeToDate(String code) {
-  String resultValue = '';
-  termsDateCode.forEach((element) {
-    if (element.key == code) resultValue = element.value;
-  });
-  return resultValue;
-}
 
-class DropdropValue {
-  String key;
-  String value;
-  DropdropValue({this.key, this.value});
-}
+// String convertTermsCodeToDate(String code) {
+//   String resultValue = '';
+  
+//   termsDateCode.forEach((element) {
+//     if (element.key == code) resultValue = element.value;
+//   });
+//   return resultValue;
+// }
+
+

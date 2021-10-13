@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class FoodOrderPage extends StatefulWidget {
   @override
@@ -61,7 +62,7 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                 CartItem(
                     productName: "Grilled Salmon",
                     productPrice: "\$96.00",
-                    productImage: "ic_popular_food_1",
+                    imageId: "ic_popular_food_1",
                     productCartQuantity: "2"),
                 SizedBox(
                   height: 10,
@@ -69,7 +70,7 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                 CartItem(
                     productName: "Meat vegetable",
                     productPrice: "\$65.08",
-                    productImage: "ic_popular_food_4",
+                    imageId: "ic_popular_food_4",
                     productCartQuantity: "5"),
                 SizedBox(
                   height: 10,
@@ -306,14 +307,14 @@ class PromoCodeWidget extends StatelessWidget {
 class CartItem extends StatelessWidget {
   String productName;
   String productPrice;
-  String productImage;
+  String imageId;
   String productCartQuantity;
 
   CartItem({
     Key key,
     @required this.productName,
     @required this.productPrice,
-    @required this.productImage,
+    @required this.imageId,
     @required this.productCartQuantity,
   }) : super(key: key);
 
@@ -321,7 +322,7 @@ class CartItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 130,
+      height: 100,
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(
           color: Color(0xFFfae3e2).withOpacity(0.3),
@@ -348,70 +349,72 @@ class CartItem extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Center(
-                        child: Image.asset(
-                      "assets/images/popular_foods/$productImage.png",
-                      width: 110,
-                      height: 100,
-                    )),
+                      child: imageId.isEmpty
+                          ? Image.asset(
+                              "assets/images/popular_foods/ic_popular_food_4.png",
+                              width: 80,
+                              height: 80,
+                            )
+                          : Image.network(
+                              imageId,
+                              fit: BoxFit.fitWidth,
+                            ),
+                    ),
                   ),
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              child: Text(
-                                "$productName",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Color(0xFF3a3a3b),
-                                    fontWeight: FontWeight.w400),
-                                textAlign: TextAlign.left,
+                Container(
+                  padding:
+                      EdgeInsets.only(left: 10, right: 5, top: 10, bottom: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                child: TextLabelFade(
+                                  width: 220,
+                                  text: productName,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: Color(0xFF3a3a3b),
+                                      fontWeight: FontWeight.w700),
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              child: Text(
-                                "$productPrice",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: Color(0xFF3a3a3b),
-                                    fontWeight: FontWeight.w400),
-                                textAlign: TextAlign.left,
+                              SizedBox(
+                                height: 5,
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 40,
-                        ),
-                        Container(
-                          alignment: Alignment.centerRight,
-                          child: Image.asset(
-                            "assets/images/menus/ic_delete.png",
-                            width: 25,
-                            height: 25,
+                              Container(
+                                child: TextLabelFade(
+                                  width: 200,
+                                  text: productPrice,
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      color: Color(0xFF3a3a3b),
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
                           ),
-                        )
-                      ],
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 20),
-                      alignment: Alignment.centerRight,
-                      child: AddToCartMenu(2),
-                    )
-                  ],
+                          SizedBox(
+                            width: 40,
+                          ),
+                        ],
+                      ),
+                      // Container(
+                      //   margin: EdgeInsets.only(left: 20),
+                      //   alignment: Alignment.centerRight,
+                      //   child: AddToCartMenu(2),
+                      // )
+                    ],
+                  ),
                 )
               ],
             ),

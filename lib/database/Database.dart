@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/model/BookingModel.dart';
 import 'package:flutter_app/model/ContactModel.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 
@@ -10,12 +10,11 @@ class DatabaseService {
   DatabaseService({this.uid});
 
   Future deleteItemData() async {
-    return await menuCollection.doc(uid).delete();
+    return await categoryCollection.doc(uid).delete();
   }
 
-// collection reference
-  final CollectionReference menuCollection =
-      FirebaseFirestore.instance.collection('menu');
+  final CollectionReference categoryCollection =
+      FirebaseFirestore.instance.collection('category');
 
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('user');
@@ -45,14 +44,19 @@ class DatabaseService {
     });
   }
 
-  Future updateMenuData(MenuModel menuitem) async {
-    return await menuCollection.doc(uid).set({
-      'menuid': menuitem.menuid,
-      'name': menuitem.name,
-      'description': menuitem.description,
-      'imageAppName': menuitem.imageAppName,
-      'imageWebName': menuitem.imageWebName,
-      'dropdownid': menuitem.dropdownid,
+  Future updateCategoryData(CategoryModel categoryitem) async {
+    return await categoryCollection.doc(categoryitem.catid).set({
+      'catid': categoryitem.catid,
+      'title': categoryitem.title,
+      'status': categoryitem.status,
+      'issale': categoryitem.issale,
+      'isrent': categoryitem.isrent,
+      'isswap': categoryitem.isswap,
+      'isinstallment': categoryitem.isinstallment,
+      'dateadded': categoryitem.dateadded,
+      'iconapp': categoryitem.iconapp,
+      'iconweb': categoryitem.iconweb,
+      'headcategory': categoryitem.headcategory
     });
   }
 
@@ -99,16 +103,21 @@ class DatabaseService {
   }
 
   //get item list from snapshot
-  List<MenuModel> _menuListFromSnapshot(QuerySnapshot snapshot) {
+  List<CategoryModel> _categoryListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       try {
-        return MenuModel(
-          menuid: doc.get('menuid') ?? '',
-          name: doc.get('name') ?? '',
-          description: doc.get('description') ?? '',
-          imageAppName: doc.get('imageAppName') ?? '',
-          imageWebName: doc.get('imageWebName') ?? '',
-          dropdownid: doc.get('dropdownid') ?? '',
+        return CategoryModel(
+          catid: doc.get('catid') ?? '',
+          title: doc.get('title') ?? '',
+          status: doc.get('status') ?? '',
+          issale: doc.get('issale') ?? false,
+          isrent: doc.get('isrent') ?? false,
+          isinstallment: doc.get('isinstallment') ?? false,
+          isswap: doc.get('isswap') ?? false,
+          dateadded: doc.get('dateadded') ?? '',
+          iconapp: doc.get('iconapp') ?? '',
+          iconweb: doc.get('iconweb') ?? '',
+          headcategory: doc.get('headcategory') ?? '',
         );
       } catch (e) {
         print(e.toString());
@@ -118,8 +127,8 @@ class DatabaseService {
   }
 
   // get all menu item on stream
-  Stream<List<MenuModel>> get getStreamMenu {
-    return menuCollection.snapshots().map(_menuListFromSnapshot);
+  Stream<List<CategoryModel>> get getStreamMenu {
+    return categoryCollection.snapshots().map(_categoryListFromSnapshot);
   }
 
   //get item list from snapshot
@@ -266,7 +275,7 @@ class DatabaseService {
 
   Future deleteAllitem() async {
     try {
-      var snapshots = await menuCollection.get();
+      var snapshots = await categoryCollection.get();
       for (var doc in snapshots.docs) {
         await doc.reference.delete();
       }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/RotationRoute.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/items/DatabaseServiceProps.dart';
-import 'package:flutter_app/database/items/DatabaseServiceProps1001.dart';
-import 'package:flutter_app/model/MenuModel.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/model/CategoryModel.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/search/SearchDisplay.dart';
@@ -23,11 +24,11 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 350,
+      height: 320,
       width: double.infinity,
       child: Column(
         children: <Widget>[
-          PopularFoodTitle(prefs: widget.prefs),
+          PopularFoodTitle(),
           Expanded(
             child: PopularFoodItems(),
           )
@@ -38,18 +39,18 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
 }
 
 class PopularFoodTitle extends StatelessWidget {
-  final SharedPreferences prefs;
-  PopularFoodTitle({this.prefs});
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      padding: EdgeInsets.only(
+        left: 10,
+        right: 10,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Text(
-            "Popluar Foods",
+            "Popluar",
             style: TextStyle(
                 fontSize: 20,
                 color: Color(0xFF3a3a3b),
@@ -62,7 +63,6 @@ class PopularFoodTitle extends StatelessWidget {
                   ScaleRoute(
                       page: SearchDisplayPage(
                     menuId: '1001',
-                    prefs: prefs,
                   )));
             },
             child: Text(
@@ -82,11 +82,11 @@ class PopularFoodTitle extends StatelessWidget {
 class PopulateList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var items = Provider.of<List<PropertyModel>>(context);
+    var items = Provider.of<List<PropertyItemModel>>(context);
     items = items == null ? [] : items;
     return ListView(
       scrollDirection: Axis.horizontal,
-      children: items.map((PropertyModel i) {
+      children: items.map((PropertyItemModel i) {
         return ItemCard(props: i);
       }).toList(),
     );
@@ -97,8 +97,8 @@ class PopularFoodItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamProvider<List<PropertyModel>>.value(
-      value: DatabaseServiceProps().getAll(),
+        body: StreamProvider<List<PropertyItemModel>>.value(
+      value: DatabaseServiceItems().getAll(),
       initialData: null,
       child: PopulateList(),
     ));

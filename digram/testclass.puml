@@ -1,0 +1,1351 @@
+@startuml
+set namespaceSeparator ::
+
+class "flutter_app::animation::RotationRoute.dart::RotationRoute" {
+  +Widget* page
+}
+
+"flutter_app::animation::RotationRoute.dart::RotationRoute" o-- "flutter::src::widgets::framework.dart::Widget"
+
+class "flutter_app::animation::ScaleRoute.dart::ScaleRoute" {
+  +Widget* page
+}
+
+"flutter_app::animation::ScaleRoute.dart::ScaleRoute" o-- "flutter::src::widgets::framework.dart::Widget"
+
+class "flutter_app::database::Database.dart::DatabaseService" {
+  +String* uid
+  +CollectionReference<Object*>* categoryCollection
+  +CollectionReference<Object*>* userCollection
+  +CollectionReference<Object*>* bookingCollection
+  +CollectionReference<Object*>* chatCollection
+  +CollectionReference<Object*>* mobileCollection
+  +Stream<List<CategoryModel*>*>* getStreamMenu
+  +Future<dynamic>* deleteItemData()
+  +Future<dynamic>* updateBookingData()
+  +Future<dynamic>* updateCategoryData()
+  +Future<dynamic>* updateUserData()
+  -List<UserBaseModel*>* _userListFromSnapshot()
+  +Future<dynamic>* addChat()
+  -List<CategoryModel*>* _categoryListFromSnapshot()
+  -List<ContactModel*>* _contactsFromSnapshot()
+  -List<PropertyModel*>* _propertyListFromSnapshot()
+  -List<BookingModel*>* _bookingListFromSnapshot()
+  -List<ContactModel*>* _contactListFromSnapshot()
+  +Future<Map<String*, dynamic>*>* getChatData()
+  +Future<Map<String*, dynamic>*>* getUseContact()
+  +Future<Map<String*, dynamic>*>* getUseData()
+  +Stream<List<BookingModel*>*>* booking()
+  +Stream<List<ContactModel*>*>* userContact()
+  +Future<dynamic>* deleteAllitem()
+}
+
+"flutter_app::database::Database.dart::DatabaseService" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::database::Database.dart::DatabaseService" o-- "dart::async::Stream<List<CategoryModel>>"
+
+abstract class "flutter_app::database::Database.dart::DatabaseServicePropsStructure" {
+  +dynamic getAll()
+  +dynamic getByPropId()
+  +dynamic getByUid()
+  +dynamic getByMenu()
+  +dynamic getByUserMenu()
+  +dynamic add()
+  +dynamic delete()
+}
+
+class "flutter_app::database::items::DatabaseCommonProps.dart::DatabaseCommonProps" {
+  +CollectionReference<Object*>* propertyCollection
+  +CollectionReference<Object*>* categoryCollection
+  +Stream<List<CategoryFormModel*>*>* getStreamCategoryForm
+  +Future<dynamic>* setCategoryForm()
+  -List<CategoryFormModel*>* _categoryFormListFromSnapshot()
+}
+
+"flutter_app::database::items::DatabaseCommonProps.dart::DatabaseCommonProps" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::database::items::DatabaseCommonProps.dart::DatabaseCommonProps" o-- "dart::async::Stream<List<CategoryFormModel>>"
+
+class "flutter_app::database::items::DatabaseServiceProps.dart::DatabaseServiceProps" {
+  +CollectionReference<Object*>* propertyCollection
+  -List<PropertyModel*>* _PropertyList()
+  +Stream<List<PropertyModel*>*>* getPropery()
+  +Stream<List<PropertyModel*>*>* getAllPropery()
+  +Stream<List<PropertyModel*>*>* getAll()
+  +Stream<List<PropertyModel*>*>* getByUid()
+  +Stream<List<PropertyModel*>*>* getByMenu()
+  +dynamic add()
+  +Future<dynamic>* delete()
+  +Stream<List<PropertyModel*>*>* getByPropId()
+  +Stream<List<dynamic>*>* getByUserMenu()
+}
+
+"flutter_app::database::items::DatabaseServiceProps.dart::DatabaseServiceProps" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::database::Database.dart::DatabaseServicePropsStructure" <|-- "flutter_app::database::items::DatabaseServiceProps.dart::DatabaseServiceProps"
+
+class "flutter_app::database::items::DatabaseServiceProps1001.dart::DatabaseServicePropsLot" {
+  {static} +CollectionReference<Object*>* propertyCollection
+  -List<PropertyLotModel*>* _LotPropertyList()
+  +Stream<List<PropertyLotModel*>*>* getProperyLot()
+  +Stream<List<PropertyLotModel*>*>* getByPropId()
+  +Stream<List<PropertyLotModel*>*>* getAllProperyLot()
+  +Future<dynamic>* add()
+  +dynamic delete()
+  +dynamic getAll()
+  +dynamic getByMenu()
+  +dynamic getByUid()
+  +dynamic getByUserMenu()
+}
+
+"flutter_app::database::items::DatabaseServiceProps1001.dart::DatabaseServicePropsLot" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::database::Database.dart::DatabaseServicePropsStructure" <|-- "flutter_app::database::items::DatabaseServiceProps1001.dart::DatabaseServicePropsLot"
+
+class "flutter_app::database::items::DatabaseServicePropsRes.dart::DatabaseServicePropsLot" {
+  {static} +CollectionReference<Object*>* propertyCollection
+  -List<PropertyLotModel*>* _LotPropertyList()
+  +Stream<List<PropertyLotModel*>*>* getProperyLot()
+  +Stream<List<PropertyLotModel*>*>* getByPropId()
+  +Stream<List<PropertyLotModel*>*>* getAllProperyLot()
+  +Future<dynamic>* add()
+  +dynamic delete()
+  +dynamic getAll()
+  +dynamic getByMenu()
+  +dynamic getByUid()
+  +dynamic getByUserMenu()
+}
+
+"flutter_app::database::items::DatabaseServicePropsRes.dart::DatabaseServicePropsLot" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::database::Database.dart::DatabaseServicePropsStructure" <|-- "flutter_app::database::items::DatabaseServicePropsRes.dart::DatabaseServicePropsLot"
+
+class "flutter_app::database::SingleItemChecker.dart::SingleItemChecker" {
+  +Future<dynamic>* addTopMenu()
+  +Future<dynamic>* deleteTopMenu()
+  +Future<dynamic>* deleteAllItem()
+  +Future<dynamic>* addBooking()
+  +Future<dynamic>* updateBooking()
+}
+
+class "flutter_app::database::temp::DemoDataBase.dart::PrepareData" {
+  +String* menuid
+  +void execute()
+  +Future<dynamic>* clearAll()
+  +Future<dynamic>* addCategoryData()
+  +Future<dynamic>* addCategoryCollection()
+  +Future<dynamic>* addBookingData()
+}
+
+class "flutter_app::main.dart::MyApp" {
+  +SharedPreferences* prefs
+  +Widget* build()
+}
+
+"flutter_app::main.dart::MyApp" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::model::BookingModel.dart::BookingModel" {
+  +String* fromYear
+  +String* fromMonth
+  +String* fromDay
+  +String* toYear
+  +String* toMonth
+  +String* toDay
+  +String* propsId
+  +String* bookId
+  +String* userId
+  +String* bookingStatus
+}
+
+class "flutter_app::model::CategoryFormModel.dart::CategoryFormModel" {
+  +String* categoryid
+  +String* popsid
+  +bool* title
+  +bool* condition_brandnew
+  +bool* condition_likebrandnew
+  +bool* condition_wellused
+  +bool* condition_heavilyused
+  +bool* condition_new
+  +bool* condition_preselling
+  +bool* condition_preowned
+  +bool* condition_foreclosed
+  +bool* condition_used
+  +bool* priceselect_forsale
+  +bool* priceselect_forfree
+  +bool* priceinput_price
+  +bool* description
+  +bool* ismoreandsameitem
+  +bool* deal_meetup
+  +bool* deal_delivery
+  +bool* brandCODE
+  +bool* location_cityproviceCODE
+  +bool* location_streetaddress
+  +bool* unitdetails_lotarea
+  +bool* unitdetails_termsCODE
+  +bool* unitdetails_bedroom
+  +bool* unitdetails_bathroom
+  +bool* unitdetails_floorarea
+  +bool* unitdetails_parkingspace
+  +bool* unitdetails_furnish_unfurnish
+  +bool* unitdetails_furnish_semifurnish
+  +bool* unitdetails_furnish_fullyfurnish
+  +bool* unitdetails_room_private
+  +bool* unitdetails_room_shared
+}
+
+class "flutter_app::model::CategoryModel.dart::CategoryModel" {
+  +String* catid
+  +String* title
+  +String* iconapp
+  +String* iconweb
+  +String* status
+  +bool* issale
+  +bool* isrent
+  +bool* isinstallment
+  +bool* isswap
+  +String* dateadded
+  +String* headcategory
+}
+
+class "flutter_app::model::ChatModel.dart::ChatModel" {
+  +String* chatId
+  +String* getChatId
+}
+
+class "flutter_app::model::ContactModel.dart::ContactModel" {
+  +String* contact1
+  +String* contact2
+  +String* date
+  +String* propsId
+}
+
+class "flutter_app::model::Property1001Model.dart::PropertyLotModel" {
+  +double* lotSize
+  +int* saleLotOption
+  +double* saleLotFixPrice
+  +double* saleAreaSizeVale
+  +int* rentLotOption
+  +double* rentLotFixPrice
+  +String* rentAgreement
+  +String* rentTermsOfPaymentCd
+  +String* rentMinContactCd
+  +double* rentMinContactNum
+  +double* rentAreaSizeVale
+  +int* numComments
+  +int* numLikes
+  +int* numViews
+  +String* propid
+  +String* menuid
+  +String* ownerUid
+  +String* status
+  +String* title
+  +String* imageName
+  +String* location
+  +String* description
+  +double* saleFixPrice
+  +double* rentFixPrice
+  +double* installmentFixPrice
+  +String* postdate
+  +bool* forSwap
+  +int* conditionCode
+}
+
+class "flutter_app::model::Property1002Model.dart::PropertyLotModel" {
+  +double* lotSize
+  +int* saleLotOption
+  +double* saleLotFixPrice
+  +int* rentLotOption
+  +double* rentLotFixPrice
+  +String* rentAgreement
+  +String* rentTermsOfPaymentCd
+  +String* rentMinContactCd
+  +double* rentMinContactNum
+  +int* numComments
+  +int* numLikes
+  +int* numViews
+  +String* propid
+  +String* menuid
+  +String* ownerUid
+  +String* status
+  +String* title
+  +String* imageName
+  +String* location
+  +String* description
+  +double* saleFixPrice
+  +double* rentFixPrice
+  +double* installmentFixPrice
+  +String* postdate
+  +bool* forSwap
+  +int* conditionCode
+}
+
+class "flutter_app::model::PropertyModel.dart::PropertyModel" {
+  +int* numComments
+  +int* numLikes
+  +int* numViews
+  +String* propid
+  +String* menuid
+  +String* ownerUid
+  +String* status
+  +String* title
+  +String* imageName
+  +String* location
+  +String* description
+  +double* saleFixPrice
+  +double* rentFixPrice
+  +double* installmentFixPrice
+  +bool* forSwap
+  +int* conditionCode
+  +String* postdate
+  +List<String*>* checkPropertySave()
+  +List<String*>* checkPropertySubmit()
+}
+
+class "flutter_app::model::UserModel.dart::UserBaseModel" {
+  +String* uid
+  +String* email
+  +String* firstName
+  +String* lastName
+  +String* phoneNumber
+  +String* status
+  +String* image
+}
+
+class "flutter_app::pages::authentication::SignInPage.dart::SignInPage" {
+  +SharedPreferences* prefs
+  +_SignInPageState* createState()
+}
+
+"flutter_app::pages::authentication::SignInPage.dart::SignInPage" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::pages::authentication::SignInPage.dart::_SignInPageState" {
+  -GlobalKey<FormState*>* _formKey
+  -AuthService* _auth
+  +bool* loading
+  +String* email
+  +String* password
+  +String* error
+  +Widget* build()
+}
+
+"flutter_app::pages::authentication::SignInPage.dart::_SignInPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter_app::pages::authentication::SignInPage.dart::_SignInPageState" o-- "flutter_app::service::Auth.dart::AuthService"
+
+class "flutter_app::pages::authentication::SignInPage.dart::FacebookGoogleLogin" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::authentication::SignUpPage.dart::SignUpPage" {
+  +_SignUpPageState* createState()
+}
+
+class "flutter_app::pages::authentication::SignUpPage.dart::_SignUpPageState" {
+  -GlobalKey<FormState*>* _formKey
+  -AuthService* _auth
+  +bool* loading
+  +String* email
+  +String* password
+  +String* firstName
+  +String* lastName
+  +String* error
+  +Widget* build()
+}
+
+"flutter_app::pages::authentication::SignUpPage.dart::_SignUpPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter_app::pages::authentication::SignUpPage.dart::_SignUpPageState" o-- "flutter_app::service::Auth.dart::AuthService"
+
+class "flutter_app::pages::authentication::SignUpPage.dart::FacebookGoogleLogin" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::booking::BookedDates.dart::BookedDates" {
+  +_BookedDatesState* createState()
+}
+
+class "flutter_app::pages::booking::BookedDates.dart::_BookedDatesState" {
+  +List<BookingModel*>* listitems
+  -String* _selectedDate
+  -String* _dateCount
+  -String* _range
+  -String* _rangeCount
+  +BookingModel* endbook
+  +String* isSelected
+  -void _onSelectionChanged()
+  +Widget* build()
+}
+
+"flutter_app::pages::booking::BookedDates.dart::_BookedDatesState" o-- "flutter_app::model::BookingModel.dart::BookingModel"
+
+class "flutter_app::pages::booking::BookingPage.dart::BookingPage" {
+  +_BookingPageState* createState()
+}
+
+class "flutter_app::pages::booking::BookingPage.dart::_BookingPageState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodDetailsPage.dart::FoodDetailsPage" {
+  +_FoodDetailsPageState* createState()
+}
+
+class "flutter_app::pages::FoodDetailsPage.dart::_FoodDetailsPageState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodDetailsPage.dart::FoodTitleWidget" {
+  +String* productName
+  +String* productPrice
+  +String* productHost
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodDetailsPage.dart::BottomMenu" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodDetailsPage.dart::AddToCartMenu" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodDetailsPage.dart::DetailContentMenu" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::FoodOrderPage" {
+  +_FoodOrderPageState* createState()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::_FoodOrderPageState" {
+  +int* counter
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::PaymentMethodWidget" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::TotalCalculationWidget" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::PromoCodeWidget" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::CartItem" {
+  +String* productName
+  +String* productPrice
+  +String* productImage
+  +String* productCartQuantity
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::CartIconWithBadge" {
+  +int* counter
+  +Widget* build()
+}
+
+class "flutter_app::pages::FoodOrderPage.dart::AddToCartMenu" {
+  +int* productCounter
+  +Widget* build()
+}
+
+class "flutter_app::pages::home::BodyContainer.dart::BodyContainer" {
+  +SharedPreferences* prefs
+  +State<StatefulWidget*>* createState()
+}
+
+"flutter_app::pages::home::BodyContainer.dart::BodyContainer" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::pages::home::BodyContainer.dart::_BodyContainer" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::home::BodyContent.dart::BodyContent" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::home::HomePage.dart::HomePage" {
+  +SharedPreferences* prefs
+  +_HomePageState* createState()
+}
+
+"flutter_app::pages::home::HomePage.dart::HomePage" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::pages::home::HomePage.dart::_HomePageState" {
+  -AuthService* _auth
+  +Widget* build()
+}
+
+"flutter_app::pages::home::HomePage.dart::_HomePageState" o-- "flutter_app::service::Auth.dart::AuthService"
+
+class "flutter_app::pages::home::topmenu::TopMenus.dart::TopMenus" {
+  +_TopMenusState* createState()
+}
+
+class "flutter_app::pages::home::topmenu::TopMenus.dart::_TopMenusState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::home::topmenu::TopMenus.dart::TopMenuTiles" {
+  +String* name
+  +String* imageUrl
+  +String* slug
+  +CategoryModel* menu
+  +Widget* build()
+}
+
+"flutter_app::pages::home::topmenu::TopMenus.dart::TopMenuTiles" o-- "flutter_app::model::CategoryModel.dart::CategoryModel"
+
+class "flutter_app::pages::item::component::BottomMenu.dart::BottomMenu" {
+  +String* ownerUid
+  +String* propsId
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::component::ItemCardMenu.dart::ItemCardMenu" {
+  +PropertyModel* props
+  +_ItemCardMenuState* createState()
+}
+
+"flutter_app::pages::item::component::ItemCardMenu.dart::ItemCardMenu" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+
+class "flutter_app::pages::item::component::ItemCardMenu.dart::_ItemCardMenuState" {
+  +Widget* build()
+  -Column* _buildButtonColumn()
+}
+
+class "flutter_app::pages::item::component::ItemViewBodyContent.dart::ItemViewBodyContent" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::DataTableOffer.dart::DataTableOffer" {
+  +_DataTableOfferState* createState()
+}
+
+class "flutter_app::pages::item::DataTableOffer.dart::_DataTableOfferState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::DataTableOffer.dart::Cards" {
+  +PropertyModel* props
+  +Widget* build()
+}
+
+"flutter_app::pages::item::DataTableOffer.dart::Cards" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+
+class "flutter_app::pages::item::itemform::ItemAddFormPage.dart::ItemAddFormPage" {
+  +_ItemAddFormPageState* createState()
+}
+
+class "flutter_app::pages::item::itemform::ItemAddFormPage.dart::_ItemAddFormPageState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::itemform::ItemAddFormPage.dart::BodyContent" {
+  +_BodyContentState* createState()
+}
+
+class "flutter_app::pages::item::itemform::ItemAddFormPage.dart::_BodyContentState" {
+  +PropertyChecking* propcheck
+  +Widget* build()
+}
+
+"flutter_app::pages::item::itemform::ItemAddFormPage.dart::_BodyContentState" o-- "flutter_app::pages::item::itemform::ItemAddFormPage.dart::PropertyChecking"
+
+class "flutter_app::pages::item::itemform::ItemAddFormPage.dart::BodyContainer" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::itemform::ItemAddFormPage.dart::PropertyChecking" {
+  +bool* sale
+  +bool* rental
+  +bool* swap
+  +bool* installment
+}
+
+class "flutter_app::pages::item::itemform::itemlist::PropsResidence.dart::PropsResidence" {
+  +_PropsResidenceState* createState()
+}
+
+class "flutter_app::pages::item::itemform::itemlist::PropsResidence.dart::_PropsResidenceState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::ItemViewDetails.dart::ItemViewDetails" {
+  +PropertyModel* props
+  +_ItemViewDetailsState* createState()
+}
+
+"flutter_app::pages::item::ItemViewDetails.dart::ItemViewDetails" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+
+class "flutter_app::pages::item::ItemViewDetails.dart::_ItemViewDetailsState" {
+  -AnimationController* _ColorAnimationController
+  -AnimationController* _TextAnimationController
+  -Animation<dynamic>* _colorTween
+  -Animation<dynamic>* _iconColorTween
+  -Animation<Offset*>* _transTween
+  +void initState()
+  -bool* _scrollListener()
+  +Widget* build()
+}
+
+"flutter_app::pages::item::ItemViewDetails.dart::_ItemViewDetailsState" o-- "flutter::src::animation::animation_controller.dart::AnimationController"
+"flutter_app::pages::item::ItemViewDetails.dart::_ItemViewDetailsState" o-- "flutter::src::animation::animation.dart::Animation<dynamic>"
+"flutter_app::pages::item::ItemViewDetails.dart::_ItemViewDetailsState" o-- "flutter::src::animation::animation.dart::Animation<Offset>"
+"flutter::src::widgets::ticker_provider.dart::TickerProviderStateMixin" <|-- "flutter_app::pages::item::ItemViewDetails.dart::_ItemViewDetailsState"
+
+class "flutter_app::pages::item::PopupOffer.dart::PopupOffer" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::PopupOffer.dart::PopupCard" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::PopupOffer.dart::BottomMenu" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::src::FormITemPage.dart::FormItemPage" {
+  +PropertyChecking* propcheck
+  +String* menuCode
+  +UserBaseModel* user
+  +PropertyModel* props
+  +_FormItemPageState* createState()
+}
+
+"flutter_app::pages::item::src::FormITemPage.dart::FormItemPage" o-- "flutter_app::pages::item::itemform::ItemAddFormPage.dart::PropertyChecking"
+"flutter_app::pages::item::src::FormITemPage.dart::FormItemPage" o-- "flutter_app::model::UserModel.dart::UserBaseModel"
+"flutter_app::pages::item::src::FormITemPage.dart::FormItemPage" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+
+class "flutter_app::pages::item::src::FormITemPage.dart::_FormItemPageState" {
+  +int* currentStep
+  +bool* isNew
+  +List<MapData*>* inputdata
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::src::FormITemPage.dart::MapData" {
+  +String* label
+  +String* key
+  +String* value
+}
+
+class "flutter_app::pages::item::src::InputTextForm.dart::InputTextForm" {
+  +String* label
+  +String* value
+  +Function* onChanged
+  +String* fieldCode
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::src::items::1001::containers::ForRentForm.dart::ForRentForm" {
+  +Function* onChangedTermsOfRent
+  +Function* onChangedMinContract
+  +Function* onChangedOptionCategory
+  +TextEditingController* rentControllerFixPrice
+  +TextEditingController* rentMinContractRangeNum
+  +TextEditingController* rentConditions
+  +TextEditingController* rentAreaSizeVal
+  +int* optionCategory
+  +String* rentMinContractRangeCode
+  +String* rentTermsOfRentCode
+  +Widget* build()
+  +dynamic rentConditionsFunc()
+  +dynamic rentMinContractRageFunc()
+  +dynamic rentTermsOfPaymentFunc()
+  +dynamic rentPriceOptionsFunc()
+  +dynamic rentOptionCategory()
+  +dynamic rentAreaSize()
+}
+
+"flutter_app::pages::item::src::items::1001::containers::ForRentForm.dart::ForRentForm" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter_app::pages::item::src::items::1001::FormObj.dart::LotFormRentObj" <|-- "flutter_app::pages::item::src::items::1001::containers::ForRentForm.dart::ForRentForm"
+
+class "flutter_app::pages::item::src::items::1001::containers::ForSaleForm.dart::ForSaleForm" {
+  +TextEditingController* saleControllerFixPrice
+  +TextEditingController* saleAreaSizeVal
+  +int* optionCategory
+  +Function* onChangedOptionCategory
+  +Widget* build()
+  +dynamic salePriceOptionsFunc()
+  +dynamic saleOptionCategory()
+  +dynamic saleAreaSize()
+}
+
+"flutter_app::pages::item::src::items::1001::containers::ForSaleForm.dart::ForSaleForm" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter_app::pages::item::src::items::1001::FormObj.dart::LotForSaleObj" <|-- "flutter_app::pages::item::src::items::1001::containers::ForSaleForm.dart::ForSaleForm"
+
+class "flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormBaseDetails" {
+  +State<StatefulWidget*>* createState()
+}
+
+class "flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormBaseDetailsState" {
+  {static} +GlobalKey<FormState*>* formKey
+  {static} +FormDetailsModel* propdetails
+  {static} +dynamic getDataValue
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormBaseDetailsState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormBaseDetailsState" o-- "flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormDetailsModel"
+
+class "flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormDetailsModel" {
+  +TextEditingController* title
+  +TextEditingController* condition
+  +TextEditingController* description
+  +int* radiovalue
+  +String* propsid
+}
+
+"flutter_app::pages::item::src::items::1001::FormBaseDetails.dart::FormDetailsModel" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotInfo" {
+  +PropertyChecking* propcheck
+  +State<StatefulWidget*>* createState()
+}
+
+"flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotInfo" o-- "flutter_app::pages::item::itemform::ItemAddFormPage.dart::PropertyChecking"
+
+class "flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotInfoState" {
+  {static} +GlobalKey<FormState*>* formKey
+  {static} +FormLotModel* propLot
+  {static} +dynamic getSaleDataValue
+  {static} +dynamic getModelValue
+  {static} +dynamic getRentDataValue
+  {static} +PropertyLotModel* formatDbLotData()
+  {static} +dynamic addLotToDB()
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotInfoState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotInfoState" o-- "flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotModel"
+
+class "flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotModel" {
+  +String* propsId
+  +TextEditingController* saleControllerFixPrice
+  +TextEditingController* saleAreaSizeVal
+  +int* saleOptionCategory
+  +String* saleOptionCategoryStr
+  +TextEditingController* rentControllerFixPrice
+  +TextEditingController* rentMinContractRangeNum
+  +TextEditingController* rentConditions
+  +String* rentMinContractRangeCode
+  +String* rentTermsOfRentCode
+  +int* rentOptionCategory
+  +String* rentOptionCategoryStr
+  +TextEditingController* rentAreaSizeVal
+}
+
+"flutter_app::pages::item::src::items::1001::FormInfo.dart::FormLotModel" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+abstract class "flutter_app::pages::item::src::items::1001::FormObj.dart::LotFormRentObj" {
+  +dynamic rentMinContractRageFunc()
+  +dynamic rentConditionsFunc()
+  +dynamic rentTermsOfPaymentFunc()
+  +dynamic rentPriceOptionsFunc()
+  +dynamic rentOptionCategory()
+  +dynamic rentAreaSize()
+}
+
+abstract class "flutter_app::pages::item::src::items::1001::FormObj.dart::LotForSaleObj" {
+  +dynamic salePriceOptionsFunc()
+  +dynamic saleOptionCategory()
+  +dynamic saleAreaSize()
+}
+
+class "flutter_app::pages::item::src::items::1002::containers::ForRentForm.dart::ForRentForm" {
+  +Function* onChangedTermsOfRent
+  +Function* onChangedMinContract
+  +Function* onChangedOptionCategory
+  +TextEditingController* rentControllerFixPrice
+  +TextEditingController* rentMinContractRangeNum
+  +TextEditingController* rentConditions
+  +int* optionCategory
+  +String* rentMinContractRangeCode
+  +String* rentTermsOfRentCode
+  +Widget* build()
+  +dynamic rentConditionsFunc()
+  +dynamic rentMinContractRageFunc()
+  +dynamic rentTermsOfPaymentFunc()
+  +dynamic rentPriceOptionsFunc()
+  +dynamic rentOptionCategory()
+}
+
+"flutter_app::pages::item::src::items::1002::containers::ForRentForm.dart::ForRentForm" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter_app::pages::item::src::items::1002::FormObj.dart::LotFormRentObj" <|-- "flutter_app::pages::item::src::items::1002::containers::ForRentForm.dart::ForRentForm"
+
+class "flutter_app::pages::item::src::items::1002::containers::ForSaleForm.dart::ForSaleForm" {
+  +TextEditingController* saleControllerFixPrice
+  +int* optionCategory
+  +Function* onChangedOptionCategory
+  +Widget* build()
+  +dynamic salePriceOptionsFunc()
+  +dynamic saleOptionCategory()
+}
+
+"flutter_app::pages::item::src::items::1002::containers::ForSaleForm.dart::ForSaleForm" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter_app::pages::item::src::items::1002::FormObj.dart::LotForSaleObj" <|-- "flutter_app::pages::item::src::items::1002::containers::ForSaleForm.dart::ForSaleForm"
+
+class "flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotInfo" {
+  +PropertyChecking* propcheck
+  +State<StatefulWidget*>* createState()
+}
+
+"flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotInfo" o-- "flutter_app::pages::item::itemform::ItemAddFormPage.dart::PropertyChecking"
+
+class "flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotInfoState" {
+  {static} +GlobalKey<FormState*>* formKey
+  {static} +FormLotModel* propLot
+  {static} +dynamic getSaleDataValue
+  {static} +dynamic getModelValue
+  {static} +dynamic getRentDataValue
+  {static} +PropertyLotModel* formatDbLotData()
+  {static} +dynamic addLotToDB()
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotInfoState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotInfoState" o-- "flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotModel"
+
+class "flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotModel" {
+  +String* propsId
+  +TextEditingController* saleControllerFixPrice
+  +int* saleOptionCategory
+  +String* saleOptionCategoryStr
+  +TextEditingController* rentControllerFixPrice
+  +TextEditingController* rentMinContractRangeNum
+  +TextEditingController* rentConditions
+  +String* rentMinContractRangeCode
+  +String* rentTermsOfRentCode
+  +int* rentOptionCategory
+  +String* rentOptionCategoryStr
+}
+
+"flutter_app::pages::item::src::items::1002::FormInfo.dart::FormLotModel" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+abstract class "flutter_app::pages::item::src::items::1002::FormObj.dart::LotFormRentObj" {
+  +dynamic rentMinContractRageFunc()
+  +dynamic rentConditionsFunc()
+  +dynamic rentTermsOfPaymentFunc()
+  +dynamic rentPriceOptionsFunc()
+  +dynamic rentOptionCategory()
+}
+
+abstract class "flutter_app::pages::item::src::items::1002::FormObj.dart::LotForSaleObj" {
+  +dynamic salePriceOptionsFunc()
+  +dynamic saleOptionCategory()
+}
+
+class "flutter_app::pages::item::src::items::common::DropdownDateTerm.dart::DropdownDateTerm" {
+  +String* value
+  +Function* onChanged
+  +String* paceholder
+  +double* width
+  +List<DropdropValue*>* dropdownoption
+  +Widget* build()
+}
+
+class "flutter_app::pages::item::src::items::common::InputTextArea.dart::InputTextArea" {
+  +String* placeholder
+  +TextEditingController* value
+  +double* width
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::common::InputTextArea.dart::InputTextArea" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "flutter_app::pages::item::src::items::common::InputTextForm.dart::InputTextForm" {
+  +TextEditingController* value
+  +String* placeholder
+  +double* width
+  +bool* isText
+  +bool* isReadOnly
+  +bool* isRadioBtnInputTextSet
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::common::InputTextForm.dart::InputTextForm" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "flutter_app::pages::item::src::items::common::InputTextFormWithIcon.dart::InputTextFormWithIcon" {
+  +double* width
+  +TextEditingController* value
+  +String* placeholder
+  +Widget* icons
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::common::InputTextFormWithIcon.dart::InputTextFormWithIcon" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter_app::pages::item::src::items::common::InputTextFormWithIcon.dart::InputTextFormWithIcon" o-- "flutter::src::widgets::framework.dart::Widget"
+
+class "flutter_app::pages::item::src::items::common::RadioBtnWithInputText.dart::RadioBtnWithInputText" {
+  +String* label
+  +int* option
+  +int* value
+  +Function* onChanged
+  +TextEditingController* controllerValue
+  +bool* condition
+  +String* placeholder
+  +Widget* build()
+}
+
+"flutter_app::pages::item::src::items::common::RadioBtnWithInputText.dart::RadioBtnWithInputText" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "flutter_app::pages::item::src::items::FormComplete.dart::FormComplete" {
+  +List<MapData*>* inputdata
+  +List<MapData*>* inputSale
+  +List<MapData*>* inputRent
+  +State<StatefulWidget*>* createState()
+}
+
+class "flutter_app::pages::item::src::items::FormComplete.dart::FormCompleteState" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::message::inbox::HomeMessagePage.dart::HomeMessagePage" {
+  +SharedPreferences* prefs
+  +_HomePageState* createState()
+}
+
+"flutter_app::pages::message::inbox::HomeMessagePage.dart::HomeMessagePage" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::pages::message::inbox::HomeMessagePage.dart::_HomePageState" {
+  -int* _currentIndex
+  -String* _tabTitle
+  -List<Widget*>* _children
+  +CollectionReference<Object*>* contactsReference
+  +DocumentReference<Object*>* profileReference
+  +DocumentSnapshot<Object*>* profileSnapshot
+  -GlobalKey<FormState*>* _formStateKey
+  -TextEditingController* _yourNameController
+  +bool* editName
+  +void initState()
+  +dynamic generateContactTab()
+  +dynamic generateProfileTab()
+  +dynamic generateContactList()
+  +void onTabTapped()
+  +Widget* build()
+}
+
+"flutter_app::pages::message::inbox::HomeMessagePage.dart::_HomePageState" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::pages::message::inbox::HomeMessagePage.dart::_HomePageState" o-- "cloud_firestore::cloud_firestore.dart::DocumentReference<Object>"
+"flutter_app::pages::message::inbox::HomeMessagePage.dart::_HomePageState" o-- "cloud_firestore::cloud_firestore.dart::DocumentSnapshot<Object>"
+"flutter_app::pages::message::inbox::HomeMessagePage.dart::_HomePageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter_app::pages::message::inbox::HomeMessagePage.dart::_HomePageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "flutter_app::pages::message::inquire::ChatInquire.dart::ChatInquire" {
+  +SharedPreferences* prefs
+  +ChatModel* chatObj
+  +PropertyModel* props
+  +bool* isNewContact
+  +bool* isNewChat
+  +CollectionReference<Object*>* chatReference
+  +ChatPageState* createState()
+}
+
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatInquire" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatInquire" o-- "flutter_app::model::ChatModel.dart::ChatModel"
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatInquire" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatInquire" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+
+class "flutter_app::pages::message::inquire::ChatInquire.dart::ChatPageState" {
+  +CollectionReference<Object*>* chatReference
+  -TextEditingController* _textController
+  -bool* _isWritting
+  +CollectionReference<Object*>* contactsReference
+  +DocumentReference<Object*>* profileReference
+  +bool* newitem
+  +Radius* messageCard
+  +void initState()
+  +List<Widget*>* generateSenderLayout()
+  +List<Widget*>* generateReceiverLayout()
+  +dynamic generateMessages()
+  +Widget* build()
+  +IconButton* getDefaultSendButton()
+  -Widget* _buildTextComposer()
+  -Future<Null*>* _sendText()
+  -void _addMessage()
+  -void _sendImage()
+}
+
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatPageState" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatPageState" o-- "cloud_firestore::cloud_firestore.dart::DocumentReference<Object>"
+"flutter_app::pages::message::inquire::ChatInquire.dart::ChatPageState" o-- "dart::ui::Radius"
+
+class "flutter_app::pages::profile::inventory::InventoryOption.dart::InventoryOption" {
+  +_InventoryOptionState* createState()
+}
+
+class "flutter_app::pages::profile::inventory::InventoryOption.dart::_InventoryOptionState" {
+  +Widget* build()
+  -Column* _buildButtonColumn()
+}
+
+class "flutter_app::pages::profile::inventory::InventoryPage.dart::InventoryPage" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::profile::ProfilePage.dart::ProfilePage" {
+  +SharedPreferences* prefs
+  +_ProfilePageState* createState()
+}
+
+"flutter_app::pages::profile::ProfilePage.dart::ProfilePage" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::pages::profile::ProfilePage.dart::_ProfilePageState" {
+  -PrepareData* _data
+  -List<Widget*>* _children
+  +DocumentReference<Object*>* profileReference
+  +DocumentSnapshot<Object*>* profileSnapshot
+  -TextEditingController* _yourNameController
+  +void initState()
+  +dynamic generateProfileTab()
+  +Widget* build()
+}
+
+"flutter_app::pages::profile::ProfilePage.dart::_ProfilePageState" o-- "flutter_app::database::temp::DemoDataBase.dart::PrepareData"
+"flutter_app::pages::profile::ProfilePage.dart::_ProfilePageState" o-- "cloud_firestore::cloud_firestore.dart::DocumentReference<Object>"
+"flutter_app::pages::profile::ProfilePage.dart::_ProfilePageState" o-- "cloud_firestore::cloud_firestore.dart::DocumentSnapshot<Object>"
+"flutter_app::pages::profile::ProfilePage.dart::_ProfilePageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "flutter_app::pages::profile::ProfilePage.dart::GetClipper" {
+  +Path* getClip()
+  +bool* shouldReclip()
+}
+
+class "flutter_app::pages::profile::ProfilePage.dart::Carry" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::profile::ProfilePage.dart::Inventory" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::profile::ProfileStats.dart::ProfileStats" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::search::BodyContainer.dart::BodyContainer" {
+  +State<StatefulWidget*>* createState()
+}
+
+class "flutter_app::pages::search::BodyContainer.dart::_BodyContainer" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::search::BodyContent.dart::BodyContent" {
+  +Widget* build()
+}
+
+class "flutter_app::pages::search::SearchDisplay.dart::SearchDisplayPage" {
+  +String* menuId
+  +SharedPreferences* prefs
+  +_SearchDisplayPageState* createState()
+}
+
+"flutter_app::pages::search::SearchDisplay.dart::SearchDisplayPage" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::pages::search::SearchDisplay.dart::_SearchDisplayPageState" {
+  +int* counter
+  +Widget* build()
+}
+
+class "flutter_app::pages::wrapper.dart::Wrapper" {
+  +SharedPreferences* prefs
+  +Widget* build()
+}
+
+"flutter_app::pages::wrapper.dart::Wrapper" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::service::Auth.dart::AuthService" {
+  -FirebaseAuth* _auth
+  +Stream<UserBaseModel*>* user
+  -UserBaseModel* _userFromFirebaseUser()
+  +Future<dynamic>* signInAnon()
+  +Future<dynamic>* signInWithEmailAndPassword()
+  +Future<dynamic>* signInWithSmartPhone()
+  +Future<dynamic>* registerWithEmailAndPassword()
+  +Future<dynamic>* signOut()
+}
+
+"flutter_app::service::Auth.dart::AuthService" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth"
+"flutter_app::service::Auth.dart::AuthService" o-- "dart::async::Stream<UserBaseModel>"
+
+class "flutter_app::service::CheckBookingDate.dart::CheckiingBookDate" {
+  +List<BookingModel*>* activeDates
+  +String* isMyBooking()
+  +bool* isNotBlockDate()
+}
+
+class "flutter_app::utils::Constant.dart::Constants" {
+  {static} +String* lotCode
+  {static} +String* resCode
+  {static} +String* collectionLot
+  {static} +String* collectionRes
+  {static} +String* itemCard1img
+  {static} +List<StrObj*>* termsDateCode
+  {static} +String* getConditionStr()
+  {static} +String* convertTermsCodeToDate()
+}
+
+class "flutter_app::utils::Constant.dart::StrObj" {
+  +String* key
+  +String* value
+}
+
+class "flutter_app::utils::DateHandler.dart::DropdropValue" {
+  +String* key
+  +String* value
+}
+
+class "flutter_app::utils::StaticString.dart::Str" {
+  +int* index
+  {static} +List<Str*>* values
+  {static} +Str* UUID
+  {static} +Str* ITEMS
+  {static} +Str* USERS
+  {static} +Str* CHAT
+  {static} +Str* BOOKING
+}
+
+"flutter_app::utils::StaticString.dart::Str" o-- "flutter_app::utils::StaticString.dart::Str"
+
+class "flutter_app::widgets::BestFoodWidget.dart::BestFoodWidget" {
+  +SharedPreferences* prefs
+  +_BestFoodWidgetState* createState()
+}
+
+"flutter_app::widgets::BestFoodWidget.dart::BestFoodWidget" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::widgets::BestFoodWidget.dart::_BestFoodWidgetState" {
+  +Widget* build()
+}
+
+class "flutter_app::widgets::card::ItemCard.dart::ItemCard" {
+  +double* inputheight
+  +PropertyModel* props
+  +Widget* build()
+}
+
+"flutter_app::widgets::card::ItemCard.dart::ItemCard" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+
+class "flutter_app::widgets::card::LargeItemCard.dart::LargeItemCard" {
+  +String* name
+  +String* imageUrl
+  +String* rating
+  +String* numberOfRating
+  +String* price
+  +String* slug
+  +Widget* build()
+}
+
+class "flutter_app::widgets::card::RowCardInquire.dart::RowCardInquire" {
+  +PropertyModel* props
+  +Widget* build()
+}
+
+"flutter_app::widgets::card::RowCardInquire.dart::RowCardInquire" o-- "flutter_app::model::PropertyModel.dart::PropertyModel"
+
+class "flutter_app::widgets::card::SmallItemCard.dart::SmallItemCard" {
+  +String* imageUrl
+  +CategoryModel* category
+  +Function* onChanged
+  +Widget* build()
+}
+
+"flutter_app::widgets::card::SmallItemCard.dart::SmallItemCard" o-- "flutter_app::model::CategoryModel.dart::CategoryModel"
+
+class "flutter_app::widgets::components::AlertBox.dart::AlertBox" {
+  +String* title
+  +String* message
+  +Widget* build()
+}
+
+class "flutter_app::widgets::components::Button1.dart::Button1" {
+  +String* label
+  +Widget* build()
+}
+
+class "flutter_app::widgets::components::CarouselSlider.dart::CarouselComponent" {
+  +CarouselController* buttonCarouselController
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::CarouselSlider.dart::CarouselComponent" o-- "carousel_slider::carousel_controller.dart::CarouselController"
+
+class "flutter_app::widgets::components::CheckBox.dart::LabeledCheckbox" {
+  +String* label
+  +EdgeInsets* padding
+  +bool* value
+  +Function* onChanged
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::CheckBox.dart::LabeledCheckbox" o-- "flutter::src::painting::edge_insets.dart::EdgeInsets"
+
+class "flutter_app::widgets::components::CheckBox2.dart::LabeledCheckboxCol" {
+  +String* label
+  +EdgeInsets* padding
+  +bool* value
+  +Function* onChanged
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::CheckBox2.dart::LabeledCheckboxCol" o-- "flutter::src::painting::edge_insets.dart::EdgeInsets"
+
+class "flutter_app::widgets::components::DropdownComponent.dart::DropdownComponent" {
+  +String* label
+  +String* value
+  +Function* onChanged
+  +CollectionReference<Object*>* snapshot
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::DropdownComponent.dart::DropdownComponent" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference<Object>"
+
+class "flutter_app::widgets::components::ModalBox.dart::ModalBox" {
+  +Widget* body
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::ModalBox.dart::ModalBox" o-- "flutter::src::widgets::framework.dart::Widget"
+
+class "flutter_app::widgets::components::RadioBtn.dart::RadioBtn" {
+  +String* label
+  +int* value
+  +int* valueController
+  +Function* onChanged
+  +Widget* build()
+}
+
+class "flutter_app::widgets::components::text::TextLabelByLine.dart::TextLabelByLine" {
+  +String* text
+  +TextStyle* style
+  +double* width
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::text::TextLabelByLine.dart::TextLabelByLine" o-- "flutter::src::painting::text_style.dart::TextStyle"
+
+class "flutter_app::widgets::components::text::TextLabelFade.dart::TextLabelFade" {
+  +String* text
+  +TextStyle* style
+  +double* width
+  +Widget* build()
+}
+
+"flutter_app::widgets::components::text::TextLabelFade.dart::TextLabelFade" o-- "flutter::src::painting::text_style.dart::TextStyle"
+
+class "flutter_app::widgets::components::UserImage.dart::UserImage" {
+  +String* image
+  +Widget* build()
+}
+
+class "flutter_app::widgets::FoodDetailsSlider.dart::FoodDetailsSlider" {
+  +String* slideImage1
+  +String* slideImage2
+  +String* slideImage3
+  +Widget* build()
+}
+
+class "flutter_app::widgets::PopularFoodsWidget.dart::PopularFoodsWidget" {
+  +SharedPreferences* prefs
+  +_PopularFoodsWidgetState* createState()
+}
+
+"flutter_app::widgets::PopularFoodsWidget.dart::PopularFoodsWidget" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::widgets::PopularFoodsWidget.dart::_PopularFoodsWidgetState" {
+  +Widget* build()
+}
+
+class "flutter_app::widgets::PopularFoodsWidget.dart::PopularFoodTitle" {
+  +SharedPreferences* prefs
+  +Widget* build()
+}
+
+"flutter_app::widgets::PopularFoodsWidget.dart::PopularFoodTitle" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::widgets::PopularFoodsWidget.dart::PopulateList" {
+  +Widget* build()
+}
+
+class "flutter_app::widgets::PopularFoodsWidget.dart::PopularFoodItems" {
+  +Widget* build()
+}
+
+class "flutter_app::widgets::section::BottomNavBarWidget.dart::BottomNavBarWidget" {
+  +SharedPreferences* prefs
+  +_BottomNavBarWidgetState* createState()
+}
+
+"flutter_app::widgets::section::BottomNavBarWidget.dart::BottomNavBarWidget" o-- "shared_preferences::shared_preferences.dart::SharedPreferences"
+
+class "flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" {
+  -int* _selectedIndex
+  +List<Widget*>* pages
+  +Widget* currentPage
+  +HomePage* homePage
+  +FoodDetailsPage* nearByLocationPage
+  +HomeMessagePage* messagePage
+  +FoodOrderPage* foodOrderPage
+  +ProfilePage* profilePage
+  -void _onItemTapped()
+  +void initState()
+  +Widget* build()
+}
+
+"flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" o-- "flutter::src::widgets::framework.dart::Widget"
+"flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" o-- "flutter_app::pages::home::HomePage.dart::HomePage"
+"flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" o-- "flutter_app::pages::FoodDetailsPage.dart::FoodDetailsPage"
+"flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" o-- "flutter_app::pages::message::inbox::HomeMessagePage.dart::HomeMessagePage"
+"flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" o-- "flutter_app::pages::FoodOrderPage.dart::FoodOrderPage"
+"flutter_app::widgets::section::BottomNavBarWidget.dart::_BottomNavBarWidgetState" o-- "flutter_app::pages::profile::ProfilePage.dart::ProfilePage"
+
+class "flutter_app::widgets::section::CommonPageDisplay.dart::CommonPageDisplay" {
+  +dynamic body
+  +_CommonPageDisplayState* createState()
+}
+
+class "flutter_app::widgets::section::CommonPageDisplay.dart::_CommonPageDisplayState" {
+  +Widget* build()
+}
+
+class "flutter_app::widgets::section::IconText.dart::IconText" {
+  +String* text
+  +String* value
+  +IconData* icon
+  +Widget* build()
+}
+
+"flutter_app::widgets::section::IconText.dart::IconText" o-- "flutter::src::widgets::icon_data.dart::IconData"
+
+class "flutter_app::widgets::section::ImagePicker.dart::ImagePickerWidget" {
+  +UserBaseModel* usrobj
+  +_ImagePickerWidgetState* createState()
+}
+
+"flutter_app::widgets::section::ImagePicker.dart::ImagePickerWidget" o-- "flutter_app::model::UserModel.dart::UserBaseModel"
+
+class "flutter_app::widgets::section::ImagePicker.dart::_ImagePickerWidgetState" {
+  +void takePhotoByCamera()
+  +Future<void>* takePhotoByGallery()
+  +void removePhoto()
+  +Widget* build()
+}
+
+class "flutter_app::widgets::section::LabelTitle.dart::LabelTitle" {
+  +String* title
+  +TextStyle* style
+  +Widget* build()
+}
+
+"flutter_app::widgets::section::LabelTitle.dart::LabelTitle" o-- "flutter::src::painting::text_style.dart::TextStyle"
+
+class "flutter_app::widgets::section::LoadingLoginPart.dart::Loading" {
+  +Widget* build()
+}
+
+class "flutter_app::widgets::section::SearchWidget.dart::SearchWidget" {
+  +Widget* build()
+}
+
+
+@enduml

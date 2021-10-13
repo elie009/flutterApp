@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blueAccent.shade100,
+      color: Colors.white,
       child: Center(
           child: SpinKitCubeGrid(
-        color: Colors.red.shade100,
+        color: primaryColor,
         size: 50.0,
       )),
     );

@@ -4,10 +4,14 @@ import 'package:flutter_app/utils/Constant.dart';
 
 class ModalBox extends StatelessWidget {
   final Widget body;
-  const ModalBox({Key key, this.body}) : super(key: key);
+  final bool isCloseDisplay;
+  final String textlabel;
+
+  const ModalBox({this.isCloseDisplay, this.textlabel, this.body});
 
   @override
   Widget build(BuildContext context) {
+    var checkCloseBtn = isCloseDisplay == null ? true : isCloseDisplay;
     return Container(
       height: 200,
       color: yellowamber,
@@ -16,14 +20,15 @@ class ModalBox extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Text('Modal BottomSheet'),
+            if (textlabel != null) new Text(textlabel),
             body == null ? Container() : body,
-            ElevatedButton(
-              child: const Text('Close BottomSheet'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            )
+            if (checkCloseBtn)
+              ElevatedButton(
+                child: const Text('Close BottomSheet'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
           ],
         ),
       ),
