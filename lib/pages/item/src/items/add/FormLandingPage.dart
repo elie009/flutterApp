@@ -7,6 +7,7 @@ import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/model/WishListModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormBaseDetails.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormComplete.dart';
@@ -52,6 +53,26 @@ class _FormLandingPageState extends State<FormLandingPage> {
     });
   }
 
+  Future<dynamic> getWishlistData(String propsid) async {
+    DatabaseServiceItems.propertyCollection
+        .doc(propsid)
+        .collection('wishlist')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        setState(() {
+          var e = WishListModel(
+              categoryid: element.data()['categoryid'],
+              title: element.data()['title'],
+              message: element.data()['message'],
+              wishid: element.data()['wishid'],
+              isSelect: element.data()['isSelect']);
+          FormUploaderState.popItem.wishlist.add(e);
+        });
+      });
+    });
+  }
+
   List<MapData> inputdata;
   @override
   Widget build(BuildContext context) {
@@ -64,6 +85,7 @@ class _FormLandingPageState extends State<FormLandingPage> {
       FormBaseDetailsState.propdetails =
           FormDetailsModel.snapshot(widget.props);
       getData(widget.props.propid);
+      if (widget.propcheck.swap) getWishlistData(widget.props.propid);
 
       DatabaseServiceItems.propertyCollection
           .where('propid', isEqualTo: widget.props.propid)
@@ -118,7 +140,6 @@ class _FormLandingPageState extends State<FormLandingPage> {
             type: StepperType.horizontal,
             onStepTapped: (step) {
               setState(() {
-                print('backkkk');
                 currentStep = step;
               });
             },

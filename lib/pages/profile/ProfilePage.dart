@@ -97,15 +97,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                         builder: ((builder) =>
                                             ImagePickerWidget(
                                               usrobj: UserBaseModel(
-                                                profileSnapshot.get('uid'),
-                                                profileSnapshot
+                                                uid: profileSnapshot.get('uid'),
+                                                firstName: profileSnapshot
                                                     .get('firstName'),
-                                                profileSnapshot.get('image'),
-                                                profileSnapshot.get('lastName'),
-                                                profileSnapshot
+                                                image: profileSnapshot.get('image'),
+                                                lastName: profileSnapshot.get('lastName'),
+                                                phoneNumber: profileSnapshot
                                                     .get('phoneNumber'),
-                                                profileSnapshot.get('status'),
-                                                profileSnapshot.get('email'),
+                                                status: profileSnapshot.get('status'),
+                                                email: profileSnapshot.get('email'),
                                               ),
                                             )));
                                   },

@@ -17,8 +17,6 @@ class DatabaseService {
   final CollectionReference chatCollection =
       FirebaseFirestore.instance.collection('chats');
 
-
-
   Future updateBooking(BookingModel data) async {
     return await bookingCollection.doc(data.bookId).set({
       'fromYear': data.fromYear,
@@ -52,13 +50,13 @@ class DatabaseService {
     return snapshot.docs.map((doc) {
       try {
         return UserBaseModel(
-          doc.get('uid') ?? '',
-          doc.get('email') ?? '',
-          doc.get('firstName') ?? '',
-          doc.get('lastName') ?? '',
-          doc.get('phoneNumber') ?? '',
-          doc.get('status') ?? '',
-          doc.get('image') ?? '',
+          uid: doc.get('uid') ?? '',
+          email: doc.get('email') ?? '',
+          firstName: doc.get('firstName') ?? '',
+          lastName: doc.get('lastName') ?? '',
+          phoneNumber: doc.get('phoneNumber') ?? '',
+          status: doc.get('status') ?? '',
+          image: doc.get('image') ?? '',
         );
       } catch (e) {
         print(e.toString());
@@ -76,8 +74,6 @@ class DatabaseService {
       'contact2': ownerUid,
     });
   }
-
-  
 
   //get item list from snapshot
   List<ContactModel> _contactsFromSnapshot(QuerySnapshot snapshot) {
@@ -193,7 +189,7 @@ class DatabaseService {
     return chatData;
   }
 
-  Future<Map<String, dynamic>> getUseData(String uid) async {
+  Future<Map<String, dynamic>> getUserData(String uid) async {
     Map<String, dynamic> userData;
     var result = await userCollection.where('uid', isEqualTo: uid).get();
 
@@ -212,7 +208,7 @@ class DatabaseService {
         .map(_bookingListFromSnapshot);
   }
 
-// get all booking item on stream
+  // get all booking item on stream
   Stream<List<ContactModel>> userContact(String userid) {
     return userCollection
         .doc(userid)
@@ -221,6 +217,9 @@ class DatabaseService {
         .map(_contactListFromSnapshot);
   }
 
+  Future<dynamic> getUserDataById(String uid) async {
+    return userCollection.doc(uid).get();
+  }
 }
 
 abstract class DatabaseServicePropsStructure<T> {

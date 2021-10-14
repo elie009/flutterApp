@@ -38,6 +38,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
           propid: doc.get('propid') ?? '',
           menuid: doc.get('menuid') ?? '',
           ownerUid: doc.get('ownerUid') ?? '',
+          ownerUsername: doc.get('ownerUsername') ?? '',
           status: doc.get('status') ?? '',
           imageId: doc.get('imageId') ?? '',
           forSale: doc.get('forSale') ?? false,
@@ -107,6 +108,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
       'propid': data.propid,
       'menuid': data.menuid,
       'ownerUid': data.ownerUid,
+      'ownerUsername': data.ownerUsername,
       'status': data.status,
       'imageId': data.imageId,
       'forSale': data.forSale,
@@ -114,6 +116,18 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
       'forInstallment': data.forInstallment,
       'forSwap': data.forSwap,
     });
+  }
+
+  Future addWishList(dynamic rawdata) {
+    PropertyItemModel data = rawdata;
+    propertyCollection
+        .doc(data.propid)
+        .collection('wishlist')
+        .doc('whislist')
+        .set({
+          
+
+        });
   }
 
   @override

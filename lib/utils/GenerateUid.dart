@@ -32,6 +32,14 @@ String get idFile {
  * Generate a v4 (random) id
  * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
  */
+String get idWishlist {
+  return "WISH" + DateTime.now().millisecondsSinceEpoch.toString();
+}
+
+/* 
+ * Generate a v4 (random) id
+ * ex. '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
+ */
 String get idBooking {
   return ("book" + uuid.v4());
 }

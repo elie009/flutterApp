@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
-import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/item/src/items/view/ItemViewDetails.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';

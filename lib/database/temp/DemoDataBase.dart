@@ -64,41 +64,41 @@ class PrepareData {
     //   unitdetails_lotarea: true,
     //   unitdetails_termsCODE: true,
     // );
-    var datarent = CategoryFormModel(
-      categoryid: '1002',
-      title: true,
-      description: true,
-      priceinput_price: true,
-      ismoreandsameitem: true,
-      location_cityproviceCODE: true,
-      location_streetaddress: true,
-      unitdetails_lotarea: true,
-      unitdetails_bedroom: true,
-      unitdetails_bathroom: true,
-      unitdetails_floorarea: true,
-      unitdetails_parkingspace: true,
-      unitdetails_furnish_fullyfurnish: true,
-      unitdetails_furnish_semifurnish: true,
-      unitdetails_furnish_unfurnish: true,
-      unitdetails_termsCODE: true,
-    );
-    await DatabaseCategory().setCategoryForm(datarent, 'rent');
-
-    // var datasale = CategoryFormModel(
-    //   categoryid: '1001',
+    // var datarent = CategoryFormModel(
+    //   categoryid: '1002',
     //   title: true,
     //   description: true,
     //   priceinput_price: true,
+    //   ismoreandsameitem: true,
     //   location_cityproviceCODE: true,
     //   location_streetaddress: true,
     //   unitdetails_lotarea: true,
-    //   condition_new: true,
-    //   condition_preselling: true,
-    //   condition_preowned: true,
-    //   condition_foreclosed: true,
+    //   unitdetails_bedroom: true,
+    //   unitdetails_bathroom: true,
+    //   unitdetails_floorarea: true,
+    //   unitdetails_parkingspace: true,
+    //   unitdetails_furnish_fullyfurnish: true,
+    //   unitdetails_furnish_semifurnish: true,
+    //   unitdetails_furnish_unfurnish: true,
+    //   unitdetails_termsCODE: true,
     // );
+    // await DatabaseCategory().setCategoryForm(datarent, 'rent');
 
-    var datasale = CategoryFormModel(
+    var datasalelot = CategoryFormModel(
+      categoryid: '1001',
+      title: true,
+      description: true,
+      priceinput_price: true,
+      location_cityproviceCODE: true,
+      location_streetaddress: true,
+      unitdetails_lotarea: true,
+      condition_new: true,
+      condition_preselling: true,
+      condition_preowned: true,
+      condition_foreclosed: true,
+    );
+await DatabaseCategory().setCategoryForm(datasalelot, 'swap');
+    var datasalehal = CategoryFormModel(
       categoryid: '1002',
       title: true,
       description: true,
@@ -119,7 +119,7 @@ class PrepareData {
       condition_preowned: true,
       condition_foreclosed: true,
     );
-    await DatabaseCategory().setCategoryForm(datasale, 'sale');
+    await DatabaseCategory().setCategoryForm(datasalehal, 'swap');
   }
 
   Future addBookingData() async {

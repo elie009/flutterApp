@@ -30,6 +30,7 @@ class PropertyItemModel {
   String propid;
   String menuid;
   String ownerUid;
+  String ownerUsername;
   String status;
   String imageId;
 
@@ -63,6 +64,7 @@ class PropertyItemModel {
     this.propid = value.get("propid");
     this.menuid = value.get("menuid");
     this.ownerUid = value.get("ownerUid");
+    this.ownerUsername = value.get("ownerUsername");
     this.status = value.get("status");
     this.imageId = value.get("imageId");
     this.forSale = value.get("forSale");
@@ -97,6 +99,7 @@ class PropertyItemModel {
     this.propid,
     this.menuid,
     this.ownerUid,
+    this.ownerUsername,
     this.status,
     this.imageId,
     this.forSale,

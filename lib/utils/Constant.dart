@@ -61,13 +61,16 @@ class Constants {
     'A01006': 'Others',
   };
 
+  static Map<String, String> category = {
+    '1001': 'Lot',
+    '1002': 'House and lot',
+  };
+
   static Map<String, String> furnishing = {
     'unfurnished': 'Unfurnished',
     'semifurnished': 'Semi Furnished',
     'fullyfurnished': 'Fully Furnished',
   };
-
- 
 }
 
 class StrObj {

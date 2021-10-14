@@ -176,20 +176,12 @@ class ChatPageState extends State<ChatInquire> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: primaryColor, //change your color here
+          color: primaryColor,
         ),
         backgroundColor: whiteColor,
         title: new Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // ClipRRect(
-            //   borderRadius: BorderRadius.circular(20.0),
-            //   child: new Container(
-            //       child: new CircleAvatar(
-            //     backgroundImage:
-            //         new NetworkImage(widget.prefs.getString('owenerImage')),
-            //   )),
-            // ),
             UserImage(image: widget.prefs.getString('owenerImage')),
             Container(
                 padding: const EdgeInsets.all(8.0),
@@ -327,12 +319,25 @@ class ChatPageState extends State<ChatInquire> {
         'contactUid': widget.props.ownerUid,
         'propsId': widget.props.propid,
         'name': widget.prefs.getString('ownerName'),
-        //'contactId': idContact,
         'lastMessage': text,
         'datetime': getDateNow,
         'status': 'UNREAD',
       }).then((value) {
-        widget.isNewContact = false;
+        DatabaseService()
+            .userCollection
+            .doc(widget.props.ownerUid)
+            .collection('contacts')
+            .doc(widget.props.propid)
+            .set({
+          'contactUid': widget.prefs.getString('uid'),
+          'propsId': widget.props.propid,
+          'name': widget.prefs.getString('name'),
+          'lastMessage': text,
+          'datetime': getDateNow,
+          'status': 'UNREAD',
+        }).then((value) {
+          widget.isNewContact = false;
+        });
       });
     } else {
       DatabaseService()
@@ -344,7 +349,6 @@ class ChatPageState extends State<ChatInquire> {
         'contactUid': widget.props.ownerUid,
         'propsId': widget.props.propid,
         'name': widget.prefs.getString('ownerName'),
-        //'contactId': idContact,
         'lastMessage': text,
         'datetime': getDateNow,
         'status': 'READ',
@@ -373,6 +377,7 @@ class ChatPageState extends State<ChatInquire> {
   }
 
   void _addMessage(String text) {
+    if (chatReference == null) return;
     chatReference.add({
       'text': text,
       'sender_id': widget.prefs.getString('uid'),

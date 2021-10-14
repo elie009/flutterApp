@@ -6,24 +6,15 @@ class UserBaseModel {
   String phoneNumber;
   String status;
   String image;
+  String displayName;
 
-  UserBaseModel.auth(
+  UserBaseModel(
       {this.uid,
       this.firstName,
       this.image,
       this.lastName,
       this.phoneNumber,
       this.status,
+      this.displayName,
       this.email});
-
-  UserBaseModel(String uid, String firstName, String image, String lastName,
-      String phoneNumber, String status, String email) {
-    this.uid = uid;
-    this.firstName = firstName;
-    this.image = image;
-    this.lastName = lastName;
-    this.phoneNumber = phoneNumber;
-    this.status = status;
-    this.email = email;
-  }
 }

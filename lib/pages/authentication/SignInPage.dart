@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/authentication/SignUpPage.dart';
 import 'package:flutter_app/service/Auth.dart';

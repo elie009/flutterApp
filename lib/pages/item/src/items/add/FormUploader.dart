@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
+import 'package:flutter_app/model/WishListModel.dart';
 import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormLandingPage.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormBaseDetails.dart';
@@ -26,9 +28,10 @@ class FormUploader extends StatefulWidget {
   }
 }
 
+bool checkBoxEvent = false;
+
 class FormUploaderState extends State<FormUploader> {
   static final formKey = GlobalKey<FormState>();
-
   static FormLotModel popItem = FormLotModel.init();
 
   static PropertyItemModel formatDbLotData(Map<String, dynamic> data) {
@@ -57,6 +60,7 @@ class FormUploaderState extends State<FormUploader> {
       propid: data['propid'] ?? '',
       menuid: data['menuid'] ?? '',
       ownerUid: data['ownerUid'] ?? '',
+      ownerUsername: data['ownerUsername'] ?? '',
       status: data['status'] ?? '',
       imageId: data['imageId'] ?? '',
       forSale: data['forSale'] ?? false,
@@ -104,9 +108,6 @@ class FormUploaderState extends State<FormUploader> {
         desiredSize / originalSize;
 
     var aspectRatio = getAspectRatio(imageFile.originalWidth.toDouble(), 1300);
-    int W = (imageFile.originalWidth * aspectRatio).round();
-    int H = (imageFile.originalHeight * aspectRatio).round();
-
     aspectRatio = getAspectRatio(imageFile.originalWidth.toDouble(), 300);
     int thumbW = (imageFile.originalWidth * aspectRatio).round();
     int thumbH = (imageFile.originalHeight * aspectRatio).round();
@@ -136,6 +137,34 @@ class FormUploaderState extends State<FormUploader> {
     FirebaseStorage.instance.ref().child("THUMB" + fileid).delete();
     Reference reference = FirebaseStorage.instance.ref().child(fileid);
     return reference.delete();
+  }
+
+  static Future addWishlist(String propsid) async {
+    try {
+      popItem.wishlist.forEach((e) {
+        String wishid = e.wishid == null ? idWishlist : e.wishid;
+        if (e.localstatus == 'DELETE') {
+          DatabaseServiceItems.propertyCollection
+              .doc(propsid)
+              .collection('wishlist')
+              .doc(wishid)
+              .delete();
+        }
+        DatabaseServiceItems.propertyCollection
+            .doc(propsid)
+            .collection('wishlist')
+            .doc(wishid)
+            .set({
+          "categoryid": e.categoryid,
+          "title": e.title,
+          "message": e.message,
+          "wishid": wishid,
+          "isSelect": e.isSelect,
+        });
+      });
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   static void uploadImages(List<dynamic> images, PropertyItemModel props) {
@@ -202,6 +231,7 @@ class FormUploaderState extends State<FormUploader> {
     props.propid = propid;
     props.menuid = menuCode;
     props.ownerUid = userui;
+    props.ownerUsername = '';
     props.status = 'UPLOAD';
     props.title = FormBaseDetailsState.propdetails.title.text;
     props.imageId = '';
@@ -219,6 +249,7 @@ class FormUploaderState extends State<FormUploader> {
     props.conditionCode = FormBaseDetailsState.propdetails.condition.text;
 
     await DatabaseServiceItems().add(props).then((value) {
+      addWishlist(props.propid);
       uploadImages(FormBaseDetailsState.propdetails.loopitems, props);
     });
   }
@@ -272,6 +303,12 @@ class FormUploaderState extends State<FormUploader> {
     ];
   }
 
+  get checkDelBtnDisp {
+    for (WishListModel element in popItem.wishlist)
+      if (element.isSelect) return true;
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -280,6 +317,8 @@ class FormUploaderState extends State<FormUploader> {
       child: Column(
         children: <Widget>[
           SecondForm(
+            isDeletebtnDisply: checkBoxEvent,
+            wishlist: popItem.wishlist,
             furnishing: popItem.unitdetails_furnish,
             brandvalue: popItem.unitdetails_brandCODE,
             lotarea: popItem.unitdetails_lotarea,
@@ -287,6 +326,37 @@ class FormUploaderState extends State<FormUploader> {
             bathrooms: popItem.unitdetails_bathroom,
             floorarea: popItem.unitdetails_floorarea,
             parkingspace: popItem.unitdetails_parkingspace,
+            onChangedWishListDelete: () {
+              setState(() {
+                popItem
+                    .wishlist[popItem.wishlist
+                        .indexWhere((element) => element.isSelect == true)]
+                    .localstatus = 'DELETE';
+
+                // popItem.wishlist
+                //     .removeWhere((contact) => contact.isSelect == true);
+              });
+            },
+            onChangedWishListCheckbox: (bool val, int index) {
+              setState(() {
+                popItem.wishlist[index].isSelect = val;
+                checkBoxEvent = checkDelBtnDisp;
+              });
+            },
+            onChangedWishListOkbtn: (val) {
+              setState(() {
+                var existingItem = popItem.wishlist.firstWhere(
+                    (itemToCheck) => itemToCheck.wishid == val.wishid,
+                    orElse: () => null);
+
+                if (existingItem != null) {
+                  int index = popItem.wishlist.indexOf(existingItem);
+                  popItem.wishlist[index] = val;
+                } else {
+                  popItem.wishlist.add(val);
+                }
+              });
+            },
             onChangedTerm: (val) {
               setState(() {
                 popItem.unitdetails_termsCODE = val;
@@ -325,6 +395,7 @@ class FormLotModel {
   TextEditingController unitdetails_room;
   String unitdetails_termsCODE;
   String unitdetails_brandCODE;
+  List<WishListModel> wishlist;
 
   FormLotModel.init() {
     this.unitdetails_lotarea = new TextEditingController();
@@ -336,6 +407,7 @@ class FormLotModel {
     this.unitdetails_room = new TextEditingController();
     this.unitdetails_termsCODE = '';
     this.unitdetails_brandCODE = '';
+    this.wishlist = [];
   }
 
   FormLotModel.snapshot(PropertyItemModel props) {
@@ -356,6 +428,7 @@ class FormLotModel {
     this.unitdetails_room.text = props.roomCode;
     this.unitdetails_termsCODE = props.termCode;
     this.unitdetails_brandCODE = props.branchCode;
+    this.wishlist = [];
   }
 
   FormLotModel({
