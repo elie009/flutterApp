@@ -88,7 +88,6 @@ class PrepareData {
       categoryid: '1001',
       title: true,
       description: true,
-      priceinput_price: true,
       location_cityproviceCODE: true,
       location_streetaddress: true,
       unitdetails_lotarea: true,
@@ -97,12 +96,11 @@ class PrepareData {
       condition_preowned: true,
       condition_foreclosed: true,
     );
-await DatabaseCategory().setCategoryForm(datasalelot, 'swap');
+    await DatabaseCategory().setCategoryForm(datasalelot, 'swap');
     var datasalehal = CategoryFormModel(
       categoryid: '1002',
       title: true,
       description: true,
-      priceinput_price: true,
       ismoreandsameitem: true,
       location_cityproviceCODE: true,
       location_streetaddress: true,
@@ -210,8 +208,7 @@ await DatabaseCategory().setCategoryForm(datasalelot, 'swap');
         e['userId'].toString(),
         e['bookingStatus'].toString(),
       );
-      await DatabaseService(uid: e['bookId'].toString())
-          .updateBooking(props);
+      await DatabaseService(uid: e['bookId'].toString()).updateBooking(props);
     });
   }
 }

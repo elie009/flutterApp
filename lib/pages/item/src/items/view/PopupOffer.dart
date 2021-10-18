@@ -1,135 +1,177 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/pages/FoodOrderPage.dart';
-import 'package:flutter_app/pages/item/src/items/view/DataTableOffer.dart';
-import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
+import 'package:flutter_app/model/PropertyItemModel.dart';
+import 'package:flutter_app/utils/DateHandler.dart';
+import 'package:flutter_app/widgets/card/RowSmallCard.dart';
 
-class PopupOffer extends StatelessWidget {
+class PopupOffer extends StatefulWidget {
+  final String uid;
+  final String propsid;
+  final Function onClick;
+  PopupOffer({this.uid, this.propsid, this.onClick});
+  @override
+  PopupOfferState createState() => new PopupOfferState();
+}
+
+class PopupOfferState extends State<PopupOffer> {
+  @override
+  void initState() {
+    getWishApplication.whenComplete(() {
+      getData;
+    });
+    super.initState();
+  }
+
+  List<PopWishObj> listimage = [];
+  List<String> listWishApplication = [];
+
+  bool checkBoxiconDisp = true;
+
+  get hasCheckInList {
+    if (listimage.isEmpty || listimage == null) checkBoxiconDisp = false;
+    for (var val in listimage) {
+      if (val.checkval == true) {
+        checkBoxiconDisp = false;
+        return;
+      }
+    }
+
+    checkBoxiconDisp = true;
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: <Widget>[
-      IconButton(
-        onPressed: () => showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('AlertDialog Tilte'),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            content: Builder(
-              builder: (context) {
-                var height = MediaQuery.of(context).size.height;
-                var width = MediaQuery.of(context).size.width;
-
-                return Container(
-                  height: height - 300,
-                  width: width - 10,
-                  child: Column(
-                    children: <Widget>[
-                      DataTableOffer(),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      BottomMenu(),
-                    ],
-                  ),
-                );
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Select item to swap"),
+        actions: <Widget>[
+          if (!checkBoxiconDisp)
+            IconButton(
+              icon: Icon(
+                Icons.check_box_outline_blank,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  listimage.forEach((f) => f.checkval = false);
+                  hasCheckInList;
+                });
               },
             ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'Cancel'),
-                child: const Text('Cancel'),
+          if (checkBoxiconDisp)
+            IconButton(
+              icon: Icon(
+                Icons.check_box,
+                color: Colors.white,
               ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
-
-            // title: const Text('AlertDialog Tilte'),
-            // content: const Text('AlertDialog description'),
-            // actions: <Widget>[
-            //   TextButton(
-            //     onPressed: () => Navigator.pop(context, 'Cancel'),
-            //     child: const Text('Cancel'),
-            //   ),
-            //   TextButton(
-            //     onPressed: () => Navigator.pop(context, 'OK'),
-            //     child: const Text('OK'),
-            //   ),
-            // ],
+              onPressed: () {
+                setState(() {
+                  listimage.forEach((f) => f.checkval = true);
+                  hasCheckInList;
+                });
+              },
+            ),
+          IconButton(
+            icon: Icon(
+              Icons.control_point,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              addData.then((value) {
+                widget.onClick();
+                Navigator.pop(context, 'OK');
+              });
+            },
           ),
-        ),
-        icon: Icon(Icons.local_offer_outlined),
-        color: primaryColor,
-        iconSize: 30,
+        ],
       ),
-      Text(
-        "Send Offer",
-        style: TextStyle(
-            fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300),
-      )
-    ]);
-  }
-}
-
-class PopupCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {}
-}
-
-class BottomMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
-          child: TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                borderSide: BorderSide(
-                  width: 0,
-                  color: Color(0xFFfb3132),
-                  style: BorderStyle.none,
-                ),
-              ),
-              filled: true,
-              fillColor: Color(0xFFFAFAFA),
-              hintStyle: new TextStyle(color: Color(0xFFd0cece), fontSize: 18),
-              hintText: "Please input bid amount",
+      body: new Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                for (PopWishObj i in listimage)
+                  RowSmallCard(
+                    onCheckChange: (val) {
+                      setState(() {
+                        hasCheckInList;
+                        i.checkval = val;
+                      });
+                    },
+                    checkVal: i.checkval,
+                    productName: i.props.title,
+                    imageId: i.props.imageId,
+                    description: i.props.description,
+                  )
+              ],
             ),
           ),
         ),
-        SizedBox(
-          height: 15,
-        ),
-        InkWell(
-          onTap: () {
-            Navigator.push(context, ScaleRoute(page: FoodOrderPage()));
-          },
-          child: Container(
-            width: 200.0,
-            height: 45.0,
-            decoration: new BoxDecoration(
-              color: primaryColor,
-              border: Border.all(color: Colors.white, width: 2.0),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Center(
-              child: Text(
-                'Offer a Bid',
-                style: new TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
+
+  Future<dynamic> get addData async {
+    List<String> propsid = [];
+    listimage.forEach((element) {
+      if (element.checkval == true) {
+        propsid.add(element.props.propid);
+      }
+    });
+
+    return DatabaseServiceItems.propertyCollection
+        .doc(widget.propsid)
+        .collection('wishapplication')
+        .doc(widget.uid)
+        .set({
+      "propsid": propsid,
+      "ownerUid": widget.uid,
+      "datepost": getDateNow,
+      "status": 'APPROVE',
+      "restriction": "public"
+    });
+  }
+
+  Future<dynamic> get getWishApplication async {
+    return DatabaseServiceItems.propertyCollection
+        .doc(widget.propsid)
+        .collection('wishapplication')
+        .doc(widget.uid)
+        .snapshots()
+        .listen((event2) {
+      var x = event2.data()['propsid'];
+      if (x == null) return;
+      if (x.isEmpty) return;
+
+      x.forEach((element) {
+        listWishApplication.add(element);
+      });
+    });
+  }
+
+  Future<dynamic> get getData async {
+    DatabaseServiceItems.propertyCollection
+        .where("forSwap", isEqualTo: true)
+        .where("ownerUid", isEqualTo: widget.uid)
+        .snapshots()
+        .listen((event1) {
+      event1.docs.forEach((element) {
+        PropertyItemModel item = PropertyItemModel.snapshot(element);
+        setState(() {
+          listimage.add(PopWishObj(
+              props: item,
+              checkval: listWishApplication.indexOf(item.propid) != -1));
+        });
+      });
+    });
+  }
+}
+
+class PopWishObj {
+  PropertyItemModel props;
+  bool checkval;
+  PopWishObj({this.props, this.checkval});
 }

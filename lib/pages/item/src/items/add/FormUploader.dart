@@ -148,19 +148,22 @@ class FormUploaderState extends State<FormUploader> {
               .doc(propsid)
               .collection('wishlist')
               .doc(wishid)
-              .delete();
-        }
-        DatabaseServiceItems.propertyCollection
-            .doc(propsid)
-            .collection('wishlist')
-            .doc(wishid)
-            .set({
-          "categoryid": e.categoryid,
-          "title": e.title,
-          "message": e.message,
-          "wishid": wishid,
-          "isSelect": e.isSelect,
-        });
+              .delete()
+              .then((value) {
+            print('=======');
+          });
+        } else
+          DatabaseServiceItems.propertyCollection
+              .doc(propsid)
+              .collection('wishlist')
+              .doc(wishid)
+              .set({
+            "categoryid": e.categoryid,
+            "title": e.title,
+            "message": e.message,
+            "wishid": wishid,
+            "isSelect": e.isSelect,
+          });
       });
     } catch (e) {
       print(e.toString());

@@ -60,7 +60,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
       children: <Widget>[
         title(),
         SizedBox(height: 20),
-        price(),
+        if (catdata.priceinput_price != null) price(),
         SizedBox(height: 20),
         if (hascondition) condition(context),
         description(),

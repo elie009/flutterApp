@@ -18,7 +18,7 @@ class WishItemCardRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        onClickCard();
+        if (onClickCard != null) onClickCard();
       },
       child: Container(
         width: double.infinity,
@@ -49,11 +49,13 @@ class WishItemCardRow extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Center(
-                          child: Image.asset(
-                        "assets/images/popular_foods/ic_popular_food_4.png",
-                        width: 50,
-                        height: 50,
-                      )),
+                        child: Container(
+                            width: 50,
+                            height: 50,
+                            child: Image.asset(
+                              "assets/images/popular_foods/ic_popular_food_4.png",
+                            )),
+                      ),
                     ),
                   ),
                   Container(
@@ -104,12 +106,13 @@ class WishItemCardRow extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Checkbox(
-                    value: wishItem.isSelect,
-                    onChanged: (bool newValue) {
-                      onChangeCheckbox(newValue);
-                    },
-                  ),
+                  if (onChangeCheckbox != null)
+                    Checkbox(
+                      value: wishItem.isSelect,
+                      onChanged: (bool newValue) {
+                        onChangeCheckbox(newValue);
+                      },
+                    ),
                 ],
               ),
             )),

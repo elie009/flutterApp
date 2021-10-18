@@ -73,10 +73,10 @@ class InventoryPage extends StatelessWidget {
                   categoryInspector(i.menuid, propcheck, user, context, i);
                 },
                 child: RowSmallCard(
-                    productName: textlimiter(i.title),
-                    productPrice: i.price.toString(),
-                    imageId: i.imageId,
-                    productCartQuantity: "2"),
+                  productName: textlimiter(i.title),
+                  productPrice: i.price.toString(),
+                  imageId: i.imageId,
+                ),
               ),
             ),
           ),
@@ -88,24 +88,18 @@ class InventoryPage extends StatelessWidget {
 CollectionReference reference;
 Future categoryInspector(String catcode, PropertyChecking action,
     UserBaseModel user, BuildContext context, PropertyItemModel props) async {
- 
-
   action.sale = props.forSale;
   action.rental = props.forRent;
   action.installment = props.forInstallment;
   action.swap = props.forSwap;
 
   if (action.sale)
-    reference = DatabaseCategory()
-        .categoryCollection
-        .doc(catcode)
-        .collection('sale');
+    reference =
+        DatabaseCategory().categoryCollection.doc(catcode).collection('sale');
 
   if (action.rental)
-    reference = DatabaseCategory()
-        .categoryCollection
-        .doc(catcode)
-        .collection('rent');
+    reference =
+        DatabaseCategory().categoryCollection.doc(catcode).collection('rent');
 
   if (action.installment)
     reference = DatabaseCategory()
@@ -114,10 +108,8 @@ Future categoryInspector(String catcode, PropertyChecking action,
         .collection('installment');
 
   if (action.swap)
-    reference = DatabaseCategory()
-        .categoryCollection
-        .doc(catcode)
-        .collection('swap');
+    reference =
+        DatabaseCategory().categoryCollection.doc(catcode).collection('swap');
 
   reference.snapshots().forEach((element) {
     element.docs.forEach((element) {
@@ -166,10 +158,6 @@ Future categoryInspector(String catcode, PropertyChecking action,
       //       user: user,
       //       catdata: catdata,
       //     )));
-
-      print('---');
-      print(props.dealmethodCode);
-      print('---');
 
       Navigator.push(
           context,

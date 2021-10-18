@@ -4,8 +4,10 @@ import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
+import 'package:flutter_app/model/WishListModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/Formatter.dart';
+import 'package:flutter_app/widgets/card/WishItemCardRow.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:provider/provider.dart';
@@ -14,8 +16,9 @@ import '../../../component/ItemCardMenu.dart';
 import '../../../component/ItemViewBodyContent.dart';
 
 class ItemViewDetails extends StatefulWidget {
-  ItemViewDetails({Key key, @required this.props}) : super(key: key);
+  ItemViewDetails({@required this.props, this.user});
   PropertyItemModel props;
+  UserBaseModel user;
   @override
   _ItemViewDetailsState createState() => _ItemViewDetailsState();
 }
@@ -42,10 +45,12 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     _transTween = Tween(begin: Offset(-10, 40), end: Offset(-10, 0))
         .animate(_TextAnimationController);
 
+    getWishApplication;
     getData(widget.props.propid);
     getCategory(widget.props.menuid, widget.props.forRent, widget.props.forSale,
         widget.props.forInstallment, widget.props.forSwap);
-    ;
+
+    if (widget.props.forSwap) getWishlist(widget.props.propid);
     super.initState();
   }
 
@@ -70,6 +75,23 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
         setState(() {
           listimage.add(element.data()['urls']);
         });
+      });
+    });
+  }
+
+  List<WishListModel> wishlist = [];
+  Future<dynamic> getWishlist(String propsid) {
+    DatabaseServiceItems.propertyCollection
+        .doc(propsid)
+        .collection('wishlist')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        wishlist.add(WishListModel(
+          title: element.data()['title'],
+          message: element.data()['message'],
+          categoryid: element.data()['categoryid'],
+        ));
       });
     });
   }
@@ -139,9 +161,21 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     });
   }
 
+  int offercounts = 0;
+  Future<dynamic> get getWishApplication async {
+    DatabaseServiceItems.propertyCollection
+        .doc(widget.props.propid)
+        .collection('wishapplication')
+        .doc(widget.user.uid)
+        .snapshots()
+        .listen((event2) {
+      var x = event2.data()['propsid'];
+      offercounts = x == null ? 0 : x.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBaseModel>(context);
     return Scaffold(
       backgroundColor: whiteColor,
       body: NotificationListener<ScrollNotification>(
@@ -210,7 +244,14 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                           ),
                         ),
                         SizedBox(height: 20),
-                        ItemCardMenu(props: widget.props),
+                        ItemCardMenu(
+                          
+                            props: widget.props,
+                            onClick: () {
+                              setState(() {
+                                getWishApplication;
+                              });
+                            }),
                         SizedBox(height: 20),
                         Container(
                           margin:
@@ -245,6 +286,67 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                         SizedBox(height: 20),
                         ItemViewBodyContent(
                             catmodel: catmodel, props: widget.props),
+                        if (widget.props.forSwap)
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    'Wishlist',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: primaryColor,
+                                        fontSize: 17),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    '(you have ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: blackColor,
+                                        fontSize: 15),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    offercounts.toString(),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: blackColor,
+                                        fontSize: 15),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    ' offer/s)',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: blackColor,
+                                        fontSize: 15),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        for (WishListModel wishitem in wishlist)
+                          WishItemCardRow(
+                            onClickCard: null,
+                            wishItem: wishitem,
+                            onChangeCheckbox: null,
+                          )
                       ],
                     ),
                   ],

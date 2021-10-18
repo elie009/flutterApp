@@ -2,18 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
-import 'package:flutter_app/model/PropertyModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/booking/BookingPage.dart';
+import 'package:flutter_app/pages/item/src/items/view/PopupOffer.dart';
 import 'package:flutter_app/pages/message/inspector/ChatInspector.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:provider/provider.dart';
 
-import '../src/items/view/PopupOffer.dart';
-
 class ItemCardMenu extends StatefulWidget {
-  ItemCardMenu({@required this.props});
+  ItemCardMenu({@required this.props, this.onClick});
   final PropertyItemModel props;
+  final Function onClick;
 
   @override
   _ItemCardMenuState createState() => _ItemCardMenuState();
@@ -35,7 +34,17 @@ class _ItemCardMenuState extends State<ItemCardMenu> {
           }),
           _buildButtonColumn(
               primaryColor, Icons.local_offer_outlined, 'Send Offer', () {
-            setState(() {});
+            setState(() {
+              showModalBottomSheet<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return PopupOffer(
+                      onClick: widget.onClick,
+                      uid: user.uid,
+                      propsid: widget.props.propid,
+                    );
+                  });
+            });
           }),
           _buildButtonColumn(primaryColor, Icons.message_outlined, 'Message',
               () {

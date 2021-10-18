@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/item/src/items/view/ItemViewDetails.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
+import 'package:provider/provider.dart';
 
 class ItemCard extends StatelessWidget {
   const ItemCard({Key key, @required this.props, this.inputheight})
@@ -29,10 +31,12 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserBaseModel>(context);
+
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context, ScaleRoute(page: ItemViewDetails(props: props)));
+        Navigator.push(context,
+            ScaleRoute(page: ItemViewDetails(props: props, user: user)));
       },
       child: Column(
         children: <Widget>[
@@ -112,7 +116,8 @@ class ItemCard extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   ScaleRoute(
-                                      page: ItemViewDetails(props: props)));
+                                      page: ItemViewDetails(
+                                          props: props, user: user)));
                             },
                             child: Container(
                                 alignment: Alignment.bottomLeft,
@@ -129,7 +134,8 @@ class ItemCard extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   ScaleRoute(
-                                      page: ItemViewDetails(props: props)));
+                                      page: ItemViewDetails(
+                                          props: props, user: user)));
                             },
                             child: Container(
                               alignment: Alignment.topRight,
@@ -165,7 +171,8 @@ class ItemCard extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   ScaleRoute(
-                                      page: ItemViewDetails(props: props)));
+                                      page: ItemViewDetails(
+                                          props: props, user: user)));
                             },
                             child: Container(
                                 alignment: Alignment.bottomLeft,
@@ -182,8 +189,11 @@ class ItemCard extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(context,
-                              ScaleRoute(page: ItemViewDetails(props: props)));
+                          Navigator.push(
+                              context,
+                              ScaleRoute(
+                                  page: ItemViewDetails(
+                                      props: props, user: user)));
                         },
                         child: Container(
                           alignment: Alignment.bottomLeft,

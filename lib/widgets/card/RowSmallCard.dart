@@ -1,21 +1,24 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 
 class RowSmallCard extends StatelessWidget {
+  bool checkVal;
   String productName;
   String productPrice;
+  String description;
   String imageId;
-  String productCartQuantity;
+  final Function onCheckChange;
 
   RowSmallCard({
-    Key key,
+    this.checkVal,
+    this.productPrice,
+    this.description,
+    this.onCheckChange,
     @required this.productName,
-    @required this.productPrice,
     @required this.imageId,
-    @required this.productCartQuantity,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +43,7 @@ class RowSmallCard extends StatelessWidget {
           ),
           child: Container(
             alignment: Alignment.center,
-            padding: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
+            padding: EdgeInsets.only(left: 5, top: 10, bottom: 10),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
@@ -48,16 +51,18 @@ class RowSmallCard extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Center(
-                      child: imageId.isEmpty
-                          ? Image.asset(
-                              "assets/images/popular_foods/ic_popular_food_4.png",
-                              width: 80,
-                              height: 80,
-                            )
-                          : Image.network(
-                              imageId,
-                              fit: BoxFit.fitWidth,
-                            ),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        child: imageId.isEmpty
+                            ? Image.asset(
+                                "assets/images/popular_foods/ic_popular_food_4.png",
+                              )
+                            : Image.network(
+                                imageId,
+                                fit: BoxFit.fitWidth,
+                              ),
+                      ),
                     ),
                   ),
                 ),
@@ -78,8 +83,8 @@ class RowSmallCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
-                                child: TextLabelFade(
-                                  width: 220,
+                                child: TextLabelByLine(
+                                  width: 0.5,
                                   text: productName,
                                   style: TextStyle(
                                       fontSize: 15,
@@ -91,30 +96,30 @@ class RowSmallCard extends StatelessWidget {
                                 height: 5,
                               ),
                               Container(
-                                child: TextLabelFade(
-                                  width: 200,
-                                  text: productPrice,
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      color: Color(0xFF3a3a3b),
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                                  child: TextLabelFade(
+                                width: 230,
+                                text: productPrice != null
+                                    ? productPrice
+                                    : description,
+                                style: TextStyle(
+                                    fontSize: 17,
+                                    color: Color(0xFF3a3a3b),
+                                    fontWeight: FontWeight.bold),
+                              )),
                             ],
-                          ),
-                          SizedBox(
-                            width: 40,
                           ),
                         ],
                       ),
-                      // Container(
-                      //   margin: EdgeInsets.only(left: 20),
-                      //   alignment: Alignment.centerRight,
-                      //   child: AddToCartMenu(2),
-                      // )
                     ],
                   ),
-                )
+                ),
+                if (onCheckChange != null)
+                  Checkbox(
+                    value: checkVal,
+                    onChanged: (bool newValue) {
+                      onCheckChange(newValue);
+                    },
+                  ),
               ],
             ),
           )),
