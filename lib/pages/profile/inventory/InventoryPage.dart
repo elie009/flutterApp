@@ -15,6 +15,8 @@ import 'package:provider/provider.dart';
 import 'InventoryOption.dart';
 
 class InventoryPage extends StatelessWidget {
+  final bool isPosting;
+  InventoryPage({this.isPosting});
   @override
   Widget build(BuildContext context) {
     final items = Provider.of<List<PropertyItemModel>>(context);
@@ -25,36 +27,37 @@ class InventoryPage extends StatelessWidget {
         SizedBox(
           height: 7,
         ),
-        Container(
-          width: double.infinity,
-          height: 60,
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
-              color: Color(0xFFADAD).withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: Offset(0, 1),
-            ),
-          ]),
-          child: Card(
-            color: whiteColor,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(5.0),
+        if (isPosting != null && isPosting)
+          Container(
+            width: double.infinity,
+            height: 60,
+            decoration: BoxDecoration(boxShadow: [
+              BoxShadow(
+                color: shadeWhite,
+                spreadRadius: 1,
+                blurRadius: 1,
+                offset: Offset(0, 1),
+              ),
+            ]),
+            child: Card(
+              color: whiteColor,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(5.0),
+                ),
+              ),
+              child: Container(
+                alignment: Alignment.centerRight,
+                child: InventoryOption(),
               ),
             ),
-            child: Container(
-              alignment: Alignment.centerRight,
-              child: InventoryOption(),
-            ),
           ),
-        ),
         for (PropertyItemModel i in items)
           Container(
             decoration: BoxDecoration(boxShadow: [
               BoxShadow(
-                color: Color(0xFFADAD).withOpacity(0.3),
+                color: shadeWhite,
                 spreadRadius: 1,
                 blurRadius: 1,
                 offset: Offset(0, 1),

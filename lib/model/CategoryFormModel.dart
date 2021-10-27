@@ -12,6 +12,9 @@ class CategoryFormModel {
   bool condition_foreclosed;
   bool condition_used;
   bool priceinput_price;
+  bool priceinput_downpayment;
+  bool priceinput_amortization;
+  bool payments_count;
   bool description;
   bool ismoreandsameitem;
   bool deal_meetup;
@@ -45,6 +48,9 @@ class CategoryFormModel {
     this.condition_foreclosed,
     this.condition_used,
     this.priceinput_price,
+    this.priceinput_downpayment,
+    this.priceinput_amortization,
+    this.payments_count,
     this.description,
     this.ismoreandsameitem,
     this.deal_meetup,

@@ -77,24 +77,26 @@ class FormBaseDetailsState extends State<FormBaseDetails> {
       child: Column(
         children: <Widget>[
           FirstForm(
-            loopitems: propdetails.loopitems,
-            propsid: propdetails.propsid,
-            uploadmedia: propdetails.uploadmedia,
-            onChangeUpload: (newValue) {
-              setState(() {
-                propdetails.uploadmedia = newValue;
-              });
-            },
-            common_price: propdetails.price,
-            common_dealmethod: propdetails.dealmethod,
-            common_condition: propdetails.condition,
+            //loopitems: propdetails.loopitems,
+            //propsid: propdetails.propsid,
+            //uploadmedia: propdetails.uploadmedia,
+            //common_price: propdetails.price,
+            // common_dealmethod: propdetails.dealmethod,
+            // common_condition: propdetails.condition,
+            // common_title: propdetails.title,
+            // common_description: propdetails.description,
+            // common_sameitem: propdetails.common_sameitem,
+
+            propdetails: propdetails,
             catdata: catdata,
-            common_title: propdetails.title,
-            common_description: propdetails.description,
-            common_sameitem: propdetails.common_sameitem,
             onChanged: (newValue) {
               setState(() {
                 propdetails.common_sameitem = newValue;
+              });
+            },
+            onChangeUpload: (newValue) {
+              setState(() {
+                propdetails.uploadmedia = newValue;
               });
             },
             onChangedCondtion: (newValue) {

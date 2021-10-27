@@ -100,12 +100,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 uid: profileSnapshot.get('uid'),
                                                 firstName: profileSnapshot
                                                     .get('firstName'),
-                                                image: profileSnapshot.get('image'),
-                                                lastName: profileSnapshot.get('lastName'),
+                                                image: profileSnapshot
+                                                    .get('image'),
+                                                lastName: profileSnapshot
+                                                    .get('lastName'),
                                                 phoneNumber: profileSnapshot
                                                     .get('phoneNumber'),
-                                                status: profileSnapshot.get('status'),
-                                                email: profileSnapshot.get('email'),
+                                                status: profileSnapshot
+                                                    .get('status'),
+                                                email: profileSnapshot
+                                                    .get('email'),
                                               ),
                                             )));
                                   },
@@ -125,7 +129,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: 50.0,
                     ),
                     Text(
-                      "Robert Downey, Jr.",
+                      profileSnapshot == null
+                          ? ''
+                          : profileSnapshot.get('displayName'),
                       style: TextStyle(
                         fontSize: 25.0,
                         fontWeight: FontWeight.bold,
@@ -147,9 +153,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 10.0,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -157,7 +160,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: 50.0,
                     ),
                     Text(
-                      "Actor and Producer",
+                      profileSnapshot == null
+                          ? ''
+                          : profileSnapshot.get('firstName') +
+                              " " +
+                              profileSnapshot.get('lastName'),
                       style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
@@ -180,7 +187,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 30.0,
                   color: whiteColor,
                 ),
-                ProfileStats(),
+                ProfileStats(
+                  follower: 0,
+                  following: 0,
+                  post: 0,
+                ),
               ],
             ),
           ),

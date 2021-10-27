@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/utils/Constant.dart';
 
 class ProfileStats extends StatelessWidget {
+  final int follower;
+  final int following;
+  final int post;
+  ProfileStats(
+      {@required this.follower, @required this.following, @required this.post});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -14,7 +20,7 @@ class ProfileStats extends StatelessWidget {
           Column(
             children: <Widget>[
               Text(
-                "45",
+                follower.toString(),
                 style: TextStyle(
                   color: whiteColor,
                   fontSize: 22.0,
@@ -41,7 +47,7 @@ class ProfileStats extends StatelessWidget {
           Column(
             children: <Widget>[
               Text(
-                "20",
+                following.toString(),
                 style: TextStyle(
                   color: whiteColor,
                   fontSize: 22.0,
@@ -68,7 +74,7 @@ class ProfileStats extends StatelessWidget {
           Column(
             children: <Widget>[
               Text(
-                "30",
+                post.toString(),
                 style: TextStyle(
                   color: whiteColor,
                   fontSize: 22.0,

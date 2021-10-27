@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/pages/item/src/items/add/FormBaseDetails.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormObj.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextArea.dart';
 import 'package:flutter_app/pages/item/src/items/common/InputTextForm.dart';
@@ -14,34 +15,48 @@ import 'package:flutter_app/widgets/components/text/TextLabelFade.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 
 class FirstForm extends StatelessWidget implements FirstFormObj {
-  FirstForm(
-      {this.common_price,
-      this.onChangeUpload,
-      this.uploadmedia,
-      this.onChanged,
-      this.common_title,
-      this.catdata,
-      this.common_condition,
-      this.loopitems,
-      this.onChangedCondtion,
-      this.common_sameitem,
-      this.common_dealmethod,
-      this.propsid,
-      this.common_description});
+  FirstForm({
+    this.catdata,
+    //this.common_title,
+    //this.common_condition,
+    //this.common_sameitem,
+    //this.common_dealmethod,
+    //this.common_description,
+    this.common_installment_amort,
+    this.common_installment_count,
+    this.common_installment_downpayment,
+    //this.common_price,
+    //this.uploadmedia,
+    //this.loopitems,
+    //this.propsid,
 
-  final TextEditingController common_price;
-  final TextEditingController common_title;
-  final TextEditingController common_description;
-  final TextEditingController common_condition;
-  final TextEditingController common_dealmethod;
+    this.propdetails,
+    
+    this.onChanged,
+    this.onChangeUpload,
+    this.onChangedCondtion,
+  });
+
+  final FormDetailsModel propdetails;
+
+  final TextEditingController common_installment_amort;
+  final TextEditingController common_installment_downpayment;
+  final TextEditingController common_installment_count;
+
+  //final TextEditingController common_title;
+  //final TextEditingController common_description;
+  //final TextEditingController common_condition;
+  //final TextEditingController common_dealmethod;
 
   final Function onChanged;
   final Function onChangedCondtion;
-  final bool common_sameitem;
+  //final bool common_sameitem;
   final Function onChangeUpload;
-  final List<Asset> uploadmedia;
-  final List<dynamic> loopitems;
-  final String propsid;
+
+  //final TextEditingController common_price;
+  //final List<Asset> uploadmedia;
+  //final List<dynamic> loopitems;
+  //final String propsid;
 
   final CategoryFormModel catdata;
 
@@ -61,6 +76,9 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         title(),
         SizedBox(height: 20),
         if (catdata.priceinput_price != null) price(),
+        if (catdata.priceinput_downpayment != null) downpayment(),
+        if (catdata.priceinput_amortization != null) amortization(),
+        if (catdata.payments_count != null) installmentCount(),
         SizedBox(height: 20),
         if (hascondition) condition(context),
         description(),
@@ -70,10 +88,10 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
           height: 150,
           width: double.infinity,
           child: UploadFileCard(
-            loopitems: loopitems,
-            uploadmedia: uploadmedia,
+            loopitems: propdetails.loopitems,
+            uploadmedia: propdetails.uploadmedia,
             onChangeUpload: onChangeUpload,
-            propsid: propsid,
+            propsid: propdetails.propsid,
           ),
         ),
       ],
@@ -93,7 +111,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         SizedBox(height: 10),
         CustomRadioButton(
           defaultSelected:
-              common_condition.text.isEmpty ? null : common_condition.text,
+              propdetails.condition.text.isEmpty ? null : propdetails.condition.text,
           elevation: 0,
           unSelectedColor: Theme.of(context).canvasColor,
           buttonLables: [
@@ -152,7 +170,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         SizedBox(height: 10),
         CustomRadioButton(
           defaultSelected:
-              common_dealmethod.text.isEmpty ? null : common_dealmethod.text,
+              propdetails.dealmethod.text.isEmpty ? null : propdetails.dealmethod.text,
           elevation: 0,
           unSelectedColor: Theme.of(context).canvasColor,
           buttonLables: [
@@ -168,7 +186,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
               unSelectedColor: Colors.black,
               textStyle: TextStyle(fontSize: 16)),
           radioButtonValue: (value) {
-            common_dealmethod.text = value;
+            propdetails.dealmethod.text = value;
           },
           selectedColor: Theme.of(context).accentColor,
           spacing: 0,
@@ -191,7 +209,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         InputTextArea(
           placeholder: "Desciption",
           width: double.infinity,
-          value: common_description,
+          value: propdetails.description,
         ),
         SizedBox(height: 20),
       ],
@@ -210,7 +228,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
       children: [
         LabeledCheckbox(
             label: 'I have more than 1 of the Same item',
-            value: common_sameitem,
+            value: propdetails.common_sameitem,
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             onChanged: onChanged),
         SizedBox(height: 20),
@@ -225,7 +243,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
       placeholder: "Price",
       isText: false,
       width: double.infinity,
-      value: common_price,
+      value: propdetails.price,
     );
   }
 
@@ -236,7 +254,49 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
       placeholder: "Title",
       isText: true,
       width: double.infinity,
-      value: common_title,
+      value: propdetails.title,
+    );
+  }
+
+  @override
+  amortization() {
+    return Container(
+      padding: EdgeInsets.only(top: 20),
+      child: InputTextForm(
+        isReadOnly: false,
+        placeholder: "Monthly amortization",
+        isText: false,
+        width: double.infinity,
+        value: common_installment_amort,
+      ),
+    );
+  }
+
+  @override
+  downpayment() {
+    return Container(
+      padding: EdgeInsets.only(top: 20),
+      child: InputTextForm(
+        isReadOnly: false,
+        placeholder: "Downpayment",
+        isText: false,
+        width: double.infinity,
+        value: common_installment_downpayment,
+      ),
+    );
+  }
+
+  @override
+  installmentCount() {
+    return Container(
+      padding: EdgeInsets.only(top: 20),
+      child: InputTextForm(
+        isReadOnly: false,
+        placeholder: "Months to pay",
+        isText: false,
+        width: double.infinity,
+        value: common_installment_count,
+      ),
     );
   }
 }

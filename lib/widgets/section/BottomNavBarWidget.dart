@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/message/inbox/HomeMessagePage.dart';
+import 'package:flutter_app/pages/posting/PostingPage.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,7 +29,7 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
     final List<Widget> _pages = [
       HomePage(),
       FoodDetailsPage(),
-      HomePage(),
+      PostingPage(),
       HomeMessagePage(prefs: widget.prefs),
       ProfilePage(prefs: widget.prefs)
     ];

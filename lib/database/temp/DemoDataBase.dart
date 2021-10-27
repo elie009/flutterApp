@@ -95,13 +95,20 @@ class PrepareData {
       condition_preselling: true,
       condition_preowned: true,
       condition_foreclosed: true,
+      priceinput_price: true,
+      priceinput_downpayment: true,
+      payments_count: true,
+      priceinput_amortization: true,
     );
-    await DatabaseCategory().setCategoryForm(datasalelot, 'swap');
+    await DatabaseCategory().setCategoryForm(datasalelot, 'installment');
     var datasalehal = CategoryFormModel(
       categoryid: '1002',
       title: true,
       description: true,
       ismoreandsameitem: true,
+      priceinput_price: true,
+      priceinput_downpayment: true,
+      payments_count: true,
       location_cityproviceCODE: true,
       location_streetaddress: true,
       unitdetails_lotarea: true,
@@ -116,8 +123,9 @@ class PrepareData {
       condition_preselling: true,
       condition_preowned: true,
       condition_foreclosed: true,
+      priceinput_amortization: true,
     );
-    await DatabaseCategory().setCategoryForm(datasalehal, 'swap');
+    await DatabaseCategory().setCategoryForm(datasalehal, 'installment');
   }
 
   Future addBookingData() async {

@@ -6,6 +6,7 @@ import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/model/WishListModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/card/WishItemCardRow.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
@@ -32,6 +33,8 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
 
   @override
   void initState() {
+    updateView(widget.props.propid, widget.user.uid);
+
     _ColorAnimationController =
         AnimationController(vsync: this, duration: Duration(seconds: 0));
     _colorTween = ColorTween(begin: Colors.transparent, end: whiteColor)
@@ -44,8 +47,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
 
     _transTween = Tween(begin: Offset(-10, 40), end: Offset(-10, 0))
         .animate(_TextAnimationController);
-
-    getWishApplication;
+    if (widget.props.forSwap) getWishApplication;
     getData(widget.props.propid);
     getCategory(widget.props.menuid, widget.props.forRent, widget.props.forSale,
         widget.props.forInstallment, widget.props.forSwap);
@@ -76,6 +78,71 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
           listimage.add(element.data()['urls']);
         });
       });
+    });
+  }
+
+  Future<dynamic> updateView(String propsid, String uid) async {
+    DatabaseServiceItems.propertyCollection
+        .doc(propsid)
+        .collection('views')
+        .where('uid', isEqualTo: uid)
+        .get()
+        .then((value) {
+      if (value.docs.length == 0) {
+        DatabaseServiceItems.propertyCollection
+            .doc(propsid)
+            .collection('views')
+            .doc('views')
+            .set({'dateview': getDateNow, 'uid': uid}).then((value) {
+          widget.props.numViews = 1;
+        });
+      } else {
+        int view = value.docs.length;
+        DatabaseServiceItems.propertyCollection
+            .doc(propsid)
+            .update({'numViews': view}).then((value) {
+          widget.props.numViews = view;
+        });
+      }
+    });
+  }
+
+  Future<dynamic> clickLikes(String propsid, String uid) async {
+    DatabaseServiceItems.propertyCollection
+        .doc(propsid)
+        .collection('likes')
+        .where('uid', isEqualTo: uid)
+        .get()
+        .then((value) {
+      int likes = value.docs.length;
+      if (likes == 0) {
+        DatabaseServiceItems.propertyCollection
+            .doc(propsid)
+            .collection('likes')
+            .doc(uid)
+            .set({'date': getDateNow, 'uid': uid}).then((value) {
+          setState(() {
+            widget.props.numLikes += 1;
+          });
+          DatabaseServiceItems.propertyCollection
+              .doc(propsid)
+              .update({'numLikes': widget.props.numLikes});
+        });
+      } else {
+        DatabaseServiceItems.propertyCollection
+            .doc(propsid)
+            .collection('likes')
+            .doc(uid)
+            .delete()
+            .then((value) {
+          setState(() {
+            widget.props.numLikes -= 1;
+          });
+          DatabaseServiceItems.propertyCollection
+              .doc(propsid)
+              .update({'numLikes': widget.props.numLikes});
+        });
+      }
     });
   }
 
@@ -169,7 +236,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
         .doc(widget.user.uid)
         .snapshots()
         .listen((event2) {
-      var x = event2.data()['propsid'];
+      var x = event2.data() == null ? null : event2.data()['propsid'];
       offercounts = x == null ? 0 : x.length;
     });
   }
@@ -243,15 +310,17 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                             ],
                           ),
                         ),
-                        SizedBox(height: 20),
-                        ItemCardMenu(
-                          
-                            props: widget.props,
-                            onClick: () {
-                              setState(() {
-                                getWishApplication;
-                              });
-                            }),
+                        Container(
+                          padding: EdgeInsets.only(top: 20),
+                          child: ItemCardMenu(
+                              props: widget.props,
+                              onClick: () {
+                                if (widget.props.forSwap)
+                                  setState(() {
+                                    getWishApplication;
+                                  });
+                              }),
+                        ),
                         SizedBox(height: 20),
                         Container(
                           margin:
@@ -268,7 +337,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                               Align(
                                 alignment: Alignment.topRight,
                                 child: Text(widget.props.numLikes.toString() +
-                                    ' like  |  ' +
+                                    ' likes  |  ' +
                                     widget.props.numViews.toString() +
                                     " views"),
                               )
@@ -388,7 +457,9 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                     ),
                     actions: <Widget>[
                       MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          clickLikes(widget.props.propid, widget.user.uid);
+                        },
                         color: whiteColor,
                         textColor: primaryColor,
                         child: Icon(
