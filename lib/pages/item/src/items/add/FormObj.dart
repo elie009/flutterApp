@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 abstract class FirstFormObj {
   title() {}
   price() {}
+  equity() {}
   downpayment() {}
   amortization() {}
   installmentCount() {}

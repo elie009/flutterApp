@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
+import 'package:flutter_app/model/ItemCommentModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/model/WishListModel.dart';
+import 'package:flutter_app/pages/item/src/items/view/unitFeedback/ItemComment.dart';
+import 'package:flutter_app/pages/item/src/items/view/unitSeller/SellerInfo.dart';
+import 'package:flutter_app/pages/item/src/items/view/unitSimilarItem/SuggestItem.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
 import 'package:flutter_app/widgets/card/WishItemCardRow.dart';
 import 'package:flutter_app/widgets/components/CarouselSlider.dart';
+import 'package:flutter_app/widgets/components/ModalBox.dart';
 import 'package:flutter_app/widgets/components/text/TextLabelByLine.dart';
-import 'package:provider/provider.dart';
 
-import '../../../component/ItemCardMenu.dart';
-import '../../../component/ItemViewBodyContent.dart';
+import 'unitMenu/ItemCardMenu.dart';
+import 'unitDetails/ItemViewBodyContent.dart';
 
 class ItemViewDetails extends StatefulWidget {
   ItemViewDetails({@required this.props, this.user});
@@ -30,6 +35,70 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
   AnimationController _TextAnimationController;
   Animation _colorTween, _iconColorTween;
   Animation<Offset> _transTween;
+  UserBaseModel user;
+
+  int offercounts = 0;
+  Future<dynamic> get getWishApplication async {
+    DatabaseServiceItems.propertyCollection
+        .doc(widget.props.propid)
+        .collection('wishapplication')
+        .doc(widget.user.uid)
+        .snapshots()
+        .listen((event2) {
+      var x = event2.data() == null ? null : event2.data()['propsid'];
+      offercounts = x == null ? 0 : x.length;
+    });
+  }
+
+  List<PropertyItemModel> similaritem = [];
+  Future<dynamic> get getSimilarItem async {
+    DatabaseServiceItems.propertyCollection
+        .where("menuid", isEqualTo: widget.props.menuid)
+        //.where('propid', isNotEqualTo: widget.props.propid)
+        .limit(10)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        if (element.get('propid') != widget.props.propid)
+          similaritem.add(PropertyItemModel.snapshot(element));
+      });
+    });
+  }
+
+  Future get getCurrentUser async {
+    await DatabaseService()
+        .userCollection
+        .doc(widget.props.ownerUid)
+        .get()
+        .then((value) {
+      setState(() {
+        user = new UserBaseModel(
+          displayName: value.get('displayName').toString(),
+          image: value.get('image').toString(),
+          location: value.get('location').toString(),
+          uid: value.get('uid').toString(),
+          createdDate: value.get('createdDate').toString(),
+          status: value.get('status').toString(),
+        );
+      });
+    });
+  }
+
+  List<ItemCommentModel> comment = [];
+  Future get getItemComment async {
+    await DatabaseServiceItems.propertyCollection
+        .doc(widget.props.propid)
+        .collection('comment')
+        .get()
+        .then((value) {
+      setState(() {
+        print(value.docs.length);
+        value.docs.forEach((element) {
+          element.data()['comment'];
+        });
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -45,10 +114,13 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     _TextAnimationController =
         AnimationController(vsync: this, duration: Duration(seconds: 0));
 
-    _transTween = Tween(begin: Offset(-10, 40), end: Offset(-10, 0))
+    _transTween = Tween(begin: Offset(-10, 60), end: Offset(-10, 0))
         .animate(_TextAnimationController);
     if (widget.props.forSwap) getWishApplication;
     getData(widget.props.propid);
+    getCurrentUser;
+    getItemComment;
+    getSimilarItem;
     getCategory(widget.props.menuid, widget.props.forRent, widget.props.forSale,
         widget.props.forInstallment, widget.props.forSwap);
 
@@ -228,21 +300,8 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     });
   }
 
-  int offercounts = 0;
-  Future<dynamic> get getWishApplication async {
-    DatabaseServiceItems.propertyCollection
-        .doc(widget.props.propid)
-        .collection('wishapplication')
-        .doc(widget.user.uid)
-        .snapshots()
-        .listen((event2) {
-      var x = event2.data() == null ? null : event2.data()['propsid'];
-      offercounts = x == null ? 0 : x.length;
-    });
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext bcontext) {
     return Scaffold(
       backgroundColor: whiteColor,
       body: NotificationListener<ScrollNotification>(
@@ -344,14 +403,6 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                             ],
                           ),
                         ),
-                        SizedBox(height: 10),
-                        TextLabelByLine(
-                            text: widget.props.description,
-                            style: TextStyle(
-                                color: blackColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w300),
-                            width: 0.9),
                         SizedBox(height: 20),
                         ItemViewBodyContent(
                             catmodel: catmodel, props: widget.props),
@@ -415,7 +466,11 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                             onClickCard: null,
                             wishItem: wishitem,
                             onChangeCheckbox: null,
-                          )
+                          ),
+                        SellerInfo(user: user),
+                        ItemComment(comments: comment),
+                        if (similaritem.isNotEmpty)
+                          SuggetItem(similaritem: similaritem),
                       ],
                     ),
                   ],
@@ -431,12 +486,16 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                     titleSpacing: 0.0,
                     title: Transform.translate(
                       offset: _transTween.value,
-                      child: Text(
-                        "TEXT",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
+                      child: Center(
+                        child: Text(
+                          widget.props.forSwap
+                              ? "Swappable Item"
+                              : formatCurency(widget.props.price.toString()),
+                          style: TextStyle(
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
                       ),
                     ),
                     leading: MaterialButton(
@@ -456,6 +515,39 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                       color: _iconColorTween.value,
                     ),
                     actions: <Widget>[
+                      Transform.translate(
+                        offset: _transTween.value,
+                        child: Center(
+                          child: Container(
+                            margin: EdgeInsets.all(5),
+                            height: 50.0,
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                  side: BorderSide(
+                                      color: Color.fromRGBO(0, 160, 227, 1))),
+                              onPressed: () {
+                                setState(() {
+                                  showModalBottomSheet<void>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return ModalBox(
+                                          isCloseDisplay: false,
+                                          body:
+                                              MineMenu.modalContainer(context),
+                                        );
+                                      });
+                                });
+                              },
+                              padding: EdgeInsets.all(10.0),
+                              color: Colors.white,
+                              textColor: Color.fromRGBO(0, 160, 227, 1),
+                              child: Text("Mine Item",
+                                  style: TextStyle(fontSize: 15)),
+                            ),
+                          ),
+                        ),
+                      ),
                       MaterialButton(
                         onPressed: () {
                           clickLikes(widget.props.propid, widget.user.uid);
@@ -468,7 +560,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                         ),
                         padding: EdgeInsets.all(16),
                         shape: CircleBorder(),
-                      )
+                      ),
                     ],
                   ),
                 ),

@@ -14,25 +14,34 @@ class ItemViewBodyContent extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 20.0, right: 20.0),
       child: Column(children: [
-        SizedBox(height: 20),
-        Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              props.forSale
-                  ? 'For Sale'
-                  : props.forRent
-                      ? 'For Rent'
-                      : props.forInstallment
-                          ? 'For Installment'
-                          : props.forSale
-                              ? 'For Swap'
-                              : '',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: primaryColor),
-            )),
-        SizedBox(height: 20),
+        Row(
+          children: [
+            Text(
+              'This item is for ',
+              style: TextStyle(fontSize: 15),
+            ),
+              Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    props.forSale
+                        ? 'Sale'
+                        : props.forRent
+                            ? 'Rent'
+                            : props.forInstallment
+                                ? 'Installment'
+                                : props.forSale
+                                    ? 'Swap'
+                                    : '',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: primaryColor),
+                  )),
+          ],
+        ),
+        SizedBox(height: 10),
+        displayLabelValue("Condition", props.conditionCode),
+        displayLabelValue("Description", props.description),
         if (catmodel.unitdetails_lotarea != null)
           displayLabelValue("Lot area (sqm)", props.lotarea.toString()),
         if (catmodel.unitdetails_floorarea != null)
@@ -49,7 +58,7 @@ class ItemViewBodyContent extends StatelessWidget {
 
   displayLabelValue(String label, String value) {
     return Container(
-      padding: EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(bottom: 10),
       child: IconText(
           text: label, value: value, icon: Icons.label_important_outline),
     );

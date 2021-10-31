@@ -45,6 +45,10 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
           forRent: doc.get('forRent') ?? false,
           forInstallment: doc.get('forInstallment') ?? false,
           forSwap: doc.get('forSwap') ?? false,
+          installment_downpayment: doc.get('installment_downpayment') ?? 0.00,
+          installment_equity: doc.get('installment_equity') ?? 0.00,
+          installment_amort: doc.get('installment_amort') ?? 0.00,
+          installment_monthstopay: doc.get('installment_monthstopay') ?? 0.00,
         );
       } catch (e) {
         print(e.toString());
@@ -115,6 +119,10 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
       'forRent': data.forRent,
       'forInstallment': data.forInstallment,
       'forSwap': data.forSwap,
+      'installment_downpayment': data.installment_downpayment,
+      'installment_equity': data.installment_equity,
+      'installment_amort': data.installment_amort,
+      'installment_monthstopay': data.installment_monthstopay,
     });
   }
 
@@ -124,10 +132,7 @@ class DatabaseServiceItems implements DatabaseServicePropsStructure {
         .doc(data.propid)
         .collection('wishlist')
         .doc('whislist')
-        .set({
-          
-
-        });
+        .set({});
   }
 
   @override

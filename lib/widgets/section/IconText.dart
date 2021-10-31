@@ -22,14 +22,14 @@ class IconText extends StatelessWidget {
           TextLabelByLine(
               text: text,
               style: TextStyle(
-                  color: blackColor, fontSize: 17, fontWeight: FontWeight.w300),
+                  color: blackColor, fontSize: 17, fontWeight: FontWeight.bold),
               width: 0.9),
           Align(
-            alignment: Alignment.center,
+            alignment: Alignment.topRight,
             child: Text(
               value,
               style: TextStyle(
-                  color: blackColor, fontSize: 20, fontWeight: FontWeight.bold),
+                  color: blackColor, fontSize: 20, fontWeight: FontWeight.w500),
             ),
           )
         ],

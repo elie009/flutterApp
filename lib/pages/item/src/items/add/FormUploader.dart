@@ -68,6 +68,10 @@ class FormUploaderState extends State<FormUploader> {
       forInstallment: data['forInstallment'] ?? false,
       forSwap: data['forSwap'] ?? false,
       termCode: data['termCode'] ?? '',
+      installment_downpayment: data['installment_downpayment'] ?? 0.0,
+      installment_equity: data['installment_equity'] ?? 0.0,
+      installment_amort: data['installment_amort'] ?? 0.0,
+      installment_monthstopay: data['installment_monthstopay'] ?? 0.0,
     );
   }
 
@@ -250,6 +254,15 @@ class FormUploaderState extends State<FormUploader> {
     props.forInstallment = FormBaseDetailsState.propdetails.isInstallment;
     props.forSwap = FormBaseDetailsState.propdetails.isSwap;
     props.conditionCode = FormBaseDetailsState.propdetails.condition.text;
+
+    props.installment_downpayment =
+        toDouble(FormBaseDetailsState.propdetails.downpayment.text);
+    props.installment_amort =
+        toDouble(FormBaseDetailsState.propdetails.installment_amort.text);
+    props.installment_equity =
+        toDouble(FormBaseDetailsState.propdetails.installment_equity.text);
+    props.installment_monthstopay =
+        toDouble(FormBaseDetailsState.propdetails.installment_count.text);
 
     await DatabaseServiceItems().add(props).then((value) {
       addWishlist(props.propid);

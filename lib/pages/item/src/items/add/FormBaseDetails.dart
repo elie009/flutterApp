@@ -117,6 +117,10 @@ class FormDetailsModel {
   TextEditingController description;
   TextEditingController dealmethod;
   TextEditingController price;
+  TextEditingController downpayment;
+  TextEditingController installment_count;
+  TextEditingController installment_amort;
+  TextEditingController installment_equity;
 
   List<Asset> uploadmedia = <Asset>[];
   List<dynamic> loopitems = <dynamic>[];
@@ -124,7 +128,6 @@ class FormDetailsModel {
   bool isRent;
   bool isInstallment;
   bool isSwap;
-
   String propsid;
   bool common_sameitem;
 
@@ -134,9 +137,12 @@ class FormDetailsModel {
     this.description = new TextEditingController();
     this.dealmethod = new TextEditingController();
     this.price = new TextEditingController();
+    this.downpayment = new TextEditingController();
+    this.installment_count = new TextEditingController();
+    this.installment_amort = new TextEditingController();
+    this.installment_equity = new TextEditingController();
 
     this.common_sameitem = false;
-
     this.isSale = false;
     this.isRent = false;
     this.isInstallment = false;
@@ -149,6 +155,10 @@ class FormDetailsModel {
     this.description = new TextEditingController();
     this.dealmethod = new TextEditingController();
     this.price = new TextEditingController();
+    this.downpayment = new TextEditingController();
+    this.installment_count = new TextEditingController();
+    this.installment_amort = new TextEditingController();
+    this.installment_equity = new TextEditingController();
 
     this.title.text = props.title;
     this.condition.text = props.conditionCode;
@@ -163,6 +173,11 @@ class FormDetailsModel {
     this.isInstallment = props.forInstallment;
     this.isSwap = props.forSwap;
     this.uploadmedia = <Asset>[];
+
+    this.downpayment.text = props.installment_downpayment.toString();
+    this.installment_count.text = props.installment_monthstopay.toString();
+    this.installment_amort.text = props.installment_amort.toString();
+    this.installment_equity.text = props.installment_equity.toString();
   }
 
   FormDetailsModel({

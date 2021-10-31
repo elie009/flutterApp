@@ -29,6 +29,7 @@ class DatabaseCategory {
       "condition_used": form.condition_used,
       "priceinput_price": form.priceinput_price,
       "priceinput_downpayment": form.priceinput_downpayment,
+      "priceinput_equity": form.priceinput_equity,
       "payments_count": form.payments_count,
       "priceinput_amortization": form.priceinput_amortization,
       "description": form.description,
@@ -121,6 +122,8 @@ class DatabaseCategory {
       'headcategory': categoryitem.headcategory
     });
   }
+
+  
 
   Future deleteCategory() async {
     try {

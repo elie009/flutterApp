@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseCategory.dart';
+import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
 import 'package:flutter_app/model/CategoryFormModel.dart';
 import 'package:flutter_app/model/CategoryModel.dart';
 import 'package:flutter_app/model/BookingModel.dart';
@@ -10,7 +13,10 @@ class PrepareData {
   void execute() {
     //clearAll();
     //addCategoryData();
-    addCategoryCollection();
+    //addCategoryCollection();
+    //updateProps();
+    //updateCategoryCollection();
+    updateUser();
     //addBookingData();
     print('your in the demo database');
   }
@@ -51,6 +57,44 @@ class PrepareData {
         headcategory: 'NONE');
 
     await DatabaseCategory().updateCategory(hal);
+  }
+
+  Future updateProps() async {
+    CollectionReference ref = DatabaseServiceItems.propertyCollection;
+    ref.snapshots().forEach((element) {
+      element.docs.forEach((data) {
+        DatabaseServiceItems.propertyCollection.doc(data.get("propid")).update({
+          "installment_downpayment": 0.00,
+          "installment_equity": 0.00,
+          "installment_amort": 0.00,
+          "installment_monthstopay": 0.00,
+        });
+      });
+    });
+  }
+
+  Future updateUser() async {
+    CollectionReference ref = DatabaseService().userCollection;
+    ref.snapshots().forEach((element) {
+      element.docs.forEach((data) {
+        DatabaseService().userCollection.doc(data.get("uid")).update({
+          "createdDate": getDateNow,
+        });
+      });
+    });
+  }
+
+  Future updateCategoryCollection() async {
+    DatabaseCategory.categoryCollectionGlobal
+        .doc('1002')
+        .collection('swap')
+        .doc('swap')
+        .update({
+      "priceinput_equity": null,
+      "priceinput_downpayment": null,
+      "priceinput_amortization": null,
+      "payments_count": null,
+    });
   }
 
   Future addCategoryCollection() async {
@@ -99,6 +143,7 @@ class PrepareData {
       priceinput_downpayment: true,
       payments_count: true,
       priceinput_amortization: true,
+      priceinput_equity: true,
     );
     await DatabaseCategory().setCategoryForm(datasalelot, 'installment');
     var datasalehal = CategoryFormModel(
@@ -124,6 +169,7 @@ class PrepareData {
       condition_preowned: true,
       condition_foreclosed: true,
       priceinput_amortization: true,
+      priceinput_equity: true,
     );
     await DatabaseCategory().setCategoryForm(datasalehal, 'installment');
   }

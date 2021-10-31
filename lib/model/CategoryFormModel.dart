@@ -14,6 +14,7 @@ class CategoryFormModel {
   bool priceinput_price;
   bool priceinput_downpayment;
   bool priceinput_amortization;
+  bool priceinput_equity;
   bool payments_count;
   bool description;
   bool ismoreandsameitem;
@@ -50,6 +51,7 @@ class CategoryFormModel {
     this.priceinput_price,
     this.priceinput_downpayment,
     this.priceinput_amortization,
+    this.priceinput_equity,
     this.payments_count,
     this.description,
     this.ismoreandsameitem,

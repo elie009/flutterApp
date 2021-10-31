@@ -23,6 +23,11 @@ class PropertyItemModel {
   String roomCode;
   String termCode;
 
+  double installment_downpayment;
+  double installment_equity;
+  double installment_amort;
+  double installment_monthstopay;
+
   int numComments;
   int numLikes;
   int numViews;
@@ -72,6 +77,11 @@ class PropertyItemModel {
     this.forInstallment = value.get("forInstallment");
     this.forSwap = value.get("forSwap");
     this.termCode = value.get("termCode");
+
+    this.installment_downpayment = value.get("installment_downpayment");
+    this.installment_equity = value.get("installment_equity");
+    this.installment_amort = value.get("installment_amort");
+    this.installment_monthstopay = value.get("installment_monthstopay");
   }
 
   PropertyItemModel({
@@ -107,5 +117,9 @@ class PropertyItemModel {
     this.forInstallment,
     this.forSwap,
     this.termCode,
+    this.installment_downpayment,
+    this.installment_equity,
+    this.installment_amort,
+    this.installment_monthstopay,
   });
 }

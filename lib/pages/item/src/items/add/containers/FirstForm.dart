@@ -31,7 +31,6 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
     //this.propsid,
 
     this.propdetails,
-    
     this.onChanged,
     this.onChangeUpload,
     this.onChangedCondtion,
@@ -77,6 +76,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         SizedBox(height: 20),
         if (catdata.priceinput_price != null) price(),
         if (catdata.priceinput_downpayment != null) downpayment(),
+        if (catdata.priceinput_equity != null) equity(),
         if (catdata.priceinput_amortization != null) amortization(),
         if (catdata.payments_count != null) installmentCount(),
         SizedBox(height: 20),
@@ -110,8 +110,9 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         ),
         SizedBox(height: 10),
         CustomRadioButton(
-          defaultSelected:
-              propdetails.condition.text.isEmpty ? null : propdetails.condition.text,
+          defaultSelected: propdetails.condition.text.isEmpty
+              ? null
+              : propdetails.condition.text,
           elevation: 0,
           unSelectedColor: Theme.of(context).canvasColor,
           buttonLables: [
@@ -169,8 +170,9 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         ),
         SizedBox(height: 10),
         CustomRadioButton(
-          defaultSelected:
-              propdetails.dealmethod.text.isEmpty ? null : propdetails.dealmethod.text,
+          defaultSelected: propdetails.dealmethod.text.isEmpty
+              ? null
+              : propdetails.dealmethod.text,
           elevation: 0,
           unSelectedColor: Theme.of(context).canvasColor,
           buttonLables: [
@@ -267,7 +269,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         placeholder: "Monthly amortization",
         isText: false,
         width: double.infinity,
-        value: common_installment_amort,
+        value: propdetails.installment_amort,
       ),
     );
   }
@@ -281,7 +283,7 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         placeholder: "Downpayment",
         isText: false,
         width: double.infinity,
-        value: common_installment_downpayment,
+        value: propdetails.downpayment,
       ),
     );
   }
@@ -295,7 +297,21 @@ class FirstForm extends StatelessWidget implements FirstFormObj {
         placeholder: "Months to pay",
         isText: false,
         width: double.infinity,
-        value: common_installment_count,
+        value: propdetails.installment_count,
+      ),
+    );
+  }
+
+  @override
+  equity() {
+    return Container(
+      padding: EdgeInsets.only(top: 20),
+      child: InputTextForm(
+        isReadOnly: false,
+        placeholder: "Equity",
+        isText: false,
+        width: double.infinity,
+        value: propdetails.installment_equity,
       ),
     );
   }

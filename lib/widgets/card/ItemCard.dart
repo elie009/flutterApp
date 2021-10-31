@@ -179,7 +179,9 @@ class ItemCard extends StatelessWidget {
                                 padding:
                                     EdgeInsets.only(left: 5, top: 0, right: 0),
                                 child: TextLabelFade(
-                                    text: formatCurency(props.price.toString()),
+                                    text: props.price == null
+                                        ? "Swappable item"
+                                        : formatCurency(props.price.toString()),
                                     style: TextStyle(
                                         color: Color(0xFF6e6e71),
                                         fontSize: 14,

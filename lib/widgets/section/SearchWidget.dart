@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../components/ModalBox.dart';
 
 class SearchWidget extends StatelessWidget {
   SearchWidget({this.widthFactor});

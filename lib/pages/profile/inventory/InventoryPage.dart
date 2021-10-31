@@ -150,6 +150,10 @@ Future categoryInspector(String catcode, PropertyChecking action,
             element.get('unitdetails_furnish_fullyfurnish'),
         unitdetails_room_private: element.get('unitdetails_room_private'),
         unitdetails_room_shared: element.get('unitdetails_room_shared'),
+        priceinput_equity: element.get('priceinput_equity'),
+        priceinput_downpayment: element.get('priceinput_downpayment'),
+        priceinput_amortization: element.get('priceinput_amortization'),
+        payments_count: element.get('payments_count'),
       );
 
       // Navigator.push(

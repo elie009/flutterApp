@@ -5,12 +5,13 @@ final oCcy = new NumberFormat("#,##0.00", "en_US");
 
 final $searchForValue = ',';
 String formatCurency(dynamic numbers) {
+  if (numbers == null || numbers == "null") return null;
   numbers = numbers is String ? toDouble(numbers) : numbers;
   return currency + oCcy.format(numbers);
 }
 
 double toDouble(String number) {
-  if (number == null || number.isEmpty) return null;
+  if (number == null || number.isEmpty || number == "null") return null;
   if (number.contains($searchForValue)) {
     number = number.replaceAll(",", "");
   }
