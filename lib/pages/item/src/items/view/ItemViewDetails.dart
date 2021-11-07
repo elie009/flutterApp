@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/database/items/DatabaseCategory.dart';
 import 'package:flutter_app/database/items/DatabaseServiceItems.dart';
@@ -7,9 +8,12 @@ import 'package:flutter_app/model/ItemCommentModel.dart';
 import 'package:flutter_app/model/PropertyItemModel.dart';
 import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/model/WishListModel.dart';
+import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/item/src/items/view/unitFeedback/ItemComment.dart';
 import 'package:flutter_app/pages/item/src/items/view/unitSeller/SellerInfo.dart';
 import 'package:flutter_app/pages/item/src/items/view/unitSimilarItem/SuggestItem.dart';
+import 'package:flutter_app/pages/profile/ProfilePage.dart';
+import 'package:flutter_app/pages/profile/ProfilePublicView.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/utils/DateHandler.dart';
 import 'package:flutter_app/utils/Formatter.dart';
@@ -25,6 +29,7 @@ class ItemViewDetails extends StatefulWidget {
   ItemViewDetails({@required this.props, this.user});
   PropertyItemModel props;
   UserBaseModel user;
+  bool userlikethispost = false;
   @override
   _ItemViewDetailsState createState() => _ItemViewDetailsState();
 }
@@ -65,7 +70,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     });
   }
 
-  Future get getCurrentUser async {
+  Future get getCurrentOwner async {
     await DatabaseService()
         .userCollection
         .doc(widget.props.ownerUid)
@@ -79,6 +84,11 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
           uid: value.get('uid').toString(),
           createdDate: value.get('createdDate').toString(),
           status: value.get('status').toString(),
+          post: value.get('post'),
+          ratings: value.get('ratings'),
+          response: value.get('response'),
+          followers: value.get('followers'),
+          following: value.get('following'),
         );
       });
     });
@@ -103,7 +113,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
   @override
   void initState() {
     updateView(widget.props.propid, widget.user.uid);
-
+    checkUserLike;
     _ColorAnimationController =
         AnimationController(vsync: this, duration: Duration(seconds: 0));
     _colorTween = ColorTween(begin: Colors.transparent, end: whiteColor)
@@ -118,7 +128,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
         .animate(_TextAnimationController);
     if (widget.props.forSwap) getWishApplication;
     getData(widget.props.propid);
-    getCurrentUser;
+    getCurrentOwner;
     getItemComment;
     getSimilarItem;
     getCategory(widget.props.menuid, widget.props.forRent, widget.props.forSale,
@@ -179,6 +189,19 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
     });
   }
 
+  Future<dynamic> get checkUserLike async {
+    DatabaseServiceItems.propertyCollection
+        .doc(widget.props.propid)
+        .collection('likes')
+        .where('uid', isEqualTo: widget.user.uid)
+        .get()
+        .then((value) {
+      if (value.docs.length != 0) {
+        widget.userlikethispost = true;
+      }
+    });
+  }
+
   Future<dynamic> clickLikes(String propsid, String uid) async {
     DatabaseServiceItems.propertyCollection
         .doc(propsid)
@@ -195,6 +218,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
             .set({'date': getDateNow, 'uid': uid}).then((value) {
           setState(() {
             widget.props.numLikes += 1;
+            widget.userlikethispost = true;
           });
           DatabaseServiceItems.propertyCollection
               .doc(propsid)
@@ -209,6 +233,7 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
             .then((value) {
           setState(() {
             widget.props.numLikes -= 1;
+            widget.userlikethispost = false;
           });
           DatabaseServiceItems.propertyCollection
               .doc(propsid)
@@ -359,13 +384,23 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                                       color: blackColor,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w200)),
-                              TextLabelByLine(
-                                  text: 'archie',
-                                  style: TextStyle(
-                                      color: primaryColor,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700),
-                                  width: 0.4),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      ScaleRoute(
+                                          page: ProfilePublicView(
+                                        user: user,
+                                      )));
+                                },
+                                child: TextLabelByLine(
+                                    text: user == null ? '' : user.displayName,
+                                    style: TextStyle(
+                                        color: primaryColor,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700),
+                                    width: 0.4),
+                              ),
                             ],
                           ),
                         ),
@@ -548,19 +583,35 @@ class _ItemViewDetailsState extends State<ItemViewDetails>
                           ),
                         ),
                       ),
-                      MaterialButton(
-                        onPressed: () {
-                          clickLikes(widget.props.propid, widget.user.uid);
-                        },
-                        color: whiteColor,
-                        textColor: primaryColor,
-                        child: Icon(
-                          Icons.favorite_outline,
-                          size: 24,
-                        ),
-                        padding: EdgeInsets.all(16),
-                        shape: CircleBorder(),
-                      ),
+                      widget.userlikethispost
+                          ? MaterialButton(
+                              onPressed: () {
+                                clickLikes(
+                                    widget.props.propid, widget.user.uid);
+                              },
+                              color: whiteColor,
+                              textColor: primaryColor,
+                              child: Icon(
+                                Icons.favorite,
+                                size: 24,
+                              ),
+                              padding: EdgeInsets.all(16),
+                              shape: CircleBorder(),
+                            )
+                          : MaterialButton(
+                              onPressed: () {
+                                clickLikes(
+                                    widget.props.propid, widget.user.uid);
+                              },
+                              color: whiteColor,
+                              textColor: primaryColor,
+                              child: Icon(
+                                Icons.favorite_outline,
+                                size: 24,
+                              ),
+                              padding: EdgeInsets.all(16),
+                              shape: CircleBorder(),
+                            ),
                     ],
                   ),
                 ),

@@ -1,17 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model/UserModel.dart';
-import 'package:provider/provider.dart';
 
 class BottomMenu extends StatelessWidget {
-  final String ownerUid;
-  final String propsId;
-
-  BottomMenu({this.ownerUid, this.propsId});
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserBaseModel>(context);
-
     return Container(
       width: double.infinity,
       child: Row(

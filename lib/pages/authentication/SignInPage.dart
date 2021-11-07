@@ -46,20 +46,6 @@ class _SignInPageState extends State<SignInPage> {
                   child: Column(
                     children: <Widget>[
                       Flexible(
-                        flex: 1,
-                        child: InkWell(
-                          child: Container(
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Icon(Icons.close),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      Flexible(
                         flex: 8,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -238,8 +224,7 @@ class _SignInPageState extends State<SignInPage> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      HomePage(
-                                                          prefs: widget.prefs)),
+                                                      HomePage()),
                                             );
                                             loading = false;
                                           }

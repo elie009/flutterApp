@@ -78,7 +78,11 @@ class PrepareData {
     ref.snapshots().forEach((element) {
       element.docs.forEach((data) {
         DatabaseService().userCollection.doc(data.get("uid")).update({
-          "createdDate": getDateNow,
+          "post": "0",
+          "ratings": "0",
+          "response": "0",
+          "followers": "0",
+          "following": "0",
         });
       });
     });

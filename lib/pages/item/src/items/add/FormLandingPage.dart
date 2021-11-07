@@ -12,11 +12,9 @@ import 'package:flutter_app/pages/item/itemform/ItemAddFormPage.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormBaseDetails.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormComplete.dart';
 import 'package:flutter_app/pages/item/src/items/add/FormUploader.dart';
-import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:flutter_app/widgets/components/AlertBox.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FormLandingPage extends StatefulWidget {
   FormLandingPage(
@@ -184,11 +182,6 @@ class _FormLandingPageState extends State<FormLandingPage> {
       ),
     );
   }
-}
-
-Future backToProfilePage(BuildContext context) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  Navigator.push(context, ScaleRoute(page: ProfilePage(prefs: prefs)));
 }
 
 class MapData {

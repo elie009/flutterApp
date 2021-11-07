@@ -1,6 +1,7 @@
 import 'package:circle_bottom_navigation/circle_bottom_navigation.dart';
 import 'package:circle_bottom_navigation/widgets/tab_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/home/HomePage.dart';
 import 'package:flutter_app/pages/message/inbox/HomeMessagePage.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_app/pages/posting/PostingPage.dart';
 import 'package:flutter_app/pages/profile/ProfilePage.dart';
 import 'package:flutter_app/utils/Constant.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BottomNavBarWidget extends StatefulWidget {
@@ -26,12 +28,14 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserBaseModel>(context);
+
     final List<Widget> _pages = [
       HomePage(),
       FoodDetailsPage(),
       PostingPage(),
       HomeMessagePage(prefs: widget.prefs),
-      ProfilePage(prefs: widget.prefs)
+      ProfilePage(user: user)
     ];
     return Scaffold(
       body: _pages[currentPage],

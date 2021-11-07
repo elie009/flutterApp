@@ -110,6 +110,8 @@ flutter:
     - assets/images/bestfood/ic_best_food_9.jpeg
     - assets/images/bestfood/ic_best_food_10.jpeg
     - assets/images/profile/profile.jpeg
+
+    - assets/demodata/userJSON.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

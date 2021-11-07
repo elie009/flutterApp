@@ -29,7 +29,7 @@ class _ItemCardMenuState extends State<ItemCardMenu> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildButtonColumn(primaryColor, Icons.access_time, 'Book', () {
+          _buildButtonColumn(primaryColor, Icons.share, 'Book', () {
             setState(() {
               Navigator.push(context, ScaleRoute(page: BookingPage()));
             });

@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/model/UserModel.dart';
 import 'package:flutter_app/utils/Constant.dart';
 
 class SellerStat extends StatelessWidget {
+  final UserBaseModel user;
+  SellerStat({@required this.user});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -14,7 +18,7 @@ class SellerStat extends StatelessWidget {
           Column(
             children: <Widget>[
               Text(
-                '0',
+                user.post,
                 style: TextStyle(
                   color: primaryColor,
                   fontSize: 22.0,

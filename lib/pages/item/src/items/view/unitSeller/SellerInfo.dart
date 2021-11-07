@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/database/Database.dart';
 import 'package:flutter_app/model/UserModel.dart';
-import 'package:flutter_app/pages/item/src/items/view/unitseller/SellerStat.dart';
-import 'package:flutter_app/utils/Constant.dart';
+import 'package:flutter_app/pages/item/src/items/view/unitSeller/SellerStat.dart';
 
 class SellerInfo extends StatelessWidget {
   //final String uid;
@@ -64,7 +62,7 @@ class SellerInfo extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
-              SellerStat(),
+              SellerStat(user: user),
             ]))
         : Container();
   }
