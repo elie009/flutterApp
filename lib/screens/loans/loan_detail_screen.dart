@@ -234,7 +234,6 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                       ),
                                       decoration: const InputDecoration(
                                         labelText: 'Payment Amount',
-                                        prefixText: '₱',
                                       ),
                                     ),
                                     const SizedBox(height: 16),

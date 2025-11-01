@@ -50,7 +50,7 @@ class LaunchScreen extends StatelessWidget {
                     context.go('/login');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2DD4BF), // Vibrant teal-green
+                    backgroundColor: const Color(0xFF10B981), // Primary green
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

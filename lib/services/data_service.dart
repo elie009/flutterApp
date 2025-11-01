@@ -48,7 +48,12 @@ class DataService {
         // Could check timestamp here for expiry
       }
 
+      // Get bank accounts summary for totalBalance
       final response = await ApiService().get('/BankAccounts/summary');
+      
+      // Parse totalBalance from the response
+      final responseData = response.data['data'] ?? response.data;
+      final totalBalance = _parseDouble(responseData['totalBalance']) ?? 0.0;
       
       // Also get bill analytics
       final billResponse = await ApiService().get('/Bills/analytics/summary');
@@ -59,10 +64,8 @@ class DataService {
         queryParameters: {'limit': 5},
       );
 
-      // Parse and combine data
-      final totalBalance = _parseDouble(response.data['totalBalance']) ?? 0.0;
-      final monthlyIncome = _parseDouble(response.data['monthlyIncome']) ?? 0.0;
-      
+      // Parse bill analytics data
+      final monthlyIncome = _parseDouble(responseData['monthlyIncome']) ?? 0.0;
       final pendingBillsCount = _parseInt(billResponse.data['pendingCount']) ?? 0;
       final pendingBillsAmount = _parseDouble(billResponse.data['pendingAmount']) ?? 0.0;
       
@@ -79,6 +82,24 @@ class DataService {
           ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
           .toList() ?? [];
 
+      // Get disposable amount (expenses) for current year and month
+      final now = DateTime.now();
+      final disposableResponse = await ApiService().get(
+        '/Dashboard/disposable-amount',
+        queryParameters: {
+          'year': now.year,
+          'month': now.month,
+        },
+      );
+      
+      // Parse expense data
+      final disposableData = disposableResponse.data['data'] ?? disposableResponse.data;
+      // Try both camelCase and PascalCase for field names
+      final totalFixedExpenses = _parseDouble(disposableData['totalFixedExpenses']) ?? 
+                                  _parseDouble(disposableData['TotalFixedExpenses']) ?? 0.0;
+      final totalVariableExpenses = _parseDouble(disposableData['totalVariableExpenses']) ?? 
+                                     _parseDouble(disposableData['TotalVariableExpenses']) ?? 0.0;
+
       final summary = DashboardSummary(
         totalBalance: totalBalance,
         monthlyIncome: monthlyIncome,
@@ -86,6 +107,8 @@ class DataService {
         pendingBillsAmount: pendingBillsAmount,
         upcomingPayments: upcomingBills,
         recentTransactions: transactions,
+        totalFixedExpenses: totalFixedExpenses,
+        totalVariableExpenses: totalVariableExpenses,
       );
 
       // Cache the result
@@ -409,6 +432,8 @@ extension DashboardSummaryExtension on DashboardSummary {
       'pendingBillsAmount': pendingBillsAmount,
       'upcomingPayments': upcomingPayments.map((e) => e.toJson()).toList(),
       'recentTransactions': recentTransactions.map((e) => e.toJson()).toList(),
+      'totalFixedExpenses': totalFixedExpenses,
+      'totalVariableExpenses': totalVariableExpenses,
     };
   }
 }

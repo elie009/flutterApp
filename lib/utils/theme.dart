@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Color Palette - Updated to match Figma design
-  static const Color primaryColor = Color(0xFF2DD4BF); // Vibrant teal-green
+  static const Color primaryColor = Color(0xFF10B981); // Primary green
   static const Color primaryDarkColor = Color(0xFF0D9488); // Dark teal-green
   static const Color successColor = Color(0xFF2E7D32);
   static const Color warningColor = Color(0xFFED6C02);

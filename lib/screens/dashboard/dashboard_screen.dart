@@ -119,7 +119,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Container(
                           width: double.infinity,
                           decoration: const BoxDecoration(
-                            color: Color(0xFF2DD4BF),
+                            color: Color(0xFF10B981),
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(30),
                               bottomRight: Radius.circular(30),
@@ -145,21 +145,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         style: TextStyle(
                                           fontSize: 28,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF212121),
+                                          color: Colors.white,
                                         ),
                                       ),
                                       Text(
                                         'Good Morning',
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Color(0xFF757575),
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ],
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.notifications_outlined),
-                                    color: const Color(0xFF212121),
+                                    color: Colors.white,
                                     onPressed: () {
                                       NavigationHelper.navigateTo(context, 'notifications');
                                     },
@@ -185,18 +185,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               'Total Balance',
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xFF757575),
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ],
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          Formatters.formatCurrency(_summary?.totalBalance ?? 7783.00),
+                                          Formatters.formatCurrency(_summary?.totalBalance ?? 0.0),
                                           style: const TextStyle(
                                             fontSize: 24,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF212121),
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ],
@@ -225,18 +225,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Total Expense',
                                                 style: TextStyle(
                                                   fontSize: 12,
-                                                  color: Color(0xFF757575),
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ],
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            Formatters.formatCurrency(-(_summary?.pendingBillsAmount ?? 1187.40)),
+                                            Formatters.formatCurrency(_summary?.totalExpense ?? 0.0),
                                             style: const TextStyle(
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
-                                              color: Color(0xFF212121),
+                                              color: Colors.white,
                                             ),
                                           ),
                                         ],
@@ -267,7 +267,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               ),
                                               child: const Icon(
                                                 Icons.check_circle,
-                                                color: Color(0xFF2DD4BF),
+                                                color: Color(0xFF10B981),
                                                 size: 20,
                                               ),
                                             ),
@@ -276,17 +276,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               '30% Of Your Expenses, Looks Good.',
                                               style: TextStyle(
                                                 fontSize: 14,
-                                                color: Color(0xFF757575),
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ],
                                         ),
                                         const Text(
-                                          '\$20,000.00',
+                                          '20,000.00',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF212121),
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ],
@@ -328,12 +328,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         width: 50,
                                         height: 50,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF2DD4BF).withOpacity(0.1),
+                                          color: const Color(0xFF10B981).withOpacity(0.1),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: const Icon(
                                           Icons.directions_car_outlined,
-                                          color: Color(0xFF2DD4BF),
+                                          color: Color(0xFF10B981),
                                           size: 28,
                                         ),
                                       ),
@@ -467,7 +467,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                         decoration: BoxDecoration(
                                           color: _selectedTransactionTab == 'Daily' 
-                                              ? const Color(0xFF2DD4BF)
+                                              ? const Color(0xFF10B981)
                                               : Colors.transparent,
                                           borderRadius: BorderRadius.circular(8),
                                         ),
@@ -494,7 +494,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                         decoration: BoxDecoration(
                                           color: _selectedTransactionTab == 'Weekly' 
-                                              ? const Color(0xFF2DD4BF)
+                                              ? const Color(0xFF10B981)
                                               : Colors.transparent,
                                           borderRadius: BorderRadius.circular(8),
                                         ),
@@ -521,7 +521,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                         decoration: BoxDecoration(
                                           color: _selectedTransactionTab == 'Monthly' 
-                                              ? const Color(0xFF2DD4BF)
+                                              ? const Color(0xFF10B981)
                                               : Colors.transparent,
                                           borderRadius: BorderRadius.circular(8),
                                         ),

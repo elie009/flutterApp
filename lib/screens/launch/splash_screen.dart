@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF2DD4BF), // Vibrant teal-green
+      backgroundColor: const Color(0xFF10B981), // Primary green
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget _buildLogoIcon() {
     return const FinancialLogo(
       size: 80,
-      color: Color(0xFF0D9488), // Dark teal-green
+      color: Colors.white, // White for visibility on green background
     );
   }
 }

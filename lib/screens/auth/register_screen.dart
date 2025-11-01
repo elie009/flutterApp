@@ -88,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF2DD4BF), // Vibrant teal-green
+              Color(0xFF10B981), // Primary green
               Color(0xFF0D9488), // Dark teal-green
             ],
           ),
@@ -158,7 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF2DD4BF),
+                                    color: Color(0xFF10B981),
                                     width: 2,
                                   ),
                                 ),
@@ -196,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF2DD4BF),
+                                    color: Color(0xFF10B981),
                                     width: 2,
                                   ),
                                 ),
@@ -237,7 +237,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF2DD4BF),
+                                    color: Color(0xFF10B981),
                                     width: 2,
                                   ),
                                 ),
@@ -286,7 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF2DD4BF),
+                                    color: Color(0xFF10B981),
                                     width: 2,
                                   ),
                                 ),
@@ -338,7 +338,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF2DD4BF),
+                                    color: Color(0xFF10B981),
                                     width: 2,
                                   ),
                                 ),
@@ -365,7 +365,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ElevatedButton(
                                 onPressed: _handleRegister,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2DD4BF),
+                                  backgroundColor: const Color(0xFF10B981),
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
@@ -397,7 +397,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   child: const Text(
                                     'Log in',
                                     style: TextStyle(
-                                      color: Color(0xFF2DD4BF),
+                                      color: Color(0xFF10B981),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

@@ -35,7 +35,7 @@ class BottomNavBar extends StatelessWidget {
           currentIndex: currentIndex,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF2DD4BF),
+          selectedItemColor: const Color(0xFF10B981),
           unselectedItemColor: const Color(0xFF757575),
           selectedFontSize: 12,
           unselectedFontSize: 12,
