@@ -89,7 +89,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     'LIFE_INSURANCE',
     // Miscellaneous
     'OTHER',
-    'GIFTS',
+    'BILLS',
     'DONATIONS',
     'FEES',
     'SUBSCRIPTIONS',

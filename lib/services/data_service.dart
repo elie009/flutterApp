@@ -1,11 +1,14 @@
 import '../models/transaction.dart';
 import '../models/bill.dart';
+import '../models/bill_analytics.dart';
 import '../models/loan.dart';
 import '../models/income_source.dart';
 import '../models/bank_account.dart';
 import '../models/bank_transaction.dart';
 import '../models/notification.dart';
 import '../models/dashboard_summary.dart';
+import '../models/savings_account.dart';
+import '../models/savings_transaction.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
@@ -190,14 +193,52 @@ class DataService {
         queryParameters: queryParams,
       );
 
-      final billsData = response.data['data'] as Map<String, dynamic>;
-      final bills = (billsData['bills'] as List<dynamic>?)
-          ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [];
+      // Handle both paginated response and direct list response
+      final responseData = response.data['data'];
+      List<Bill> bills = [];
+      Map<String, dynamic>? pagination;
+
+      if (responseData is Map<String, dynamic>) {
+        // Check if it's a paginated response with 'data' and pagination keys
+        if (responseData.containsKey('data') && responseData.containsKey('page')) {
+          // Paginated format: { data: [...], page: 1, limit: 20, totalCount: 5, ... }
+          bills = (responseData['data'] as List<dynamic>?)
+              ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
+              .toList() ?? [];
+          pagination = {
+            'page': responseData['page'],
+            'limit': responseData['limit'],
+            'totalCount': responseData['totalCount'],
+            'totalPages': responseData['totalPages'],
+            'hasNextPage': responseData['hasNextPage'],
+            'hasPreviousPage': responseData['hasPreviousPage'],
+          };
+        } else if (responseData.containsKey('data') && responseData.containsKey('pagination')) {
+          // Alternative format with nested pagination object
+          bills = (responseData['data'] as List<dynamic>?)
+              ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
+              .toList() ?? [];
+          pagination = responseData['pagination'] as Map<String, dynamic>?;
+        } else if (responseData.containsKey('bills') && responseData.containsKey('pagination')) {
+          // Legacy format with 'bills' key
+          bills = (responseData['bills'] as List<dynamic>?)
+              ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
+              .toList() ?? [];
+          pagination = responseData['pagination'] as Map<String, dynamic>?;
+        } else {
+          // Single bill object - shouldn't happen but handle gracefully
+          bills = [];
+          pagination = null;
+        }
+      } else if (responseData is List) {
+        // Direct list response
+        bills = responseData.map((e) => Bill.fromJson(e as Map<String, dynamic>)).toList();
+        pagination = null;
+      }
 
       return {
         'bills': bills,
-        'pagination': billsData['pagination'],
+        'pagination': pagination,
       };
     } catch (e) {
       rethrow;
@@ -246,6 +287,105 @@ class DataService {
       );
       final data = response.data['data'] as List<dynamic>? ?? [];
       return data.map((e) => Bill.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Create bill
+  Future<Bill> createBill(Map<String, dynamic> billData) async {
+    try {
+      final response = await ApiService().post('/Bills', data: billData);
+      return Bill.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Update bill
+  Future<Bill> updateBill(String billId, Map<String, dynamic> billData) async {
+    try {
+      final response = await ApiService().put('/Bills/$billId', data: billData);
+      return Bill.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Delete bill
+  Future<bool> deleteBill(String billId) async {
+    try {
+      final response = await ApiService().delete('/Bills/$billId');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Get bill analytics summary
+  Future<BillAnalytics> getBillAnalyticsSummary() async {
+    try {
+      final response = await ApiService().get('/Bills/analytics/summary');
+      return BillAnalytics.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get total pending amount
+  Future<double> getTotalPendingAmount() async {
+    try {
+      final response = await ApiService().get('/Bills/analytics/total-pending');
+      return (response.data['data'] as num?)?.toDouble() ?? 0.0;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get bills for specific month
+  Future<List<Bill>> getBillsForMonth({
+    required int year,
+    required int month,
+    String? provider,
+    String? billType,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'year': year,
+        'month': month,
+        if (provider != null) 'provider': provider,
+        if (billType != null) 'billType': billType,
+      };
+
+      final response = await ApiService().get(
+        '/Bills/monthly',
+        queryParameters: queryParams,
+      );
+      
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => Bill.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Quick update monthly bill
+  Future<Bill> updateMonthlyBill(String billId, {
+    double? amount,
+    String? notes,
+    String? status,
+  }) async {
+    try {
+      final payload = <String, dynamic>{};
+      if (amount != null) payload['amount'] = amount;
+      if (notes != null) payload['notes'] = notes;
+      if (status != null) payload['status'] = status;
+
+      final response = await ApiService().put(
+        '/Bills/$billId/monthly',
+        data: payload,
+      );
+      return Bill.fromJson(response.data['data'] as Map<String, dynamic>);
     } catch (e) {
       rethrow;
     }
@@ -833,6 +973,216 @@ class DataService {
   Future<bool> markNotificationAsRead(String notificationId) async {
     try {
       final response = await ApiService().put('/notifications/$notificationId/read');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Savings Accounts
+  Future<List<SavingsAccount>> getSavingsAccounts() async {
+    try {
+      final response = await ApiService().get('/Savings/accounts');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data
+          .map((e) => SavingsAccount.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SavingsAccount> getSavingsAccount(String savingsAccountId) async {
+    try {
+      final response = await ApiService().get('/Savings/accounts/$savingsAccountId');
+      return SavingsAccount.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SavingsAccount> createSavingsAccount(Map<String, dynamic> accountData) async {
+    try {
+      final response = await ApiService().post(
+        '/Savings/accounts',
+        data: accountData,
+      );
+      return SavingsAccount.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SavingsAccount> updateSavingsAccount(
+    String savingsAccountId,
+    Map<String, dynamic> accountData,
+  ) async {
+    try {
+      final response = await ApiService().put(
+        '/Savings/accounts/$savingsAccountId',
+        data: accountData,
+      );
+      return SavingsAccount.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteSavingsAccount(String savingsAccountId) async {
+    try {
+      final response = await ApiService().delete('/Savings/accounts/$savingsAccountId');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<SavingsAccount> updateSavingsGoal(
+    String savingsAccountId, {
+    double? targetAmount,
+    DateTime? targetDate,
+  }) async {
+    try {
+      final payload = <String, dynamic>{};
+      if (targetAmount != null) payload['targetAmount'] = targetAmount;
+      if (targetDate != null) payload['targetDate'] = targetDate.toIso8601String();
+
+      final response = await ApiService().put(
+        '/Savings/accounts/$savingsAccountId/goal',
+        data: payload,
+      );
+      return SavingsAccount.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getSavingsSummary() async {
+    try {
+      final response = await ApiService().get('/Savings/summary');
+      return response.data['data'] as Map<String, dynamic>;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getSavingsAnalytics({
+    String period = 'month',
+  }) async {
+    try {
+      final response = await ApiService().get(
+        '/Savings/analytics',
+        queryParameters: {'period': period},
+      );
+      return response.data['data'] as Map<String, dynamic>;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<SavingsAccount>> getSavingsByType(String savingsType) async {
+    try {
+      final response = await ApiService().get('/Savings/goals/$savingsType');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data
+          .map((e) => SavingsAccount.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getSavingsProgress() async {
+    try {
+      final response = await ApiService().get('/Savings/progress');
+      return response.data['data'] as Map<String, dynamic>;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Savings Transactions
+  Future<List<SavingsTransaction>> getSavingsTransactions(
+    String savingsAccountId, {
+    int page = 1,
+    int limit = 50,
+  }) async {
+    try {
+      final response = await ApiService().get(
+        '/Savings/accounts/$savingsAccountId/transactions',
+        queryParameters: {'page': page, 'limit': limit},
+      );
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data
+          .map((e) => SavingsTransaction.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SavingsTransaction> getSavingsTransaction(String transactionId) async {
+    try {
+      final response = await ApiService().get('/Savings/transactions/$transactionId');
+      return SavingsTransaction.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SavingsTransaction> createSavingsTransaction(
+    Map<String, dynamic> transactionData,
+  ) async {
+    try {
+      final response = await ApiService().post(
+        '/Savings/transactions',
+        data: transactionData,
+      );
+      return SavingsTransaction.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Savings Transfers
+  Future<bool> transferBankToSavings({
+    required String bankAccountId,
+    required String savingsAccountId,
+    required double amount,
+    String? description,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        '/Savings/transfer/bank-to-savings',
+        data: {
+          'bankAccountId': bankAccountId,
+          'savingsAccountId': savingsAccountId,
+          'amount': amount,
+          if (description != null) 'description': description,
+        },
+      );
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> transferSavingsToBank({
+    required String savingsAccountId,
+    required String bankAccountId,
+    required double amount,
+    String? description,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        '/Savings/transfer/savings-to-bank',
+        data: {
+          'savingsAccountId': savingsAccountId,
+          'bankAccountId': bankAccountId,
+          'amount': amount,
+          if (description != null) 'description': description,
+        },
+      );
       return response.data['success'] == true;
     } catch (e) {
       return false;

@@ -517,17 +517,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               },
                             ),
                             _buildCategoryItem(
-                              icon: Icons.card_giftcard,
-                              label: 'Gifts',
+                              icon: Icons.receipt_long,
+                              label: 'Bills',
                               onTap: () {
-                                // Navigate to Gifts category
+                                NavigationHelper.navigateTo(context, 'bills');
                               },
                             ),
                             _buildCategoryItem(
                               icon: Icons.savings,
                               label: 'Savings',
                               onTap: () {
-                                // Navigate to Savings category
+                                NavigationHelper.navigateTo(context, 'savings');
                               },
                             ),
                             _buildCategoryItem(

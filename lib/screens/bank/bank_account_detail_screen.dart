@@ -141,11 +141,6 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen>
                         ],
                       ),
                     ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _addTransaction(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Transaction'),
-      ),
     );
   }
 
@@ -190,12 +185,12 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen>
                       _buildStatItem(
                         'Total Incoming',
                         Formatters.formatCurrency(_account!.totalIncoming),
-                        color: Colors.green,
+                        color: const Color(0xFFBAFFC3),
                       ),
                       _buildStatItem(
                         'Total Outgoing',
                         Formatters.formatCurrency(_account!.totalOutgoing),
-                        color: Colors.red,
+                        color: const Color(0xFFFA4D5F),
                       ),
                     ],
                   ),

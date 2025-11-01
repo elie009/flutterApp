@@ -19,6 +19,8 @@ import '../screens/analytics/analytics_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/profile_screen.dart';
+import '../screens/savings/savings_categories_screen.dart';
+import '../screens/savings/savings_account_detail_screen.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../utils/navigation_helper.dart';
@@ -160,6 +162,19 @@ class AppRouter {
         path: '/category',
         name: 'category',
         builder: (context, state) => const CategoryScreen(),
+      ),
+      GoRoute(
+        path: '/savings',
+        name: 'savings',
+        builder: (context, state) => const SavingsCategoriesScreen(),
+      ),
+      GoRoute(
+        path: '/savings/:id',
+        name: 'savings-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return SavingsAccountDetailScreen(savingsAccountId: id);
+        },
       ),
       GoRoute(
         path: '/notifications',

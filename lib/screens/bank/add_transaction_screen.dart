@@ -107,7 +107,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     'EMERGENCY_FUND',
     // Miscellaneous
     'OTHER',
-    'GIFTS',
+    'BILLS',
     'DONATIONS',
     'FEES',
   ];

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../models/bill.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
 import '../../utils/theme.dart';
 
@@ -18,6 +18,7 @@ class BillDetailScreen extends StatefulWidget {
 
 class _BillDetailScreenState extends State<BillDetailScreen> {
   Bill? _bill;
+  List<Bill> _childBills = [];
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -35,8 +36,22 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
 
     try {
       final bill = await DataService().getBill(widget.billId);
+      
+      // Load all bills to find child bills
+      final billsResult = await DataService().getBills(page: 1, limit: 100);
+      final allBills = billsResult['bills'] as List<Bill>;
+      
+      // Find child bills (bills with parentBillId matching this bill's id)
+      final childBills = allBills
+          .where((b) => b.parentBillId == bill.id)
+          .toList();
+      
+      // Sort child bills by due date
+      childBills.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+      
       setState(() {
         _bill = bill;
+        _childBills = childBills;
         _isLoading = false;
       });
     } catch (e) {
@@ -88,11 +103,14 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: const Text('Bill Details'),
       ),
       body: _isLoading
-          ? const LoadingIndicator(message: 'Loading bill details...')
+          ? _buildSkeletonLoader()
           : _errorMessage != null
               ? ErrorDisplay(
                   message: _errorMessage!,
@@ -216,6 +234,98 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                               ),
                             ),
                           ),
+                          if (_childBills.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Scheduled Bills',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ...(_childBills.map((bill) => Padding(
+                                          padding: const EdgeInsets.only(bottom: 12),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      bill.billName,
+                                                      style: const TextStyle(
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      'Due: ${Formatters.formatDate(bill.dueDate)}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: bill.isOverdue
+                                                            ? AppTheme.errorColor
+                                                            : Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    Formatters.formatCurrency(
+                                                        bill.amount),
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: bill.isOverdue
+                                                          ? AppTheme.errorColor
+                                                          : bill.isPaid
+                                                              ? AppTheme
+                                                                  .successColor
+                                                              : AppTheme
+                                                                  .warningColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: Text(
+                                                      bill.status,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ))),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                           if (!_bill!.isPaid) ...[
                             const SizedBox(height: 16),
                             SizedBox(
@@ -241,6 +351,148 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                         ],
                       ),
                     ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Main card skeleton
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: _buildSkeletonBox(width: double.infinity, height: 24)),
+                      const SizedBox(width: 12),
+                      _buildSkeletonBox(width: 80, height: 32, borderRadius: BorderRadius.circular(16)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSkeletonBox(width: 60, height: 14),
+                      _buildSkeletonBox(width: 100, height: 28),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Details card skeleton
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  _buildDetailRowSkeleton(),
+                  const SizedBox(height: 8),
+                  _buildDivider(),
+                  const SizedBox(height: 8),
+                  _buildDetailRowSkeleton(),
+                  const SizedBox(height: 8),
+                  _buildDivider(),
+                  const SizedBox(height: 8),
+                  _buildDetailRowSkeleton(),
+                  const SizedBox(height: 8),
+                  _buildDivider(),
+                  const SizedBox(height: 8),
+                  _buildDetailRowSkeleton(),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Scheduled bills skeleton
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSkeletonBox(width: 140, height: 20),
+                  const SizedBox(height: 16),
+                  ...List.generate(3, (index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildSkeletonBox(width: 100, height: 16),
+                                  const SizedBox(height: 8),
+                                  _buildSkeletonBox(width: 80, height: 12),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _buildSkeletonBox(width: 80, height: 16),
+                                const SizedBox(height: 8),
+                                _buildSkeletonBox(width: 60, height: 24, borderRadius: BorderRadius.circular(8)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Button skeleton
+          _buildSkeletonBox(width: double.infinity, height: 56, borderRadius: BorderRadius.circular(12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonBox({
+    required double width,
+    required double height,
+    BorderRadius? borderRadius,
+  }) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: borderRadius ?? BorderRadius.zero,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRowSkeleton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildSkeletonBox(width: 80, height: 14),
+        _buildSkeletonBox(width: 100, height: 14),
+      ],
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: Colors.grey.shade300,
     );
   }
 
