@@ -235,7 +235,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

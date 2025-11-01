@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/launch/splash_screen.dart';
+import '../screens/launch/launch_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
@@ -10,6 +12,7 @@ import '../screens/loans/loans_screen.dart';
 import '../screens/loans/loan_detail_screen.dart';
 import '../screens/income/income_sources_screen.dart';
 import '../screens/bank/bank_accounts_screen.dart';
+import '../screens/analytics/analytics_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/profile_screen.dart';
@@ -19,9 +22,30 @@ import '../utils/navigation_helper.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     redirect: (BuildContext context, GoRouterState state) async {
-      // Check if we have a stored token
+      // Allow splash and launch screens without authentication
+      final isPublicRoute = state.matchedLocation == '/splash' ||
+          state.matchedLocation == '/launch' ||
+          state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
+
+      // If going to splash and already logged in, skip to dashboard
+      if (state.matchedLocation == '/splash') {
+        final token = await StorageService.getToken();
+        if (token != null) {
+          final isLoggedIn = await AuthService.isAuthenticated();
+          if (isLoggedIn) {
+            return '/dashboard';
+          }
+        }
+      }
+
+      if (isPublicRoute) {
+        return null; // Allow access to public routes
+      }
+
+      // Check authentication for protected routes
       final token = await StorageService.getToken();
       final hasToken = token != null;
       final isLoggedIn = await AuthService.isAuthenticated();
@@ -29,7 +53,7 @@ class AppRouter {
           state.matchedLocation == '/register';
 
       if (!isLoggedIn && !isLoginRoute) {
-        return '/login';
+        return '/launch'; // Redirect to launch screen if not logged in
       }
       if (isLoggedIn && isLoginRoute) {
         return '/dashboard';
@@ -37,6 +61,16 @@ class AppRouter {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/launch',
+        name: 'launch',
+        builder: (context, state) => const LaunchScreen(),
+      ),
       GoRoute(
         path: '/login',
         name: 'login',
@@ -51,6 +85,11 @@ class AppRouter {
         path: '/dashboard',
         name: 'dashboard',
         builder: (context, state) => const DashboardScreen(),
+      ),
+      GoRoute(
+        path: '/analytics',
+        name: 'analytics',
+        builder: (context, state) => const AnalyticsScreen(),
       ),
       GoRoute(
         path: '/transactions',

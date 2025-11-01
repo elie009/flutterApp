@@ -170,28 +170,8 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      // Token expired, try to refresh
-      final refreshed = await AuthService.refreshToken();
-      if (refreshed) {
-        // Retry the original request
-        final opts = err.requestOptions;
-        final token = await StorageService.getToken();
-        opts.headers['Authorization'] = 'Bearer $token';
-        
-        try {
-          final response = await ApiService().dio.fetch(opts);
-          handler.resolve(response);
-          return;
-        } catch (e) {
-          // Refresh failed, logout user
-          await AuthService.logout();
-          handler.reject(err);
-          return;
-        }
-      } else {
-        // Refresh failed, logout user
-        await AuthService.logout();
-      }
+      // Token expired or invalid, logout user
+      await AuthService.logout();
     }
     handler.next(err);
   }

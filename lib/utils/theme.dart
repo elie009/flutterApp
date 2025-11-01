@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Color Palette
-  static const Color primaryColor = Color(0xFF1976D2);
+  // Color Palette - Updated to match Figma design
+  static const Color primaryColor = Color(0xFF2DD4BF); // Vibrant teal-green
+  static const Color primaryDarkColor = Color(0xFF0D9488); // Dark teal-green
   static const Color successColor = Color(0xFF2E7D32);
   static const Color warningColor = Color(0xFFED6C02);
   static const Color errorColor = Color(0xFFD32F2F);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color backgroundColor = Color(0xFFFEFEFE); // Light off-white
   static const Color cardColor = Colors.white;
   static const Color textPrimary = Color(0xFF212121);
   static const Color textSecondary = Color(0xFF757575);
+  static const Color textLightGray = Color(0xFF9CA3AF); // Light gray for descriptions
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -20,6 +22,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         primary: primaryColor,
+        primaryContainer: primaryDarkColor,
         secondary: successColor,
         error: errorColor,
       ),

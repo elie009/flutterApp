@@ -7,10 +7,13 @@ class Formatters {
   static final DateFormat displayDateTimeFormat = DateFormat('MMM dd, yyyy HH:mm');
 
   static String formatCurrency(double amount, {String symbol = '₱'}) {
-    return '$symbol${amount.toStringAsFixed(2).replaceAllMapped(
+    final isNegative = amount < 0;
+    final absAmount = amount.abs();
+    final formatted = absAmount.toStringAsFixed(2).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
-        )}';
+        );
+    return isNegative ? '-$symbol$formatted' : '$symbol$formatted';
   }
 
   static String formatDate(DateTime date) {
