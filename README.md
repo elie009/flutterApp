@@ -1,28 +1,88 @@
-# Flutter Food Delivery Application Design
+# UtilityHub360 Mobile App
 
-## This application is not completed yet. Currently, I am working on it. 
-A small attempt to make an Food delivery app user interface in Flutter for Android and iOS.
+A cross-platform Flutter application for financial management with support for Android and iOS.
 
-## 🤓 Author(s)
-**Md Tarikul Islam** [![Twitter Follow](https://img.shields.io/twitter/follow/tarikul711.svg?style=social)](https://twitter.com/tarikul711)
+## Features
 
-## Food Ordering & Delivery App UI in Flutter
-<img src="screens/full_ui.png"  />
+- 🏠 Dashboard - Quick overview of financial status
+- 💰 Transactions - Track all financial transactions
+- 📄 Bills & Utilities - Manage and pay bills
+- 💳 Loan Management - Track loans and payments
+- 💵 Income Sources - Manage income streams
+- 🏦 Bank Accounts - Track account balances
+- 🔔 Notifications - Important alerts
+- ⚙️ Settings - Profile and preferences
 
-## ScreenShots
-### Home Page
-<img src="screens/home_screen.jpg" height="500em" />
+## Getting Started
 
-### Food Details Screen & Add To Cart Screen
-<img src="screens/detail_screen.jpg" height="500em" /> &nbsp;&nbsp;&nbsp;&nbsp; <img src="screens/add_to_cart_screen.jpg" height="500em" />
+### Prerequisites
 
-### Login & Registration Screen
-<img src="screens/login_screen.jpg" height="500em" />&nbsp;&nbsp;&nbsp;&nbsp; <img src="screens/signin_scren.jpg" height="500em" />
+- Flutter SDK (3.0.0 or higher)
+- Dart SDK
+- Android Studio / Xcode (for platform-specific builds)
+- Android SDK / Xcode Command Line Tools
 
-## ✨ Requirements
-* Any Operating System (ie. MacOS X, Linux, Windows)
-* Any IDE with Flutter SDK installed (ie.  Android Studio, VSCode, IntelliJ, etc)
-* A little knowledge of Dart and Flutter
-* A brain to think 🤓🤓
+### Installation
 
+1. Install dependencies:
+```bash
+flutter pub get
+```
+
+2. Generate code (for models with json_serializable):
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+3. Run the app:
+```bash
+flutter run
+```
+
+## Build for Production
+
+### Android
+```bash
+flutter build apk --release
+# or for App Bundle
+flutter build appbundle --release
+```
+
+### iOS
+```bash
+flutter build ios --release
+```
+
+## Configuration
+
+### API Base URL
+Update the API base URL in `lib/config/app_config.dart`:
+```dart
+static const String baseUrl = 'https://api.utilityhub360.com/api';
+```
+
+## Project Structure
+
+```
+lib/
+├── config/          # App configuration
+├── models/          # Data models
+├── services/        # API services
+├── providers/          # State management
+├── screens/         # UI screens
+├── widgets/         # Reusable widgets
+├── utils/           # Utilities and helpers
+└── main.dart        # App entry point
+```
+
+## Security Features
+
+- Secure token storage using flutter_secure_storage
+- Biometric authentication support
+- SSL pinning (configure in network layer)
+- Encrypted local data storage
+
+## License
+
+Copyright © 2024 UtilityHub360
 
