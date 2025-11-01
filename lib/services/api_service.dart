@@ -42,9 +42,16 @@ class ApiService {
   Future<void> updateAuthHeader(String? token) async {
     if (token != null) {
       _dio.options.headers['Authorization'] = 'Bearer $token';
+      // Reset logout flag when new token is set
+      _AuthInterceptor.resetLogoutFlag();
     } else {
       _dio.options.headers.remove('Authorization');
     }
+  }
+
+  // Reset logout flag (public method for AuthInterceptor)
+  static void resetLogoutFlag() {
+    _AuthInterceptor.resetLogoutFlag();
   }
 
   // GET request
@@ -158,6 +165,13 @@ class ApiService {
 
 // Auth Interceptor to add token and handle token refresh
 class _AuthInterceptor extends Interceptor {
+  static bool _isHandling401 = false;
+  static bool _hasLoggedOut = false;
+
+  static void resetLogoutFlag() {
+    _hasLoggedOut = false;
+  }
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await StorageService.getToken();
@@ -170,8 +184,29 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      // Token expired or invalid, logout user
-      await AuthService.logout();
+      // Don't auto-logout when already logging out to prevent infinite loops
+      final requestPath = err.requestOptions.path;
+      
+      // Skip if:
+      // 1. Already handling a 401 error
+      // 2. Already logged out in this session
+      // 3. This is the logout request itself
+      if (!requestPath.contains('/auth/logout') && 
+          !_isHandling401 && 
+          !_hasLoggedOut) {
+        _isHandling401 = true;
+        _hasLoggedOut = true;
+        
+        try {
+          // Token expired or invalid, logout user
+          await AuthService.logout();
+        } catch (e) {
+          // Even if logout fails, we don't want to try again
+          _hasLoggedOut = true;
+        } finally {
+          _isHandling401 = false;
+        }
+      }
     }
     handler.next(err);
   }

@@ -4,9 +4,8 @@ import '../../models/loan.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
-import '../../widgets/bottom_nav_bar.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
 
 class LoansScreen extends StatefulWidget {
@@ -89,12 +88,89 @@ class _LoansScreenState extends State<LoansScreen> {
     _loadLoans(refresh: true);
   }
 
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Header Section
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SkeletonBox(width: 120, height: 28),
+                const SizedBox(height: 20),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SkeletonBox(width: 60, height: 32, borderRadius: BorderRadius.circular(16)),
+                      const SizedBox(width: 8),
+                      SkeletonBox(width: 60, height: 32, borderRadius: BorderRadius.circular(16)),
+                      const SizedBox(width: 8),
+                      SkeletonBox(width: 60, height: 32, borderRadius: BorderRadius.circular(16)),
+                      const SizedBox(width: 8),
+                      SkeletonBox(width: 80, height: 32, borderRadius: BorderRadius.circular(16)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Loans list skeleton
+          ...List.generate(5, (index) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    SkeletonBox(width: 50, height: 50, borderRadius: BorderRadius.circular(10)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonBox(width: double.infinity, height: 16),
+                          const SizedBox(height: 8),
+                          SkeletonBox(width: 120, height: 12),
+                          const SizedBox(height: 8),
+                          SkeletonBox(width: 80, height: 12),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        SkeletonBox(width: 80, height: 16),
+                        const SizedBox(height: 4),
+                        SkeletonBox(width: 100, height: 12),
+                      ],
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
       body: _isLoading && _loans.isEmpty
-          ? const LoadingIndicator(message: 'Loading loans...')
+          ? _buildSkeletonLoader()
           : _errorMessage != null && _loans.isEmpty
               ? ErrorDisplay(
                   message: _errorMessage!,

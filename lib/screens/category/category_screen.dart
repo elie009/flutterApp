@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../models/bank_account.dart';
 import '../../models/dashboard_summary.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
 import '../../widgets/bottom_nav_bar.dart';
+import '../../widgets/skeleton_loader.dart';
 import '../../utils/navigation_helper.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -93,12 +92,124 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
+  Widget _buildSkeletonLoader() {
+    return Column(
+      children: [
+        // Header Section Skeleton
+        Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFF10B981),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+          ),
+          padding: const EdgeInsets.only(
+            top: 50,
+            left: 20,
+            right: 20,
+            bottom: 30,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SkeletonBox(width: 40, height: 40, shape: BoxShape.circle),
+                  SkeletonBox(width: 100, height: 28),
+                  SkeletonBox(width: 40, height: 40, shape: BoxShape.circle),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonBox(width: 100, height: 14),
+                        const SizedBox(height: 4),
+                        SkeletonBox(width: 120, height: 24),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 2,
+                    height: 50,
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonBox(width: 100, height: 14),
+                          const SizedBox(height: 4),
+                          SkeletonBox(width: 120, height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              SkeletonBox(width: double.infinity, height: 40, borderRadius: BorderRadius.circular(12)),
+              const SizedBox(height: 12),
+              SkeletonBox(width: 200, height: 16),
+            ],
+          ),
+        ),
+        // Category Grid Skeleton
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+            ),
+            child: GridView.count(
+              crossAxisCount: 3,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.0,
+              children: List.generate(9, (index) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE0E0E0),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SkeletonBox(width: 50, height: 50, borderRadius: BorderRadius.circular(10)),
+                    const SizedBox(height: 8),
+                    SkeletonBox(width: 60, height: 14),
+                  ],
+                ),
+              )),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
       body: _isLoading
-          ? const LoadingIndicator(message: 'Loading...')
+          ? _buildSkeletonLoader()
           : _errorMessage != null
               ? ErrorDisplay(
                   message: _errorMessage!,

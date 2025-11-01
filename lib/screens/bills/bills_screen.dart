@@ -4,9 +4,8 @@ import '../../models/bill.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
-import '../../widgets/bottom_nav_bar.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
 
 class BillsScreen extends StatefulWidget {
@@ -171,7 +170,7 @@ class _BillsScreenState extends State<BillsScreen> {
           // Bills List
           Expanded(
             child: _isLoading && _bills.isEmpty
-                ? const LoadingIndicator(message: 'Loading bills...')
+                ? SkeletonList(itemCount: 6)
                 : _errorMessage != null && _bills.isEmpty
                     ? ErrorDisplay(
                         message: _errorMessage!,

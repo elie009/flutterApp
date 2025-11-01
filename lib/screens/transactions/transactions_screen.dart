@@ -4,8 +4,8 @@ import '../../models/transaction.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/bottom_nav_bar.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
 
 class TransactionsScreen extends StatefulWidget {
@@ -148,7 +148,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           // Transactions List
           Expanded(
             child: _isLoading && _transactions.isEmpty
-                ? const LoadingIndicator(message: 'Loading transactions...')
+                ? SkeletonList(itemCount: 8)
                 : _errorMessage != null && _transactions.isEmpty
                     ? ErrorDisplay(
                         message: _errorMessage!,

@@ -3,8 +3,8 @@ import '../../models/income_source.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
 
 class IncomeSourcesScreen extends StatefulWidget {
@@ -95,7 +95,7 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
         title: const Text('Income Sources'),
       ),
       body: _isLoading
-          ? const LoadingIndicator(message: 'Loading income sources...')
+          ? SkeletonList(itemCount: 5)
           : _errorMessage != null
               ? ErrorDisplay(
                   message: _errorMessage!,

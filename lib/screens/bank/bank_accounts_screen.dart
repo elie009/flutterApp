@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import '../../models/bank_account.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
-import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
 import 'bank_account_detail_screen.dart';
 import 'add_edit_bank_account_screen.dart';
-import 'add_expense_screen.dart';
 import 'add_transaction_screen.dart';
 
 class BankAccountsScreen extends StatefulWidget {
@@ -68,7 +67,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
         title: const Text('Bank Accounts'),
       ),
       body: _isLoading
-          ? const LoadingIndicator(message: 'Loading bank accounts...')
+          ? SkeletonList(itemCount: 6)
           : _errorMessage != null
               ? ErrorDisplay(
                   message: _errorMessage!,
