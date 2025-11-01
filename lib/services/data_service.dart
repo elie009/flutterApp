@@ -99,6 +99,15 @@ class DataService {
                                   _parseDouble(disposableData['TotalFixedExpenses']) ?? 0.0;
       final totalVariableExpenses = _parseDouble(disposableData['totalVariableExpenses']) ?? 
                                      _parseDouble(disposableData['TotalVariableExpenses']) ?? 0.0;
+      final remainingPercentage = _parseDouble(disposableData['remainingPercentage']) ?? 
+                                   _parseDouble(disposableData['RemainingPercentage']) ?? 0.0;
+      final remainingDisposableAmount = _parseDouble(disposableData['remainingDisposableAmount']) ?? 
+                                        _parseDouble(disposableData['RemainingDisposableAmount']) ?? 0.0;
+
+      // Get savings summary
+      final savingsResponse = await ApiService().get('/Savings/summary');
+      final savingsData = savingsResponse.data['data'] ?? savingsResponse.data;
+      final totalSavings = _parseDouble(savingsData['totalSavings']) ?? 0.0;
 
       final summary = DashboardSummary(
         totalBalance: totalBalance,
@@ -109,6 +118,9 @@ class DataService {
         recentTransactions: transactions,
         totalFixedExpenses: totalFixedExpenses,
         totalVariableExpenses: totalVariableExpenses,
+        remainingPercentage: remainingPercentage,
+        remainingDisposableAmount: remainingDisposableAmount,
+        totalSavings: totalSavings,
       );
 
       // Cache the result
@@ -434,6 +446,9 @@ extension DashboardSummaryExtension on DashboardSummary {
       'recentTransactions': recentTransactions.map((e) => e.toJson()).toList(),
       'totalFixedExpenses': totalFixedExpenses,
       'totalVariableExpenses': totalVariableExpenses,
+      'remainingPercentage': remainingPercentage,
+      'remainingDisposableAmount': remainingDisposableAmount,
+      'totalSavings': totalSavings,
     };
   }
 }

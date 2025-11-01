@@ -253,53 +253,83 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
+                                    // Custom Progress Bar with Text Inside
+                                    LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final progress = (_summary?.remainingPercentage ?? 0.0) / 100.0;
+                                        final progressWidth = constraints.maxWidth * progress;
+                                        return Stack(
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.all(8),
+                                              height: 40,
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: const Icon(
-                                                Icons.check_circle,
-                                                color: Color(0xFF10B981),
-                                                size: 20,
+                                                border: Border.all(
+                                                  color: const Color(0xFF10B981).withOpacity(0.5),
+                                                  width: 1,
+                                                ),
                                               ),
                                             ),
-                                            const SizedBox(width: 12),
-                                            const Text(
-                                              '30% Of Your Expenses, Looks Good.',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white,
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(8),
+                                              child: TweenAnimationBuilder<double>(
+                                                duration: const Duration(milliseconds: 500),
+                                                tween: Tween(
+                                                  begin: 0.0,
+                                                  end: progressWidth,
+                                                ),
+                                                builder: (context, value, child) {
+                                                  return Container(
+                                                    height: 40,
+                                                    width: value,
+                                                    color: const Color(0xFF3E9C5E),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 40,
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                Formatters.formatCurrency(_summary?.remainingDisposableAmount ?? 0.0),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: [
+                                                    Shadow(
+                                                      offset: Offset(0, 1),
+                                                      blurRadius: 2,
+                                                      color: Colors.black26,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ],
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.check_circle,
+                                          color: Color(0xFFFFFFFF),
+                                          size: 16,
                                         ),
-                                        const Text(
-                                          '20,000.00',
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '${(_summary?.remainingPercentage ?? 0.0).toStringAsFixed(0)}% Of your remaining disposable amount',
                                           style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                            fontSize: 13,
+                                            color: Colors.white.withOpacity(0.9),
                                           ),
                                         ),
                                       ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: LinearProgressIndicator(
-                                        value: 0.3,
-                                        minHeight: 8,
-                                        backgroundColor: Colors.white.withOpacity(0.3),
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                                      ),
                                     ),
                                   ],
                                 ),
@@ -332,19 +362,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: const Icon(
-                                          Icons.directions_car_outlined,
+                                          Icons.account_balance_wallet_outlined,
                                           color: Color(0xFF10B981),
                                           size: 28,
                                         ),
                                       ),
                                       const SizedBox(height: 8),
                                       const Text(
-                                        'Savings On\nGoals',
+                                        'Total Saving\nAmount',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF757575),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        Formatters.formatCurrency(_summary?.totalSavings ?? 0.0),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF212121),
                                         ),
                                       ),
                                     ],

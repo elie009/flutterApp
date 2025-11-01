@@ -13,6 +13,9 @@ class DashboardSummary extends Equatable {
   final List<Transaction> recentTransactions;
   final double totalFixedExpenses;
   final double totalVariableExpenses;
+  final double remainingPercentage;
+  final double remainingDisposableAmount;
+  final double totalSavings;
 
   const DashboardSummary({
     required this.totalBalance,
@@ -23,6 +26,9 @@ class DashboardSummary extends Equatable {
     required this.recentTransactions,
     required this.totalFixedExpenses,
     required this.totalVariableExpenses,
+    required this.remainingPercentage,
+    required this.remainingDisposableAmount,
+    required this.totalSavings,
   });
 
   // Computed property for total expense
@@ -44,6 +50,9 @@ class DashboardSummary extends Equatable {
           [],
       totalFixedExpenses: JsonParser.parseDouble(json['totalFixedExpenses']) ?? 0.0,
       totalVariableExpenses: JsonParser.parseDouble(json['totalVariableExpenses']) ?? 0.0,
+      remainingPercentage: JsonParser.parseDouble(json['remainingPercentage']) ?? 0.0,
+      remainingDisposableAmount: JsonParser.parseDouble(json['remainingDisposableAmount']) ?? 0.0,
+      totalSavings: JsonParser.parseDouble(json['totalSavings']) ?? 0.0,
     );
   }
 
@@ -57,6 +66,9 @@ class DashboardSummary extends Equatable {
         recentTransactions,
         totalFixedExpenses,
         totalVariableExpenses,
+        remainingPercentage,
+        remainingDisposableAmount,
+        totalSavings,
       ];
 }
 
