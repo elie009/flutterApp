@@ -177,7 +177,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                SkeletonBox(width: double.infinity, height: 40, borderRadius: BorderRadius.circular(12)),
+                SkeletonBox(width: double.infinity, height: 40, borderRadius: BorderRadius.circular(20)),
                 const SizedBox(height: 12),
                 SkeletonBox(width: 200, height: 16),
               ],
@@ -388,6 +388,36 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Calculate net to determine label type
+                                  Builder(
+                                    builder: (context) {
+                                      final incoming = _summary?.totalIncoming ?? 0.0;
+                                      final outgoing = _summary?.totalOutgoing ?? 0.0;
+                                      String label;
+                                      Color labelColor;
+                                      
+                                      if (incoming > outgoing) {
+                                        label = 'Net Incoming';
+                                        labelColor = const Color(0xFF4CAF50); // Green
+                                      } else if (outgoing > incoming) {
+                                        label = 'Net Outgoing';
+                                        labelColor = const Color(0xFFE53935); // Red
+                                      } else {
+                                        label = 'Net Balance';
+                                        labelColor = const Color(0xFF2196F3); // Blue
+                                      }
+                                      
+                                      return Text(
+                                        label,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white.withOpacity(0.9),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 8),
                                   // Custom Progress Bar with Text Inside
                                   LayoutBuilder(
                                     builder: (context, constraints) {
@@ -399,7 +429,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                             height: 40,
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(20),
                                               border: Border.all(
                                                 color: const Color(0xFF10B981).withOpacity(0.5),
                                                 width: 1,
@@ -407,7 +437,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                             ),
                                           ),
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(20),
                                             child: TweenAnimationBuilder<double>(
                                               duration: const Duration(milliseconds: 500),
                                               tween: Tween(
@@ -563,6 +593,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ],
                 ),
               ),
+            ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
