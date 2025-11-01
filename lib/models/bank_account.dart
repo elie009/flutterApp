@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../utils/json_parser.dart';
 
 class BankAccount extends Equatable {
   final String id;
@@ -29,8 +30,8 @@ class BankAccount extends Equatable {
       accountName: json['accountName'] as String,
       accountNumber: json['accountNumber'] as String,
       accountType: json['accountType'] as String,
-      balance: (json['balance'] as num).toDouble(),
-      initialBalance: (json['initialBalance'] as num).toDouble(),
+      balance: JsonParser.parseDoubleRequired(json['balance']),
+      initialBalance: JsonParser.parseDoubleRequired(json['initialBalance']),
       currency: json['currency'] as String? ?? 'PHP',
       isActive: json['isActive'] as bool? ?? true,
       financialInstitution: json['financialInstitution'] as String?,

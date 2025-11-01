@@ -13,10 +13,48 @@ class AuthService {
     ApiService().init();
   }
 
-  // Check if user is authenticated
-  static bool isAuthenticated() {
-    return _currentUser != null;
+  // Restore session from storage
+  static Future<void> restoreSession() async {
+    final token = await StorageService.getToken();
+    if (token != null) {
+      // Update API service auth header
+      await ApiService().updateAuthHeader(token);
+      
+      // Try to get user profile to restore session
+      try {
+        final user = await getUserProfile();
+        if (user != null) {
+          _currentUser = user;
+        }
+      } catch (e) {
+        // If getting profile fails, clear tokens (they might be expired)
+        await clearTokens();
+      }
+    }
   }
+
+  // Clear tokens (used internally)
+  static Future<void> clearTokens() async {
+    await StorageService.clearTokens();
+    await ApiService().updateAuthHeader(null);
+    _currentUser = null;
+  }
+
+  // Check if user is authenticated (checks both token and user)
+  static Future<bool> isAuthenticated() async {
+    if (_currentUser != null) {
+      return true;
+    }
+    // Check if we have a stored token
+    final token = await StorageService.getToken();
+    if (token != null) {
+      // Try to restore session
+      await restoreSession();
+      return _currentUser != null;
+    }
+    return false;
+  }
+
 
   // Get current user
   static User? getCurrentUser() {
@@ -151,8 +189,7 @@ class AuthService {
   // Logout
   static Future<void> logout() async {
     _currentUser = null;
-    await StorageService.clearTokens();
-    await ApiService().updateAuthHeader(null);
+    await clearTokens();
   }
 
   // Get user profile

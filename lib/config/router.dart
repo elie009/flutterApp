@@ -14,13 +14,17 @@ import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/profile_screen.dart';
 import '../services/auth_service.dart';
+import '../services/storage_service.dart';
 import '../utils/navigation_helper.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/login',
-    redirect: (BuildContext context, GoRouterState state) {
-      final isLoggedIn = AuthService.isAuthenticated();
+    redirect: (BuildContext context, GoRouterState state) async {
+      // Check if we have a stored token
+      final token = await StorageService.getToken();
+      final hasToken = token != null;
+      final isLoggedIn = await AuthService.isAuthenticated();
       final isLoginRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
 

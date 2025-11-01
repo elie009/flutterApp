@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../utils/json_parser.dart';
 
 class Loan extends Equatable {
   final String id;
@@ -28,12 +29,12 @@ class Loan extends Equatable {
   factory Loan.fromJson(Map<String, dynamic> json) {
     return Loan(
       id: json['id'] as String,
-      principal: (json['principal'] as num).toDouble(),
-      interestRate: (json['interestRate'] as num).toDouble(),
-      term: json['term'] as int,
-      status: json['status'] as String,
-      monthlyPayment: (json['monthlyPayment'] as num).toDouble(),
-      remainingBalance: (json['remainingBalance'] as num).toDouble(),
+      principal: JsonParser.parseDoubleRequired(json['principal']),
+      interestRate: JsonParser.parseDoubleRequired(json['interestRate']),
+      term: JsonParser.parseIntRequired(json['term']),
+      status: JsonParser.parseString(json['status']),
+      monthlyPayment: JsonParser.parseDoubleRequired(json['monthlyPayment']),
+      remainingBalance: JsonParser.parseDoubleRequired(json['remainingBalance']),
       nextDueDate: json['nextDueDate'] != null
           ? DateTime.parse(json['nextDueDate'] as String)
           : null,

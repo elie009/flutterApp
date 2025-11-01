@@ -22,6 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     AuthService.init();
+    // Set default credentials for development
+    _emailController.text = 'demo@utilityhub360.com';
+    _passwordController.text = 'Demo123!';
   }
 
   @override

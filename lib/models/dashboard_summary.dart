@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'bank_account.dart';
 import 'transaction.dart';
 import 'bill.dart';
+import '../utils/json_parser.dart';
 
 class DashboardSummary extends Equatable {
   final double totalBalance;
@@ -22,10 +23,10 @@ class DashboardSummary extends Equatable {
 
   factory DashboardSummary.fromJson(Map<String, dynamic> json) {
     return DashboardSummary(
-      totalBalance: (json['totalBalance'] as num?)?.toDouble() ?? 0.0,
-      monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble() ?? 0.0,
-      pendingBillsCount: json['pendingBillsCount'] as int? ?? 0,
-      pendingBillsAmount: (json['pendingBillsAmount'] as num?)?.toDouble() ?? 0.0,
+      totalBalance: JsonParser.parseDouble(json['totalBalance']) ?? 0.0,
+      monthlyIncome: JsonParser.parseDouble(json['monthlyIncome']) ?? 0.0,
+      pendingBillsCount: JsonParser.parseInt(json['pendingBillsCount']) ?? 0,
+      pendingBillsAmount: JsonParser.parseDouble(json['pendingBillsAmount']) ?? 0.0,
       upcomingPayments: (json['upcomingPayments'] as List<dynamic>?)
               ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
               .toList() ??

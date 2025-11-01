@@ -151,6 +151,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       backgroundColor: transaction.isIncome
                                           ? AppTheme.successColor
                                           : AppTheme.errorColor,
+                                      child: Icon(
+                                        transaction.isIncome
+                                            ? Icons.arrow_downward
+                                            : Icons.arrow_upward,
+                                        color: Colors.white,
                                       ),
                                     ),
                                     title: Text(transaction.description),

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../utils/json_parser.dart';
 
 class Bill extends Equatable {
   final String id;
@@ -27,7 +28,7 @@ class Bill extends Equatable {
     return Bill(
       id: json['id'] as String,
       billName: json['billName'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: JsonParser.parseDoubleRequired(json['amount']),
       dueDate: DateTime.parse(json['dueDate'] as String),
       status: json['status'] as String,
       provider: json['provider'] as String?,

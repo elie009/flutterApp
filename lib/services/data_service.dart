@@ -16,6 +16,29 @@ class DataService {
   factory DataService() => _instance;
   DataService._internal();
 
+  // Helper methods to parse values that might be strings or numbers
+  double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value);
+    }
+    if (value is num) return value.toDouble();
+    return null;
+  }
+
+  int? _parseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    if (value is num) return value.toInt();
+    return null;
+  }
+
   // Dashboard Summary
   Future<DashboardSummary> getDashboardSummary() async {
     try {
@@ -28,20 +51,20 @@ class DataService {
       final response = await ApiService().get('/BankAccounts/summary');
       
       // Also get bill analytics
-      final billResponse = await ApiService().get('/BillAnalytics/summary');
+      final billResponse = await ApiService().get('/Bills/analytics/summary');
       
       // Get recent transactions
       final transactionsResponse = await ApiService().get(
-        '/Transactions',
+        '/BankAccounts/transactions',
         queryParameters: {'limit': 5},
       );
 
       // Parse and combine data
-      final totalBalance = (response.data['totalBalance'] as num?)?.toDouble() ?? 0.0;
-      final monthlyIncome = (response.data['monthlyIncome'] as num?)?.toDouble() ?? 0.0;
+      final totalBalance = _parseDouble(response.data['totalBalance']) ?? 0.0;
+      final monthlyIncome = _parseDouble(response.data['monthlyIncome']) ?? 0.0;
       
-      final pendingBillsCount = billResponse.data['pendingCount'] as int? ?? 0;
-      final pendingBillsAmount = (billResponse.data['pendingAmount'] as num?)?.toDouble() ?? 0.0;
+      final pendingBillsCount = _parseInt(billResponse.data['pendingCount']) ?? 0;
+      final pendingBillsAmount = _parseDouble(billResponse.data['pendingAmount']) ?? 0.0;
       
       final transactions = (transactionsResponse.data['data'] as List<dynamic>?)
           ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
@@ -88,7 +111,6 @@ class DataService {
   }) async {
     try {
       final queryParams = <String, dynamic>{
-        'page': page,
         'limit': limit,
         if (transactionType != null) 'transactionType': transactionType,
         if (category != null) 'category': category,
@@ -97,7 +119,7 @@ class DataService {
       };
 
       final response = await ApiService().get(
-        '/Transactions',
+        '/BankAccounts/transactions',
         queryParameters: queryParams,
       );
 
