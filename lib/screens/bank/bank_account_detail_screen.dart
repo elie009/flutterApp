@@ -75,54 +75,99 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Account Details'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'Transactions'),
-          ],
-        ),
-        actions: [
-          if (_account != null)
-            PopupMenuButton<String>(
-              onSelected: (value) async {
-                switch (value) {
-                  case 'edit':
-                    _editAccount(context);
-                    break;
-                  case 'activate':
-                    _activateAccount();
-                    break;
-                  case 'sync':
-                    _syncAccount();
-                    break;
-                  case 'archive':
-                    _archiveAccount();
-                    break;
-                  case 'delete':
-                    _deleteAccount();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                if (_account!.isConnected)
-                  const PopupMenuItem(value: 'sync', child: Text('Sync')),
-                if (_account!.isActive)
-                  const PopupMenuItem(value: 'archive', child: Text('Archive')),
-                if (!_account!.isActive)
-                  const PopupMenuItem(value: 'activate', child: Text('Activate')),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text('Delete', style: TextStyle(color: Colors.red)),
+      backgroundColor: const Color(0xFFE8F5E9),
+      body: Column(
+        children: [
+          // Header Section with Green Background and Curved Edges
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              bottom: 10,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Account Details',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (_account != null)
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
+                        color: Colors.white,
+                        onSelected: (value) async {
+                          switch (value) {
+                            case 'edit':
+                              _editAccount(context);
+                              break;
+                            case 'activate':
+                              _activateAccount();
+                              break;
+                            case 'sync':
+                              _syncAccount();
+                              break;
+                            case 'archive':
+                              _archiveAccount();
+                              break;
+                            case 'delete':
+                              _deleteAccount();
+                              break;
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          if (_account!.isConnected)
+                            const PopupMenuItem(value: 'sync', child: Text('Sync')),
+                          if (_account!.isActive)
+                            const PopupMenuItem(value: 'archive', child: Text('Archive')),
+                          if (!_account!.isActive)
+                            const PopupMenuItem(value: 'activate', child: Text('Activate')),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Delete', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: Colors.white,
+                  dividerColor: Colors.transparent,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  tabs: const [
+                    Tab(text: 'Overview'),
+                    Tab(text: 'Transactions'),
+                  ],
                 ),
               ],
             ),
-        ],
-      ),
-      body: _isLoading
+          ),
+          // Body Content
+          Expanded(
+            child: _isLoading
           ? const LoadingIndicator(message: 'Loading account details...')
           : _errorMessage != null
               ? custom_error.ErrorDisplay(
@@ -141,6 +186,9 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen>
                         ],
                       ),
                     ),
+          ),
+        ],
+      ),
     );
   }
 

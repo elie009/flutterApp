@@ -58,6 +58,8 @@ class DataService {
       // Parse totalBalance from the response
       final responseData = response.data['data'] ?? response.data;
       final totalBalance = _parseDouble(responseData['totalBalance']) ?? 0.0;
+      final totalIncoming = _parseDouble(responseData['totalIncoming']) ?? 0.0;
+      final totalOutgoing = _parseDouble(responseData['totalOutgoing']) ?? 0.0;
       
       // Also get bill analytics
       final billResponse = await ApiService().get('/Bills/analytics/summary');
@@ -125,6 +127,8 @@ class DataService {
         remainingPercentage: remainingPercentage,
         remainingDisposableAmount: remainingDisposableAmount,
         totalSavings: totalSavings,
+        totalIncoming: totalIncoming,
+        totalOutgoing: totalOutgoing,
       );
 
       // Cache the result
@@ -147,10 +151,13 @@ class DataService {
     String? category,
     String? dateFrom,
     String? dateTo,
+    String? accountType,
   }) async {
     try {
       final queryParams = <String, dynamic>{
+        'page': page,
         'limit': limit,
+        if (accountType != null) 'accountType': accountType,
         if (transactionType != null) 'transactionType': transactionType,
         if (category != null) 'category': category,
         if (dateFrom != null) 'dateFrom': dateFrom,
@@ -1205,6 +1212,8 @@ extension DashboardSummaryExtension on DashboardSummary {
       'remainingPercentage': remainingPercentage,
       'remainingDisposableAmount': remainingDisposableAmount,
       'totalSavings': totalSavings,
+      'totalIncoming': totalIncoming,
+      'totalOutgoing': totalOutgoing,
     };
   }
 }

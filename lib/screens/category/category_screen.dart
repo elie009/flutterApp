@@ -127,7 +127,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SkeletonBox(width: 40, height: 40, shape: BoxShape.circle),
+                    const SizedBox(width: 48), // Balance space
                     SkeletonBox(width: 100, height: 28),
                     SkeletonBox(width: 40, height: 40, shape: BoxShape.circle),
                   ],
@@ -268,10 +268,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                                  onPressed: () => Navigator.of(context).pop(),
-                                ),
+                                const SizedBox(width: 48), // Balance space
                                 const Text(
                                   'Categories',
                                   style: TextStyle(
@@ -510,10 +507,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               },
                             ),
                             _buildCategoryItem(
-                              icon: Icons.key,
-                              label: 'Rent',
+                              icon: Icons.account_balance_wallet,
+                              label: 'Income',
                               onTap: () {
-                                // Navigate to Rent category
+                                // Navigate to Income category
                               },
                             ),
                             _buildCategoryItem(

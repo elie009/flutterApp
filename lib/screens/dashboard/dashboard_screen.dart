@@ -68,18 +68,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     IconData icon;
     Color iconColor;
 
-    if (transaction.category?.toLowerCase() == 'salary') {
-      icon = Icons.attach_money;
-      iconColor = Colors.lightBlue;
-    } else if (transaction.category?.toLowerCase() == 'groceries' || 
-               transaction.category?.toLowerCase() == 'food' ||
-               transaction.category?.toLowerCase() == 'pantry') {
-      icon = Icons.shopping_bag;
-      iconColor = Colors.lightBlue;
-    } else if (transaction.category?.toLowerCase() == 'rent') {
-      icon = Icons.key;
-      iconColor = Colors.lightBlue;
+    // Determine icon and color based on transaction type
+    final transactionType = transaction.transactionType.toUpperCase();
+    if (transactionType == 'CREDIT') {
+      icon = Icons.arrow_downward;
+      iconColor = const Color(0xFF4CAF50); // Light green
+    } else if (transactionType == 'DEBIT') {
+      icon = Icons.arrow_upward;
+      iconColor = const Color(0xFFE53935); // Light red
     } else {
+      // Fallback for other transaction types
       icon = transaction.isIncome ? Icons.arrow_downward : Icons.arrow_upward;
       iconColor = Colors.lightBlue;
     }
@@ -374,12 +372,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                     ],
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.notifications_outlined),
-                                    color: Colors.white,
-                                    onPressed: () {
-                                      NavigationHelper.navigateTo(context, 'notifications');
-                                    },
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.3),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.notifications_outlined),
+                                      color: Colors.white,
+                                      onPressed: () {
+                                        NavigationHelper.navigateTo(context, 'notifications');
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
@@ -619,18 +625,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         width: 50,
                                         height: 50,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF2196F3).withOpacity(0.1),
+                                          color: const Color(0xFF4CAF50).withOpacity(0.1),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: const Icon(
-                                          Icons.money_outlined,
-                                          color: Color(0xFF2196F3),
+                                          Icons.arrow_downward,
+                                          color: Color(0xFF4CAF50),
                                           size: 28,
                                         ),
                                       ),
                                       const SizedBox(height: 8),
                                       const Text(
-                                        'Revenue Last Week',
+                                        'Total Incoming Amount',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 12,
@@ -640,7 +646,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        Formatters.formatCurrency(_summary?.monthlyIncome ?? 4000.00),
+                                        Formatters.formatCurrency(_summary?.totalIncoming ?? 0.0),
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -662,18 +668,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         width: 50,
                                         height: 50,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF2196F3).withOpacity(0.1),
+                                          color: const Color(0xFFE53935).withOpacity(0.1),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: const Icon(
-                                          Icons.restaurant_outlined,
-                                          color: Color(0xFF2196F3),
+                                          Icons.arrow_upward,
+                                          color: Color(0xFFE53935),
                                           size: 28,
                                         ),
                                       ),
                                       const SizedBox(height: 8),
                                       const Text(
-                                        'Food Last Week',
+                                        'Total Outgoing Amount',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 12,
@@ -683,7 +689,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        Formatters.formatCurrency(-100.00),
+                                        Formatters.formatCurrency(_summary?.totalOutgoing ?? 0.0),
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,

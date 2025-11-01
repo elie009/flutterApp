@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../models/bill.dart';
 import '../../services/data_service.dart';
@@ -104,12 +105,38 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text('Bill Details'),
-      ),
-      body: _isLoading
+      body: Column(
+        children: [
+          // Header Section with Green Background and Curved Edges
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            child: const Center(
+              child: Text(
+                'Bill Details',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          // Body Content
+          Expanded(
+            child: _isLoading
           ? _buildSkeletonLoader()
           : _errorMessage != null
               ? ErrorDisplay(
@@ -351,6 +378,9 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                         ],
                       ),
                     ),
+          ),
+        ],
+      ),
     );
   }
 

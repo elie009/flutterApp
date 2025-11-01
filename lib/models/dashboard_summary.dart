@@ -16,6 +16,8 @@ class DashboardSummary extends Equatable {
   final double remainingPercentage;
   final double remainingDisposableAmount;
   final double totalSavings;
+  final double totalIncoming;
+  final double totalOutgoing;
 
   const DashboardSummary({
     required this.totalBalance,
@@ -29,6 +31,8 @@ class DashboardSummary extends Equatable {
     required this.remainingPercentage,
     required this.remainingDisposableAmount,
     required this.totalSavings,
+    required this.totalIncoming,
+    required this.totalOutgoing,
   });
 
   // Computed property for total expense
@@ -53,6 +57,8 @@ class DashboardSummary extends Equatable {
       remainingPercentage: JsonParser.parseDouble(json['remainingPercentage']) ?? 0.0,
       remainingDisposableAmount: JsonParser.parseDouble(json['remainingDisposableAmount']) ?? 0.0,
       totalSavings: JsonParser.parseDouble(json['totalSavings']) ?? 0.0,
+      totalIncoming: JsonParser.parseDouble(json['totalIncoming']) ?? 0.0,
+      totalOutgoing: JsonParser.parseDouble(json['totalOutgoing']) ?? 0.0,
     );
   }
 
@@ -69,6 +75,8 @@ class DashboardSummary extends Equatable {
         remainingPercentage,
         remainingDisposableAmount,
         totalSavings,
+        totalIncoming,
+        totalOutgoing,
       ];
 }
 

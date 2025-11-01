@@ -75,57 +75,7 @@ class _SavingsAccountDetailScreenState extends State<SavingsAccountDetailScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_account?.accountName ?? 'Savings Account'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'Transactions'),
-          ],
-        ),
-        actions: [
-          if (_account != null)
-            PopupMenuButton<String>(
-              onSelected: (value) async {
-                switch (value) {
-                  case 'edit':
-                    _editAccount(context);
-                    break;
-                  case 'delete':
-                    _deleteAccount();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text('Delete', style: TextStyle(color: Colors.red)),
-                ),
-              ],
-            ),
-        ],
-      ),
-      body: _isLoading
-          ? const LoadingIndicator(message: 'Loading savings account...')
-          : _errorMessage != null
-              ? custom_error.ErrorDisplay(
-                  message: _errorMessage!,
-                  onRetry: _loadAccountDetails,
-                )
-              : _account == null
-                  ? const Center(child: Text('Account not found'))
-                  : RefreshIndicator(
-                      onRefresh: _refresh,
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildOverviewTab(),
-                          _buildTransactionsTab(),
-                        ],
-                      ),
-                    ),
+      backgroundColor: const Color(0xFFE8F5E9),
       floatingActionButton: _account != null
           ? FloatingActionButton.extended(
               onPressed: () => _transferMoney(context),
@@ -134,6 +84,104 @@ class _SavingsAccountDetailScreenState extends State<SavingsAccountDetailScreen>
               backgroundColor: AppTheme.primaryColor,
             )
           : null,
+      body: Column(
+        children: [
+          // Header Section with Green Background and Curved Edges
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              bottom: 10,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          _account?.accountName ?? 'Savings Account',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (_account != null)
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
+                        color: Colors.white,
+                        onSelected: (value) async {
+                          switch (value) {
+                            case 'edit':
+                              _editAccount(context);
+                              break;
+                            case 'delete':
+                              _deleteAccount();
+                              break;
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Delete', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: Colors.white,
+                  dividerColor: Colors.transparent,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  tabs: const [
+                    Tab(text: 'Overview'),
+                    Tab(text: 'Transactions'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Body Content
+          Expanded(
+            child: _isLoading
+                ? const LoadingIndicator(message: 'Loading savings account...')
+                : _errorMessage != null
+                    ? custom_error.ErrorDisplay(
+                        message: _errorMessage!,
+                        onRetry: _loadAccountDetails,
+                      )
+                    : _account == null
+                        ? const Center(child: Text('Account not found'))
+                        : RefreshIndicator(
+                            onRefresh: _refresh,
+                            child: TabBarView(
+                              controller: _tabController,
+                              children: [
+                                _buildOverviewTab(),
+                                _buildTransactionsTab(),
+                              ],
+                            ),
+                          ),
+          ),
+        ],
+      ),
     );
   }
 
