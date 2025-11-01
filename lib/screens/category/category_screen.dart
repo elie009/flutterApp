@@ -486,20 +486,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               },
                             ),
                             _buildCategoryItem(
-                              icon: Icons.directions_bus,
-                              label: 'Transport',
-                              onTap: () {
-                                // Navigate to Transport category
-                              },
-                            ),
-                            _buildCategoryItem(
-                              icon: Icons.medication,
-                              label: 'Medicine',
-                              onTap: () {
-                                // Navigate to Medicine category
-                              },
-                            ),
-                            _buildCategoryItem(
                               icon: Icons.shopping_bag,
                               label: 'Groceries',
                               onTap: () {
@@ -507,10 +493,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               },
                             ),
                             _buildCategoryItem(
+                              icon: Icons.add,
+                              label: 'More',
+                              onTap: () {
+                                // Navigate to More category
+                              },
+                            ),
+                            _buildCategoryItem(
+                              icon: Icons.settings,
+                              label: 'Settings',
+                              onTap: () {
+                                // Navigate to Settings category
+                              },
+                            ),
+                            _buildCategoryItem(
                               icon: Icons.account_balance_wallet,
                               label: 'Income',
                               onTap: () {
-                                // Navigate to Income category
+                                NavigationHelper.navigateTo(context, 'income');
                               },
                             ),
                             _buildCategoryItem(

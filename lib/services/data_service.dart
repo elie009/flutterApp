@@ -495,11 +495,20 @@ class DataService {
   }
 
   // Income Sources
-  Future<Map<String, dynamic>> getIncomeSources({bool includeSummary = true}) async {
+  Future<Map<String, dynamic>> getIncomeSources({
+    bool includeSummary = true,
+    bool activeOnly = true,
+    int page = 1,
+    int limit = 50,
+  }) async {
     try {
       final response = await ApiService().get(
-        '/IncomeSources',
-        queryParameters: {'includeSummary': includeSummary},
+        '/incomesource/with-summary',
+        queryParameters: {
+          'activeOnly': activeOnly,
+          'page': page,
+          'limit': limit,
+        },
       );
 
       final data = response.data['data'] as Map<String, dynamic>;
@@ -509,19 +518,52 @@ class DataService {
 
       return {
         'incomeSources': incomeSources,
-        'totalMonthlyIncome': data['totalMonthlyIncome'] as double? ?? 0.0,
-        'totalSources': data['totalSources'] as int? ?? 0,
+        'totalMonthlyIncome': _parseDouble(data['totalMonthlyIncome']) ?? 0.0,
+        'totalSources': _parseInt(data['totalSources']) ?? 0,
+        'totalActiveSources': _parseInt(data['totalActiveSources']) ?? 0,
+        'totalPrimarySources': _parseInt(data['totalPrimarySources']) ?? 0,
       };
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<IncomeSource> createIncomeSource(IncomeSource incomeSource) async {
+  Future<List<IncomeSource>> getAllIncomeSources({
+    bool activeOnly = true,
+    int page = 1,
+    int limit = 50,
+  }) async {
+    try {
+      final response = await ApiService().get(
+        '/incomesource',
+        queryParameters: {
+          'activeOnly': activeOnly,
+          'page': page,
+          'limit': limit,
+        },
+      );
+
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => IncomeSource.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<IncomeSource> getIncomeSource(String id) async {
+    try {
+      final response = await ApiService().get('/incomesource/$id');
+      return IncomeSource.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<IncomeSource> createIncomeSource(Map<String, dynamic> incomeData) async {
     try {
       final response = await ApiService().post(
-        '/IncomeSources',
-        data: incomeSource.toJson(),
+        '/incomesource',
+        data: incomeData,
       );
       return IncomeSource.fromJson(response.data['data'] as Map<String, dynamic>);
     } catch (e) {
@@ -529,11 +571,11 @@ class DataService {
     }
   }
 
-  Future<IncomeSource> updateIncomeSource(String id, IncomeSource incomeSource) async {
+  Future<IncomeSource> updateIncomeSource(String id, Map<String, dynamic> incomeData) async {
     try {
       final response = await ApiService().put(
-        '/IncomeSources/$id',
-        data: incomeSource.toJson(),
+        '/incomesource/$id',
+        data: incomeData,
       );
       return IncomeSource.fromJson(response.data['data'] as Map<String, dynamic>);
     } catch (e) {
@@ -543,10 +585,103 @@ class DataService {
 
   Future<bool> deleteIncomeSource(String id) async {
     try {
-      final response = await ApiService().delete('/IncomeSources/$id');
+      final response = await ApiService().delete('/incomesource/$id');
       return response.data['success'] == true;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<double> getTotalMonthlyIncome() async {
+    try {
+      final response = await ApiService().get('/incomesource/total-monthly-income');
+      return _parseDouble(response.data['data']) ?? 0.0;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, double>> getIncomeByCategory() async {
+    try {
+      final response = await ApiService().get('/incomesource/income-by-category');
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return data.map((key, value) => MapEntry(
+            key,
+            _parseDouble(value) ?? 0.0,
+          ));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, double>> getIncomeByFrequency() async {
+    try {
+      final response = await ApiService().get('/incomesource/income-by-frequency');
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return data.map((key, value) => MapEntry(
+            key,
+            _parseDouble(value) ?? 0.0,
+          ));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getAvailableCategories() async {
+    try {
+      final response = await ApiService().get('/incomesource/available-categories');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => e.toString()).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getAvailableFrequencies() async {
+    try {
+      final response = await ApiService().get('/incomesource/available-frequencies');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => e.toString()).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<IncomeSource>> getIncomeSourcesByCategory(String category, {
+    int page = 1,
+    int limit = 50,
+  }) async {
+    try {
+      final response = await ApiService().get(
+        '/incomesource/by-category/$category',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+        },
+      );
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => IncomeSource.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<IncomeSource>> getIncomeSourcesByFrequency(String frequency, {
+    int page = 1,
+    int limit = 50,
+  }) async {
+    try {
+      final response = await ApiService().get(
+        '/incomesource/by-frequency/$frequency',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+        },
+      );
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => IncomeSource.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
     }
   }
 
