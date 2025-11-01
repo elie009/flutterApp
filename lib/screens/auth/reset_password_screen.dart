@@ -1,40 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
-import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/financial_logo.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({
+    super.key,
+    this.token,
+    this.email,
+  });
+
+  final String? token;
+  final String? email;
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _tokenController = TextEditingController();
+  final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
-  bool _obscurePassword = true;
+  bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isSuccess = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill token and email from URL parameters if provided
+    if (widget.token != null) {
+      _tokenController.text = widget.token!;
+    }
+    if (widget.email != null) {
+      _emailController.text = widget.email!;
+    }
+  }
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
+    _tokenController.dispose();
+    _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleRegister() async {
+  Future<void> _handleResetPassword() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -43,13 +60,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    final result = await AuthService.register(
-      name: _nameController.text.trim(),
+    final result = await AuthService.resetPassword(
+      token: _tokenController.text.trim(),
       email: _emailController.text.trim(),
-      phone: _phoneController.text.trim().isEmpty 
-          ? null 
-          : _phoneController.text.trim(),
-      password: _passwordController.text,
+      newPassword: _newPasswordController.text,
       confirmPassword: _confirmPasswordController.text,
     );
 
@@ -58,32 +72,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     if (result['success'] == true) {
+      setState(() {
+        _isSuccess = true;
+      });
       if (mounted) {
-        // Check if user was auto-logged in (has tokens)
-        final token = await StorageService.getToken();
-        if (token != null) {
-          // Auto-login successful, go to dashboard
-          NavigationHelper.showSuccessDialog(
-            context,
-            result['message'] as String? ?? 'Registration successful!',
-          );
-          Future.delayed(const Duration(seconds: 1), () {
-            if (mounted) {
-              context.go('/dashboard');
-            }
-          });
-        } else {
-          // No auto-login, go to login screen
-          NavigationHelper.showSuccessDialog(
-            context,
-            result['message'] as String? ?? 'Registration successful!',
-          );
-          Future.delayed(const Duration(seconds: 1), () {
-            if (mounted) {
-              context.go('/login');
-            }
-          });
-        }
+        NavigationHelper.showSuccessDialog(
+          context,
+          result['message'] as String? ?? 'Password has been reset successfully.',
+        );
+        // Navigate to login after a short delay
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            context.go('/login');
+          }
+        });
       }
     } else {
       if (mounted) {
@@ -121,14 +123,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white,
               ),
               const SizedBox(height: 16),
-              // Welcome Text
+              // Title Text
               const Text(
-                'Create Account',
+                'Reset Password',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  'Enter your new password',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -155,16 +169,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const SizedBox(height: 20),
-                            // Name Field
+                            const SizedBox(height: 30),
+                            if (_isSuccess)
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF0FDF4),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xFF10B981),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.check_circle,
+                                      color: Color(0xFF10B981),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Password reset successful! Redirecting to login...',
+                                        style: TextStyle(
+                                          color: Colors.grey[800],
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (_isSuccess) const SizedBox(height: 24),
+                            // Token Field (hidden but required)
                             TextFormField(
-                              controller: _nameController,
+                              controller: _tokenController,
                               decoration: InputDecoration(
-                                labelText: 'Full Name',
-                                hintText: 'John Doe',
-                                prefixIcon: const Icon(Icons.person),
+                                labelText: 'Reset Token',
+                                hintText: 'Enter token from email',
+                                prefixIcon: const Icon(Icons.vpn_key),
                                 filled: true,
-                                fillColor: const Color(0xFFF0FDF4), // Light green background
+                                fillColor: const Color(0xFFF0FDF4),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
@@ -187,13 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your name';
-                                }
-                                if (value.length < 2) {
-                                  return 'Name must be at least 2 characters';
-                                }
-                                if (value.length > 100) {
-                                  return 'Name must not exceed 100 characters';
+                                  return 'Please enter the reset token';
                                 }
                                 return null;
                               },
@@ -203,8 +242,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
+                              enabled: !_isSuccess,
                               decoration: InputDecoration(
-                                labelText: 'Email',
+                                labelText: 'Email Address',
                                 hintText: 'example@example.com',
                                 prefixIcon: const Icon(Icons.email),
                                 filled: true,
@@ -228,6 +268,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(color: Colors.red),
                                 ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -240,55 +284,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               },
                             ),
                             const SizedBox(height: 16),
-                            // Phone Field
+                            // New Password Field
                             TextFormField(
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone,
+                              controller: _newPasswordController,
+                              obscureText: _obscureNewPassword,
+                              enabled: !_isSuccess,
                               decoration: InputDecoration(
-                                labelText: 'Mobile Number',
-                                hintText: '+123 456 789',
-                                prefixIcon: const Icon(Icons.phone),
-                                filled: true,
-                                fillColor: const Color(0xFFF0FDF4),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFF10B981),
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Colors.red),
-                                ),
-                              ),
-                              // Phone is optional, no validation needed
-                            ),
-                            const SizedBox(height: 16),
-                            // Password Field
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: _obscurePassword,
-                              decoration: InputDecoration(
-                                labelText: 'Password',
+                                labelText: 'New Password',
+                                hintText: 'Enter new password (min 6 characters)',
                                 prefixIcon: const Icon(Icons.lock),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscurePassword
+                                    _obscureNewPassword
                                         ? Icons.visibility
                                         : Icons.visibility_off,
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _obscurePassword = !_obscurePassword;
+                                      _obscureNewPassword = !_obscureNewPassword;
                                     });
                                   },
                                 ),
@@ -313,10 +326,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(color: Colors.red),
                                 ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your password';
+                                  return 'Please enter your new password';
                                 }
                                 if (value.length < 6) {
                                   return 'Password must be at least 6 characters';
@@ -329,8 +346,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
+                              enabled: !_isSuccess,
                               decoration: InputDecoration(
-                                labelText: 'Confirm Password',
+                                labelText: 'Confirm New Password',
+                                hintText: 'Confirm your new password',
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -365,24 +384,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(color: Colors.red),
                                 ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please confirm your password';
                                 }
-                                if (value != _passwordController.text) {
+                                if (value != _newPasswordController.text) {
                                   return 'Passwords do not match';
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 24),
-                            // Register Button
+                            // Reset Password Button
                             if (_isLoading)
-                              const LoadingIndicator(message: 'Registering...')
-                            else
+                              const LoadingIndicator(message: 'Resetting password...')
+                            else if (!_isSuccess)
                               ElevatedButton(
-                                onPressed: _handleRegister,
+                                onPressed: _handleResetPassword,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF10B981),
                                   foregroundColor: Colors.white,
@@ -393,7 +416,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   elevation: 0,
                                 ),
                                 child: const Text(
-                                  'Sign Up',
+                                  'Reset Password',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -401,27 +424,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             const SizedBox(height: 16),
-                            // Login Link
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Already have an account? ',
-                                  style: TextStyle(color: Colors.grey),
+                            // Back to Login Link
+                            TextButton(
+                              onPressed: () {
+                                context.go('/login');
+                              },
+                              child: const Text(
+                                'Back to Login',
+                                style: TextStyle(
+                                  color: Color(0xFF0D9488),
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                TextButton(
-                                  onPressed: () {
-                                    context.go('/login');
-                                  },
-                                  child: const Text(
-                                    'Log in',
-                                    style: TextStyle(
-                                      color: Color(0xFF10B981),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         ),

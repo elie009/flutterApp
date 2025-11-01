@@ -92,52 +92,106 @@ class _LoansScreenState extends State<LoansScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Loans'),
-      ),
-      body: Column(
-        children: [
-          // Filter Chips
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                FilterChip(
-                  label: const Text('All'),
-                  selected: _selectedStatus == null,
-                  onSelected: (_) => _filterByStatus(null),
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Active'),
-                  selected: _selectedStatus == 'ACTIVE',
-                  onSelected: (_) => _filterByStatus('ACTIVE'),
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Pending'),
-                  selected: _selectedStatus == 'PENDING',
-                  onSelected: (_) => _filterByStatus('PENDING'),
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Completed'),
-                  selected: _selectedStatus == 'COMPLETED',
-                  onSelected: (_) => _filterByStatus('COMPLETED'),
-                ),
-              ],
-            ),
-          ),
-          // Loans List
-          Expanded(
-            child: _isLoading && _loans.isEmpty
-                ? const LoadingIndicator(message: 'Loading loans...')
-                : _errorMessage != null && _loans.isEmpty
-                    ? ErrorDisplay(
-                        message: _errorMessage!,
-                        onRetry: () => _loadLoans(refresh: true),
-                      )
-                    : SmartRefresher(
+      backgroundColor: const Color(0xFFE8F5E9),
+      body: _isLoading && _loans.isEmpty
+          ? const LoadingIndicator(message: 'Loading loans...')
+          : _errorMessage != null && _loans.isEmpty
+              ? ErrorDisplay(
+                  message: _errorMessage!,
+                  onRetry: () => _loadLoans(refresh: true),
+                )
+              : Column(
+                  children: [
+                    // Header Section with Green Background
+                    Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF10B981),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                      ),
+                      padding: const EdgeInsets.only(
+                        top: 50,
+                        left: 20,
+                        right: 20,
+                        bottom: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'My Loans',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Filter Chips
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                FilterChip(
+                                  label: const Text('All'),
+                                  selected: _selectedStatus == null,
+                                  selectedColor: Colors.white,
+                                  labelStyle: TextStyle(
+                                    color: _selectedStatus == null
+                                        ? const Color(0xFF10B981)
+                                        : Colors.white,
+                                  ),
+                                  onSelected: (_) => _filterByStatus(null),
+                                ),
+                                const SizedBox(width: 8),
+                                FilterChip(
+                                  label: const Text('Active'),
+                                  selected: _selectedStatus == 'ACTIVE',
+                                  selectedColor: Colors.white,
+                                  labelStyle: TextStyle(
+                                    color: _selectedStatus == 'ACTIVE'
+                                        ? const Color(0xFF10B981)
+                                        : Colors.white,
+                                  ),
+                                  onSelected: (_) => _filterByStatus('ACTIVE'),
+                                ),
+                                const SizedBox(width: 8),
+                                FilterChip(
+                                  label: const Text('Pending'),
+                                  selected: _selectedStatus == 'PENDING',
+                                  selectedColor: Colors.white,
+                                  labelStyle: TextStyle(
+                                    color: _selectedStatus == 'PENDING'
+                                        ? const Color(0xFF10B981)
+                                        : Colors.white,
+                                  ),
+                                  onSelected: (_) => _filterByStatus('PENDING'),
+                                ),
+                                const SizedBox(width: 8),
+                                FilterChip(
+                                  label: const Text('Completed'),
+                                  selected: _selectedStatus == 'COMPLETED',
+                                  selectedColor: Colors.white,
+                                  labelStyle: TextStyle(
+                                    color: _selectedStatus == 'COMPLETED'
+                                        ? const Color(0xFF10B981)
+                                        : Colors.white,
+                                  ),
+                                  onSelected: (_) => _filterByStatus('COMPLETED'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Loans List
+                    Expanded(
+                      child: SmartRefresher(
                         controller: _refreshController,
                         onRefresh: _onRefresh,
                         onLoading: _onLoadMore,
@@ -146,69 +200,112 @@ class _LoansScreenState extends State<LoansScreen> {
                             ? const Center(
                                 child: Text(
                                   'No loans found',
-                                  style: TextStyle(color: Colors.grey),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               )
                             : ListView.builder(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
                                 itemCount: _loans.length,
                                 itemBuilder: (context, index) {
                                   final loan = _loans[index];
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 4,
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
                                     child: ListTile(
-                                      leading: const Icon(
-                                        Icons.credit_card,
-                                        size: 40,
+                                      contentPadding: const EdgeInsets.all(16),
+                                      leading: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF10B981).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.account_balance_rounded,
+                                          color: Color(0xFF10B981),
+                                          size: 28,
+                                        ),
                                       ),
                                       title: Text(
                                         loan.purpose ?? 'Loan',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
+                                          fontSize: 16,
                                         ),
                                       ),
                                       subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
+                                          const SizedBox(height: 4),
                                           Text(
                                             'Principal: ${Formatters.formatCurrency(loan.principal)}',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
                                           ),
                                           if (loan.nextDueDate != null)
                                             Text(
-                                              'Next Due: ${Formatters.formatDate(loan.nextDueDate!)}',
+                                              'Due: ${Formatters.formatDate(loan.nextDueDate!)}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          Text(
-                                            'Status: ${loan.status}',
-                                            style: TextStyle(
+                                          const SizedBox(height: 4),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
                                               color: loan.isActive
-                                                  ? AppTheme.successColor
-                                                  : Colors.grey,
+                                                  ? AppTheme.successColor.withOpacity(0.1)
+                                                  : Colors.grey.withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              loan.status,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: loan.isActive
+                                                    ? AppTheme.successColor
+                                                    : Colors.grey,
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                       trailing: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            Formatters.formatCurrency(
-                                              loan.remainingBalance,
-                                            ),
+                                            Formatters.formatCurrency(loan.remainingBalance),
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
+                                              color: Color(0xFF10B981),
                                             ),
                                           ),
                                           Text(
-                                            'Monthly: ${Formatters.formatCurrency(loan.monthlyPayment)}',
+                                            '${Formatters.formatCurrency(loan.monthlyPayment)}/mo',
                                             style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               color: Colors.grey,
                                             ),
                                           ),
@@ -226,9 +323,9 @@ class _LoansScreenState extends State<LoansScreen> {
                                 },
                               ),
                       ),
-          ),
-        ],
-      ),
+                    ),
+                  ],
+                ),
     );
   }
 

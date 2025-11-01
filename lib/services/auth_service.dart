@@ -2,6 +2,7 @@ import '../models/user.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
+import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 
 class AuthService {
@@ -68,7 +69,7 @@ class AuthService {
   }) async {
     try {
       final response = await ApiService().post(
-        '/Auth/login',
+        '/auth/login',
         data: {
           'email': email,
           'password': password,
@@ -99,18 +100,46 @@ class AuthService {
 
         return {
           'success': true,
+          'message': response.data['message'] as String? ?? 'Login successful',
           'user': _currentUser,
         };
       } else {
+        // Handle validation errors
+        final errors = response.data['errors'] as List<dynamic>?;
+        String message = response.data['message'] as String? ?? 'Login failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
         return {
           'success': false,
-          'message': response.data['message'] as String? ?? 'Login failed',
+          'message': message,
+          'errors': errors,
         };
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      // Handle DioException with response data
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        final errors = responseData['errors'] as List<dynamic>?;
+        String message = responseData['message'] as String? ?? 'Login failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
+        return {
+          'success': false,
+          'message': message,
+          'errors': errors,
+        };
+      }
       return {
         'success': false,
-        'message': e.toString().replaceAll('Exception: ', ''),
+        'message': 'Network error: ${e.message}',
+      };
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      return {
+        'success': false,
+        'message': errorMessage,
       };
     }
   }
@@ -119,18 +148,159 @@ class AuthService {
   static Future<Map<String, dynamic>> register({
     required String name,
     required String email,
-    required String phone,
+    String? phone,
     required String password,
     required String confirmPassword,
   }) async {
     try {
       final response = await ApiService().post(
-        '/Auth/register',
+        '/auth/register',
         data: {
           'name': name,
           'email': email,
-          'phone': phone,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
           'password': password,
+          'confirmPassword': confirmPassword,
+        },
+      );
+
+      if (response.data['success'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>?;
+        if (data != null && data.containsKey('token')) {
+          // Auto-login after registration
+          final token = data['token'] as String;
+          final refreshToken = data['refreshToken'] as String;
+          final userData = data['user'] as Map<String, dynamic>;
+
+          // Save tokens
+          await StorageService.saveToken(token);
+          await StorageService.saveRefreshToken(refreshToken);
+
+          // Update API service auth header
+          await ApiService().updateAuthHeader(token);
+
+          // Set current user
+          _currentUser = User.fromJson(userData);
+        }
+        
+        return {
+          'success': true,
+          'message': response.data['message'] as String? ?? 'Registration successful',
+        };
+      } else {
+        // Handle validation errors
+        final errors = response.data['errors'] as List<dynamic>?;
+        String message = response.data['message'] as String? ?? 'Registration failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
+        return {
+          'success': false,
+          'message': message,
+          'errors': errors,
+        };
+      }
+    } on DioException catch (e) {
+      // Handle DioException with response data
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        final errors = responseData['errors'] as List<dynamic>?;
+        String message = responseData['message'] as String? ?? 'Registration failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
+        return {
+          'success': false,
+          'message': message,
+          'errors': errors,
+        };
+      }
+      return {
+        'success': false,
+        'message': 'Network error: ${e.message}',
+      };
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      return {
+        'success': false,
+        'message': errorMessage,
+      };
+    }
+  }
+
+  // Forgot Password
+  static Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        '/auth/forgot-password',
+        data: {
+          'email': email,
+        },
+      );
+
+      if (response.data['success'] == true) {
+        return {
+          'success': true,
+          'message': response.data['message'] as String? ?? 
+              'If the email exists, a password reset link has been sent.',
+        };
+      } else {
+        // Handle validation errors
+        final errors = response.data['errors'] as List<dynamic>?;
+        String message = response.data['message'] as String? ?? 'Request failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
+        return {
+          'success': false,
+          'message': message,
+          'errors': errors,
+        };
+      }
+    } on DioException catch (e) {
+      // Handle DioException with response data
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        final errors = responseData['errors'] as List<dynamic>?;
+        String message = responseData['message'] as String? ?? 'Request failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
+        return {
+          'success': false,
+          'message': message,
+          'errors': errors,
+        };
+      }
+      return {
+        'success': false,
+        'message': 'Network error: ${e.message}',
+      };
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      return {
+        'success': false,
+        'message': errorMessage,
+      };
+    }
+  }
+
+  // Reset Password
+  static Future<Map<String, dynamic>> resetPassword({
+    required String token,
+    required String email,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        '/auth/reset-password',
+        data: {
+          'token': token,
+          'email': email,
+          'newPassword': newPassword,
           'confirmPassword': confirmPassword,
         },
       );
@@ -138,18 +308,46 @@ class AuthService {
       if (response.data['success'] == true) {
         return {
           'success': true,
-          'message': response.data['message'] as String? ?? 'Registration successful',
+          'message': response.data['message'] as String? ?? 
+              'Password has been reset successfully.',
         };
       } else {
+        // Handle validation errors
+        final errors = response.data['errors'] as List<dynamic>?;
+        String message = response.data['message'] as String? ?? 'Password reset failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
         return {
           'success': false,
-          'message': response.data['message'] as String? ?? 'Registration failed',
+          'message': message,
+          'errors': errors,
         };
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      // Handle DioException with response data
+      if (e.response != null) {
+        final responseData = e.response!.data;
+        final errors = responseData['errors'] as List<dynamic>?;
+        String message = responseData['message'] as String? ?? 'Password reset failed';
+        if (errors != null && errors.isNotEmpty) {
+          message = errors.join(', ');
+        }
+        return {
+          'success': false,
+          'message': message,
+          'errors': errors,
+        };
+      }
       return {
         'success': false,
-        'message': e.toString().replaceAll('Exception: ', ''),
+        'message': 'Network error: ${e.message}',
+      };
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      return {
+        'success': false,
+        'message': errorMessage,
       };
     }
   }
@@ -163,7 +361,7 @@ class AuthService {
       }
 
       final response = await ApiService().post(
-        '/Auth/refresh',
+        '/auth/refresh',
         data: {
           'refreshToken': refreshTokenValue,
         },
@@ -188,14 +386,28 @@ class AuthService {
 
   // Logout
   static Future<void> logout() async {
-    _currentUser = null;
-    await clearTokens();
+    try {
+      final token = await StorageService.getToken();
+      if (token != null) {
+        // Try to call logout endpoint (don't wait for response if it fails)
+        try {
+          await ApiService().post('/auth/logout');
+        } catch (e) {
+          // Ignore logout API errors, still clear local tokens
+        }
+      }
+    } catch (e) {
+      // Ignore errors
+    } finally {
+      _currentUser = null;
+      await clearTokens();
+    }
   }
 
   // Get user profile
   static Future<User?> getUserProfile() async {
     try {
-      final response = await ApiService().get('/UserProfile');
+      final response = await ApiService().get('/auth/me');
       if (response.data['success'] == true) {
         final userData = response.data['data'] as Map<String, dynamic>;
         _currentUser = User.fromJson(userData);

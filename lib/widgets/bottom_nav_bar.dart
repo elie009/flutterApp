@@ -31,64 +31,160 @@ class BottomNavBar extends StatelessWidget {
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
-        child: BottomNavigationBar(
-          currentIndex: currentIndex,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF10B981),
-          unselectedItemColor: const Color(0xFF757575),
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          elevation: 0,
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                context.go('/dashboard');
-                break;
-              case 1:
-                context.go('/analytics');
-                break;
-              case 2:
-                context.go('/transactions');
-                break;
-              case 3:
-                context.go('/banks');
-                break;
-              case 4:
-                context.go('/settings');
-                break;
-            }
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(
-                currentIndex == 0 ? Icons.home : Icons.home_outlined,
+        child: Container(
+          height: 77,
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Home
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  icon: currentIndex == 0 ? Icons.home : Icons.home_outlined,
+                  label: 'Home',
+                  index: 0,
+                  route: '/dashboard',
+                ),
               ),
-              label: 'Home',
+              // Analytics
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  icon: currentIndex == 1 ? Icons.bar_chart : Icons.bar_chart_outlined,
+                  label: 'Analytics',
+                  index: 1,
+                  route: '/analytics',
+                ),
+              ),
+              // Category (Center - Bigger)
+              Expanded(
+                child: _buildCenterNavItem(
+                  context,
+                  icon: currentIndex == 2 ? Icons.apps : Icons.apps_outlined,
+                  label: 'Category',
+                  index: 2,
+                  route: '/category',
+                ),
+              ),
+              // Transactions
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  icon: currentIndex == 3 ? Icons.receipt_long : Icons.receipt_long_outlined,
+                  label: 'Transactions',
+                  index: 3,
+                  route: '/transactions',
+                ),
+              ),
+              // Profile
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  icon: currentIndex == 4 ? Icons.person : Icons.person_outline,
+                  label: 'Profile',
+                  index: 4,
+                  route: '/settings',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required int index,
+    required String route,
+  }) {
+    final isSelected = currentIndex == index;
+    final color = isSelected ? const Color(0xFF10B981) : const Color(0xFF757575);
+
+    return GestureDetector(
+      onTap: () {
+        if (currentIndex != index) {
+          context.go(route);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: color,
+              size: 22,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                currentIndex == 1 ? Icons.bar_chart : Icons.bar_chart_outlined,
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
-              label: 'Analytics',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                currentIndex == 2 ? Icons.swap_horiz : Icons.swap_horiz,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterNavItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required int index,
+    required String route,
+  }) {
+    final isSelected = currentIndex == index;
+    final color = isSelected ? const Color(0xFF10B981) : const Color(0xFF757575);
+
+    return GestureDetector(
+      onTap: () {
+        if (currentIndex != index) {
+          context.go(route);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected ? color.withOpacity(0.15) : color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
-              label: 'Transfer',
+              child: Icon(
+                icon,
+                color: color,
+                size: 28, // Bigger icon but adjusted
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                currentIndex == 3 ? Icons.account_balance_wallet : Icons.account_balance_wallet_outlined,
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12, // Adjusted font size
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
               ),
-              label: 'Wallet',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                currentIndex == 4 ? Icons.person : Icons.person_outline,
-              ),
-              label: 'Profile',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -96,4 +192,3 @@ class BottomNavBar extends StatelessWidget {
     );
   }
 }
-

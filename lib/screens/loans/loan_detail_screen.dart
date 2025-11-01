@@ -19,8 +19,15 @@ class LoanDetailScreen extends StatefulWidget {
 class _LoanDetailScreenState extends State<LoanDetailScreen> {
   Loan? _loan;
   bool _isLoading = true;
+  bool _isUpdating = false;
   String? _errorMessage;
+  bool _manualMode = false;
   final _paymentAmountController = TextEditingController();
+  final _interestRateController = TextEditingController();
+  final _monthlyPaymentController = TextEditingController();
+  final _remainingBalanceController = TextEditingController();
+  final _purposeController = TextEditingController();
+  final _additionalInfoController = TextEditingController();
 
   @override
   void initState() {
@@ -41,6 +48,11 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         _isLoading = false;
         _paymentAmountController.text =
             loan.monthlyPayment.toStringAsFixed(2);
+        _interestRateController.text = loan.interestRate.toStringAsFixed(2);
+        _monthlyPaymentController.text = loan.monthlyPayment.toStringAsFixed(2);
+        _remainingBalanceController.text = loan.remainingBalance.toStringAsFixed(2);
+        _purposeController.text = loan.purpose ?? '';
+        _additionalInfoController.text = '';
       });
     } catch (e) {
       setState(() {
@@ -99,6 +111,52 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         NavigationHelper.showSnackBar(
           context,
           'Payment failed',
+          backgroundColor: AppTheme.errorColor,
+        );
+      }
+    }
+  }
+
+  Future<void> _updateLoan() async {
+    if (_loan == null) return;
+
+    setState(() {
+      _isUpdating = true;
+    });
+
+    try {
+      final interestRate = double.tryParse(_interestRateController.text);
+      final updatedLoan = await DataService().updateLoan(
+        loanId: widget.loanId,
+        purpose: _purposeController.text.isNotEmpty ? _purposeController.text : null,
+        additionalInfo: _additionalInfoController.text.isNotEmpty ? _additionalInfoController.text : null,
+        interestRate: interestRate,
+        monthlyPayment: _manualMode ? double.tryParse(_monthlyPaymentController.text) : null,
+        remainingBalance: _manualMode ? double.tryParse(_remainingBalanceController.text) : null,
+      );
+
+      setState(() {
+        _loan = updatedLoan;
+        _isUpdating = false;
+        _manualMode = false;
+      });
+
+      if (mounted) {
+        NavigationHelper.showSnackBar(
+          context,
+          'Loan updated successfully',
+          backgroundColor: AppTheme.successColor,
+        );
+        _loadLoan();
+      }
+    } catch (e) {
+      setState(() {
+        _isUpdating = false;
+      });
+      if (mounted) {
+        NavigationHelper.showSnackBar(
+          context,
+          'Failed to update loan: ${e.toString()}',
           backgroundColor: AppTheme.errorColor,
         );
       }
@@ -210,6 +268,110 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(height: 16),
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Manage Loan',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: CheckboxListTile(
+                                          value: _manualMode,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _manualMode = value ?? false;
+                                            });
+                                          },
+                                          title: const Text(
+                                            'Manual Override Mode',
+                                            style: TextStyle(fontSize: 14),
+                                          ),
+                                          contentPadding: EdgeInsets.zero,
+                                          controlAffinity: ListTileControlAffinity.leading,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _manualMode
+                                        ? 'Manual mode is ON. You can override all values.'
+                                        : 'When manual mode is OFF, only interest rate can be changed and backend will calculate everything.',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextField(
+                                    controller: _interestRateController,
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Interest Rate (%)',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextField(
+                                    controller: _monthlyPaymentController,
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                    decoration: InputDecoration(
+                                      labelText: 'Monthly Payment',
+                                      border: const OutlineInputBorder(),
+                                      helperText: _manualMode ? null : 'Auto-calculated by backend',
+                                    ),
+                                    enabled: _manualMode,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextField(
+                                    controller: _remainingBalanceController,
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                    decoration: InputDecoration(
+                                      labelText: 'Remaining Balance',
+                                      border: const OutlineInputBorder(),
+                                      helperText: _manualMode ? null : 'Auto-calculated by backend',
+                                    ),
+                                    enabled: _manualMode,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: _isUpdating ? null : _updateLoan,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppTheme.primaryColor,
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                      ),
+                                      child: _isUpdating
+                                          ? const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            )
+                                          : const Text(
+                                              'Update Loan',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                           if (_loan!.isActive) ...[
                             const SizedBox(height: 16),
                             Card(
@@ -292,6 +454,11 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   @override
   void dispose() {
     _paymentAmountController.dispose();
+    _interestRateController.dispose();
+    _monthlyPaymentController.dispose();
+    _remainingBalanceController.dispose();
+    _purposeController.dispose();
+    _additionalInfoController.dispose();
     super.dispose();
   }
 }

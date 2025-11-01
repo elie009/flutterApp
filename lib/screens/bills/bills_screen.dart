@@ -282,7 +282,7 @@ class _BillsScreenState extends State<BillsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 3),
+      // Bills screen not in main navigation
     );
   }
 

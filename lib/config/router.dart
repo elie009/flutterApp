@@ -4,6 +4,8 @@ import '../screens/launch/splash_screen.dart';
 import '../screens/launch/launch_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
+import '../screens/auth/reset_password_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/transactions/transactions_screen.dart';
 import '../screens/bills/bills_screen.dart';
@@ -12,6 +14,7 @@ import '../screens/loans/loans_screen.dart';
 import '../screens/loans/loan_detail_screen.dart';
 import '../screens/income/income_sources_screen.dart';
 import '../screens/bank/bank_accounts_screen.dart';
+import '../screens/category/category_screen.dart';
 import '../screens/analytics/analytics_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
@@ -28,7 +31,9 @@ class AppRouter {
       final isPublicRoute = state.matchedLocation == '/splash' ||
           state.matchedLocation == '/launch' ||
           state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/forgot-password' ||
+          state.matchedLocation.startsWith('/reset-password');
 
       // If going to splash and already logged in, skip to dashboard
       if (state.matchedLocation == '/splash') {
@@ -50,7 +55,9 @@ class AppRouter {
       final hasToken = token != null;
       final isLoggedIn = await AuthService.isAuthenticated();
       final isLoginRoute = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/forgot-password' ||
+          state.matchedLocation.startsWith('/reset-password');
 
       if (!isLoggedIn && !isLoginRoute) {
         return '/launch'; // Redirect to launch screen if not logged in
@@ -80,6 +87,23 @@ class AppRouter {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/reset-password',
+        name: 'reset-password',
+        builder: (context, state) {
+          final token = state.uri.queryParameters['token'];
+          final email = state.uri.queryParameters['email'];
+          return ResetPasswordScreen(
+            token: token,
+            email: email,
+          );
+        },
       ),
       GoRoute(
         path: '/dashboard',
@@ -131,6 +155,11 @@ class AppRouter {
         path: '/banks',
         name: 'banks',
         builder: (context, state) => const BankAccountsScreen(),
+      ),
+      GoRoute(
+        path: '/category',
+        name: 'category',
+        builder: (context, state) => const CategoryScreen(),
       ),
       GoRoute(
         path: '/notifications',
