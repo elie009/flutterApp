@@ -63,10 +63,39 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bank Accounts'),
-      ),
-      body: _isLoading
+      backgroundColor: const Color(0xFFE8F5E9),
+      body: Column(
+        children: [
+          // Header Section with Green Background and Curved Edges
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            child: const Center(
+              child: Text(
+                'Bank Accounts',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          // Body Content
+          Expanded(
+            child: _isLoading
           ? SkeletonList(itemCount: 6)
           : _errorMessage != null
               ? ErrorDisplay(
@@ -210,6 +239,9 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                     ],
                   ),
                 ),
+          ),
+        ],
+      ),
     );
   }
 

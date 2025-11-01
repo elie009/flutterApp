@@ -24,9 +24,8 @@ class AppConfig {
   static const String dateTimeFormat = 'yyyy-MM-dd HH:mm:ss';
   static const String displayDateFormat = 'MMM dd, yyyy';
 
-  // Currency
-  static const String defaultCurrency = 'PHP';
-  static const String currencySymbol = '₱';
+  // Currency - Use CurrencyHelper for dynamic currency symbols
+  // No hardcoded currency symbols - get from user preferences
 
   // Cache Keys
   static const String cacheDashboard = 'dashboard_data';

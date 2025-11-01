@@ -9,6 +9,7 @@ import '../models/notification.dart';
 import '../models/dashboard_summary.dart';
 import '../models/savings_account.dart';
 import '../models/savings_transaction.dart';
+import '../models/analytics_report.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
@@ -44,12 +45,19 @@ class DataService {
   }
 
   // Dashboard Summary
-  Future<DashboardSummary> getDashboardSummary() async {
+  Future<DashboardSummary> getDashboardSummary({bool forceRefresh = false}) async {
     try {
-      // Try cache first
-      final cached = StorageService.getCache(AppConfig.cacheDashboard);
-      if (cached != null) {
-        // Could check timestamp here for expiry
+      // Try cache first if not forcing refresh
+      if (!forceRefresh) {
+        final cached = StorageService.getCache(AppConfig.cacheDashboard);
+        if (cached != null) {
+          try {
+            final jsonData = jsonDecode(cached);
+            return DashboardSummary.fromJson(jsonData);
+          } catch (e) {
+            // If cache parsing fails, continue to fetch from API
+          }
+        }
       }
 
       // Get bank accounts summary for totalBalance
@@ -1330,6 +1338,164 @@ class DataService {
       return false;
     }
   }
+
+  // Analytics & Reports
+  Future<FinancialSummary> getFinancialSummary({DateTime? date}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (date != null) {
+        queryParams['date'] = date.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/summary',
+        queryParameters: queryParams.isEmpty ? null : queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return FinancialSummary.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<FullFinancialReport> getFullFinancialReport({
+    String period = 'MONTHLY',
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+      };
+
+      if (period == 'CUSTOM' && startDate != null && endDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/full',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return FullFinancialReport.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<IncomeReport> getIncomeReport({
+    String period = 'MONTHLY',
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+      };
+
+      if (period == 'CUSTOM' && startDate != null && endDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/income',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return IncomeReport.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<ExpenseReport> getExpenseReport({
+    String period = 'MONTHLY',
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+      };
+
+      if (period == 'CUSTOM' && startDate != null && endDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/expenses',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return ExpenseReport.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<LoanReport> getLoanReport({
+    String period = 'MONTHLY',
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+      };
+
+      if (period == 'CUSTOM' && startDate != null && endDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/loans',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return LoanReport.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<NetWorthReport> getNetWorthReport({
+    String period = 'MONTHLY',
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+      };
+
+      if (period == 'CUSTOM' && startDate != null && endDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/networth',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return NetWorthReport.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 }
 
 // Add toJson method to DashboardSummary for caching

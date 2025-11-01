@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../models/income_source.dart';
 import '../../services/data_service.dart';
+import '../../services/auth_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
 import '../../config/app_config.dart';
@@ -24,7 +25,7 @@ class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
 
   String _selectedFrequency = 'MONTHLY';
   String _selectedCategory = 'PRIMARY';
-  String _currency = AppConfig.defaultCurrency;
+  String _currency = '';
   bool _isActive = true;
   bool _isLoading = false;
 
@@ -58,6 +59,12 @@ class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
       _selectedCategory = source.category ?? 'PRIMARY';
       _currency = source.currency;
       _isActive = source.isActive;
+    } else {
+      // For new income source, use user's preferred currency if available
+      final user = AuthService.getCurrentUser();
+      if (user?.preferredCurrency != null) {
+        _currency = user!.preferredCurrency!;
+      }
     }
     _loadCategoriesAndFrequencies();
   }

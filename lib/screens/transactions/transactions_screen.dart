@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../models/transaction.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
@@ -171,6 +172,75 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       _dateTo = null;
     });
     _loadTransactions(refresh: true);
+  }
+
+  Future<void> _uploadReceipts() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: true,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        List<PlatformFile> validFiles = [];
+        List<String> errors = [];
+
+        // Validate file sizes (max 5MB each)
+        const int maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+
+        for (var file in result.files) {
+          if (file.size != null && file.size! > maxSizeInBytes) {
+            errors.add('${file.name} exceeds 5MB limit');
+          } else {
+            validFiles.add(file);
+          }
+        }
+
+        if (validFiles.isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(errors.join('\n')),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
+          return;
+        }
+
+        // Show success message with file count
+        if (mounted) {
+          String message = '${validFiles.length} receipt(s) selected';
+          if (errors.isNotEmpty) {
+            message += '\n${errors.length} file(s) skipped (exceeds 5MB)';
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: const Color(0xFF10B981),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // TODO: Upload files to server/API
+          // Here you would typically upload the files using your API service
+          // For example:
+          // await DataService().uploadReceipts(validFiles);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting files: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _showDateFilterDialog() async {
@@ -416,6 +486,23 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         onSelected: (_) => _showDateFilterDialog(),
                       ),
                     ],
+                  ),
+                ),
+                // Upload Receipt Button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _uploadReceipts,
+                      icon: const Icon(Icons.upload_file),
+                      label: const Text('Upload receipt'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF10B981),
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                   ),
                 ),
                 // Transactions List

@@ -29,14 +29,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadDashboard();
   }
 
-  Future<void> _loadDashboard() async {
+  Future<void> _loadDashboard({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final summary = await DataService().getDashboardSummary();
+      final summary = await DataService().getDashboardSummary(forceRefresh: forceRefresh);
       setState(() {
         _summary = summary;
         _isLoading = false;
@@ -51,7 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _onRefresh() async {
     try {
-      await _loadDashboard();
+      await _loadDashboard(forceRefresh: true);
       _refreshController.refreshCompleted();
     } catch (e) {
       _refreshController.refreshFailed();

@@ -136,19 +136,50 @@ class _SavingsCategoriesScreenState extends State<SavingsCategoriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
-        title: const Text('Savings'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _addSavingsAccount(context),
-            tooltip: 'Add Savings Account',
+      body: Column(
+        children: [
+          // Header Section with Green Background and Curved Edges
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            child: Stack(
+              children: [
+                const Center(
+                  child: Text(
+                    'Savings',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    onPressed: () => _addSavingsAccount(context),
+                    tooltip: 'Add Savings Account',
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-      body: _isLoading
+          // Body Content
+          Expanded(
+            child: _isLoading
           ? SkeletonList(itemCount: 6)
           : _errorMessage != null
               ? ErrorDisplay(
@@ -343,6 +374,9 @@ class _SavingsCategoriesScreenState extends State<SavingsCategoriesScreen> {
                     ],
                   ),
                 ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addSavingsAccount(context),
         backgroundColor: AppTheme.primaryColor,

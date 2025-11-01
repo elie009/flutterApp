@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../models/dashboard_summary.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
@@ -15,6 +16,7 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
   DashboardSummary? _summary;
   bool _isLoading = true;
   String? _errorMessage;
@@ -25,14 +27,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
     _loadData();
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadData({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final summary = await DataService().getDashboardSummary();
+      final summary = await DataService().getDashboardSummary(forceRefresh: forceRefresh);
       setState(() {
         _summary = summary;
         _isLoading = false;
@@ -42,6 +44,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
         _errorMessage = e.toString();
         _isLoading = false;
       });
+    }
+  }
+
+  void _onRefresh() async {
+    try {
+      await _loadData(forceRefresh: true);
+      _refreshController.refreshCompleted();
+    } catch (e) {
+      _refreshController.refreshFailed();
     }
   }
 
@@ -243,8 +254,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   message: _errorMessage!,
                   onRetry: _loadData,
                 )
-              : SingleChildScrollView(
-                  child: Column(
+              : SmartRefresher(
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  child: SingleChildScrollView(
+                    child: Column(
                     children: [
                       // Header Section with Green Background
                       Container(
@@ -545,10 +559,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 100), // Space for bottom nav
                   ],
                 ),
-                ),
+              ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
   }
 }
