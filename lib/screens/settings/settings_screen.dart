@@ -92,7 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Bank Accounts'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              NavigationHelper.navigateTo(context, 'banks');
+              // Use push instead of go to maintain navigation stack
+              context.pushNamed('banks');
             },
           ),
           ListTile(

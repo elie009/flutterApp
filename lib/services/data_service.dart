@@ -718,7 +718,12 @@ class DataService {
   Future<Map<String, dynamic>> getBankAccountsSummary() async {
     try {
       final response = await ApiService().get('/BankAccounts/summary');
-      return response.data['data'] as Map<String, dynamic>;
+      final data = response.data['data'] ?? response.data;
+      if (data is Map<String, dynamic>) {
+        return data;
+      }
+      // Return empty map if data is not a map
+      return <String, dynamic>{};
     } catch (e) {
       rethrow;
     }

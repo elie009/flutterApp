@@ -46,7 +46,7 @@ dependencies:
 
   # Image handling
   image_picker: ^1.0.7
-  file_picker: ^6.1.1
+  file_picker: ^8.1.4
 
   # Navigation
   go_router: ^13.0.0

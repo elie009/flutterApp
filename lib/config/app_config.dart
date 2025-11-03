@@ -1,6 +1,6 @@
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'http://localhost:5000/api';
+  static const String baseUrl = 'https://api.utilityhub360.com/api';
   static const Duration apiTimeout = Duration(seconds: 30);
   static const Duration cacheTimeout = Duration(minutes: 5);
 

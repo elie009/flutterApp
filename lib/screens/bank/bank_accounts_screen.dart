@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/bank_account.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
@@ -32,6 +33,24 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
     _loadBankAccounts();
   }
 
+  // Helper methods to safely parse summary data
+  double? _parseDoubleFromSummary(Map<String, dynamic> summary, String key) {
+    final value = summary[key];
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+
+  int? _parseIntFromSummary(Map<String, dynamic> summary, String key) {
+    final value = summary[key];
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
   Future<void> _loadBankAccounts() async {
     setState(() {
       _isLoading = true;
@@ -46,10 +65,11 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
 
       setState(() {
         _accounts = accounts;
-        _totalBalance = (summary['totalBalance'] as num?)?.toDouble() ?? 0.0;
-        _totalAccounts = summary['totalAccounts'] as int? ?? accounts.length;
-        _activeAccounts = summary['activeAccounts'] as int? ?? accounts.length;
-        _connectedAccounts = summary['connectedAccounts'] as int? ?? 0;
+        // Safely parse summary data with type checking
+        _totalBalance = _parseDoubleFromSummary(summary, 'totalBalance') ?? 0.0;
+        _totalAccounts = _parseIntFromSummary(summary, 'totalAccounts') ?? accounts.length;
+        _activeAccounts = _parseIntFromSummary(summary, 'activeAccounts') ?? accounts.where((a) => a.isActive).length;
+        _connectedAccounts = _parseIntFromSummary(summary, 'connectedAccounts') ?? accounts.where((a) => a.isConnected).length;
         _isLoading = false;
       });
     } catch (e) {
@@ -62,9 +82,38 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE8F5E9),
-      body: Column(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
+        if (!didPop && mounted) {
+          // Schedule navigation immediately after current frame
+          Future.microtask(() {
+            if (!mounted) return;
+            try {
+              // If we can pop (because we used push), pop to previous route
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                // Fallback: navigate to category or dashboard if no route to pop
+                // This handles cases where user navigated directly to this screen
+                context.go('/category');
+              }
+            } catch (e) {
+              // If navigation fails, try dashboard as last resort
+              if (mounted) {
+                try {
+                  context.go('/dashboard');
+                } catch (_) {
+                  // canPop: false should prevent app closure even if navigation fails
+                }
+              }
+            }
+          });
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFE8F5E9),
+        body: Column(
         children: [
           // Header Section with Green Background and Curved Edges
           Container(
@@ -242,6 +291,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 

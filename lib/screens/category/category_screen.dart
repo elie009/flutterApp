@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../models/dashboard_summary.dart';
 import '../../services/data_service.dart';
@@ -582,7 +583,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               icon: Icons.account_balance_rounded,
                               label: 'Account',
                               onTap: () {
-                                NavigationHelper.navigateTo(context, 'banks');
+                                // Use push instead of go to maintain navigation stack
+                                context.pushNamed('banks');
                               },
                             ),
                           ],
