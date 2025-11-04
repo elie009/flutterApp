@@ -556,6 +556,11 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddIncomeSourceDialog,
+        backgroundColor: const Color(0xFF10B981),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: Column(
         children: [
           // Header Section with Green Background and Curved Edges
@@ -575,24 +580,15 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
               bottom: 20,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Expanded(
-                  child: Center(
-                    child: Text(
-                      'Income Sources',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'Income Sources',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add, color: Colors.white),
-                  onPressed: _showAddIncomeSourceDialog,
-                  tooltip: 'Add Income Source',
                 ),
               ],
             ),

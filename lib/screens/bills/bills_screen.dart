@@ -596,7 +596,7 @@ class _BillsScreenState extends State<BillsScreen> {
                     ],
                   ),
                 ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           // TODO: Navigate to add bill screen
           NavigationHelper.showSnackBar(
@@ -606,14 +606,7 @@ class _BillsScreenState extends State<BillsScreen> {
           );
         },
         backgroundColor: const Color(0xFF10B981),
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'Add Bill',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

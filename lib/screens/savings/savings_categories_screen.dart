@@ -154,27 +154,15 @@ class _SavingsCategoriesScreenState extends State<SavingsCategoriesScreen> {
               right: 20,
               bottom: 20,
             ),
-            child: Stack(
-              children: [
-                const Center(
-                  child: Text(
-                    'Savings',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+            child: const Center(
+              child: Text(
+                'Savings',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.add, color: Colors.white),
-                    onPressed: () => _addSavingsAccount(context),
-                    tooltip: 'Add Savings Account',
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           // Body Content

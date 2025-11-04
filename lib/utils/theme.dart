@@ -57,14 +57,7 @@ class AppTheme {
           ),
         ),
       ),
-      cardTheme: CardThemeData(
-        color: cardColor,
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
+      // Card styling is handled by Material 3 colorScheme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,

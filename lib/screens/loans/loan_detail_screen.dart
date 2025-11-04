@@ -166,25 +166,54 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Loan Details'),
-      ),
-      body: _isLoading
-          ? const LoadingIndicator(message: 'Loading loan details...')
-          : _errorMessage != null
-              ? ErrorDisplay(
-                  message: _errorMessage!,
-                  onRetry: _loadLoan,
-                )
-              : _loan == null
-                  ? const Center(
-                      child: Text('Loan not found'),
-                    )
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+      backgroundColor: const Color(0xFFE8F5E9),
+      body: Column(
+        children: [
+          // Header Section with Green Background and Curved Edges
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            child: const Center(
+              child: Text(
+                'Loan Details',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          // Body Content
+          Expanded(
+            child: _isLoading
+                ? const LoadingIndicator(message: 'Loading loan details...')
+                : _errorMessage != null
+                    ? ErrorDisplay(
+                        message: _errorMessage!,
+                        onRetry: _loadLoan,
+                      )
+                    : _loan == null
+                        ? const Center(
+                            child: Text('Loan not found'),
+                          )
+                        : SingleChildScrollView(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                           Card(
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -426,6 +455,9 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                         ],
                       ),
                     ),
+          ),
+        ],
+      ),
     );
   }
 
