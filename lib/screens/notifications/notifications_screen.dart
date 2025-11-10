@@ -6,6 +6,7 @@ import '../../utils/formatters.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -94,6 +95,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         title: const Text('Notifications'),
       ),
@@ -214,6 +216,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 4),
     );
   }
 

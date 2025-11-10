@@ -6,6 +6,8 @@ import '../../utils/navigation_helper.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
+import 'disburse_loan_dialog.dart';
 
 class LoanDetailScreen extends StatefulWidget {
   final String loanId;
@@ -22,6 +24,17 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   bool _isUpdating = false;
   String? _errorMessage;
   bool _manualMode = false;
+  static const List<String> _loanStatusOptions = [
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'DISBURSED',
+    'ACTIVE',
+    'COMPLETED',
+    'CANCELLED',
+    'DEFAULTED',
+  ];
+  String? _selectedStatus;
   final _paymentAmountController = TextEditingController();
   final _interestRateController = TextEditingController();
   final _monthlyPaymentController = TextEditingController();
@@ -53,6 +66,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         _remainingBalanceController.text = loan.remainingBalance.toStringAsFixed(2);
         _purposeController.text = loan.purpose ?? '';
         _additionalInfoController.text = '';
+        _selectedStatus = loan.status;
       });
     } catch (e) {
       setState(() {
@@ -130,6 +144,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         loanId: widget.loanId,
         purpose: _purposeController.text.isNotEmpty ? _purposeController.text : null,
         additionalInfo: _additionalInfoController.text.isNotEmpty ? _additionalInfoController.text : null,
+        status: _selectedStatus,
         interestRate: interestRate,
         monthlyPayment: _manualMode ? double.tryParse(_monthlyPaymentController.text) : null,
         remainingBalance: _manualMode ? double.tryParse(_remainingBalanceController.text) : null,
@@ -160,6 +175,20 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
           backgroundColor: AppTheme.errorColor,
         );
       }
+    }
+  }
+
+  Future<void> _showDisburseDialog() async {
+    if (_loan == null) return;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => DisburseLoanDialog(loan: _loan!),
+    );
+
+    // If disbursement was successful, reload the loan
+    if (result == true && mounted) {
+      _loadLoan();
     }
   }
 
@@ -352,6 +381,32 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 16),
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedStatus,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Loan Status',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: [
+                                      ..._loanStatusOptions,
+                                      if (_selectedStatus != null &&
+                                          !_loanStatusOptions.contains(_selectedStatus))
+                                        _selectedStatus!,
+                                    ]
+                                        .map(
+                                          (status) => DropdownMenuItem<String>(
+                                            value: status,
+                                            child: Text(status),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedStatus = value;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
                                   TextField(
                                     controller: _monthlyPaymentController,
                                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -401,6 +456,56 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                               ),
                             ),
                           ),
+                          // Disburse Loan Button (for PENDING or APPROVED loans)
+                          if (_loan!.status == 'PENDING' || _loan!.status == 'APPROVED') ...[
+                            const SizedBox(height: 16),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Disburse Loan',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Disburse the loan amount. You can optionally credit it directly to a bank account.',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: _showDisburseDialog,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppTheme.primaryColor,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Disburse Loan',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                          // Make Payment Section (for ACTIVE loans)
                           if (_loan!.isActive) ...[
                             const SizedBox(height: 16),
                             Card(
@@ -458,6 +563,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

@@ -8,6 +8,7 @@ import '../../utils/theme.dart';
 import '../../config/app_config.dart';
 import '../../widgets/error_widget.dart';
 import '../../widgets/skeleton_loader.dart';
+import '../../widgets/bottom_nav_bar.dart';
 import 'add_edit_income_source_dialog.dart';
 
 class IncomeSourcesScreen extends StatefulWidget {
@@ -795,12 +796,9 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
                                                             },
                                                           ),
                                                           PopupMenuItem(
-                                                            child: const Row(
-                                                              children: [
-                                                                Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                                                                SizedBox(width: 8),
-                                                                Text('Delete', style: TextStyle(color: AppTheme.errorColor)),
-                                                              ],
+                                                            child: const Text(
+                                                              'Delete',
+                                                              style: TextStyle(color: AppTheme.errorColor),
                                                             ),
                                                             onTap: () {
                                                               Future.delayed(
@@ -884,6 +882,7 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
             ),
           ],
         ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

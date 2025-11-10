@@ -16,7 +16,51 @@ class AddEditIncomeSourceDialog extends StatefulWidget {
   State<AddEditIncomeSourceDialog> createState() => _AddEditIncomeSourceDialogState();
 }
 
+class _CurrencyOption {
+  final String code;
+  final String label;
+  final String symbol;
+
+  const _CurrencyOption({
+    required this.code,
+    required this.label,
+    required this.symbol,
+  });
+}
+
 class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
+  static const List<_CurrencyOption> _currencyOptions = [
+    _CurrencyOption(code: 'USD', label: 'USD - US Dollar (\$)', symbol: '\$'),
+    _CurrencyOption(code: 'AED', label: 'AED - UAE Dirham (\u{062F}.\u{0625})', symbol: '\u{062F}.\u{0625}'),
+    _CurrencyOption(code: 'AUD', label: 'AUD - Australian Dollar (A\$)', symbol: 'A\$'),
+    _CurrencyOption(code: 'BRL', label: 'BRL - Brazilian Real (R\$)', symbol: 'R\$'),
+    _CurrencyOption(code: 'CAD', label: 'CAD - Canadian Dollar (C\$)', symbol: 'C\$'),
+    _CurrencyOption(code: 'CHF', label: 'CHF - Swiss Franc (CHF)', symbol: 'CHF'),
+    _CurrencyOption(code: 'CNY', label: 'CNY - Chinese Yuan (\u{00A5})', symbol: '\u{00A5}'),
+    _CurrencyOption(code: 'CZK', label: 'CZK - Czech Koruna (K\u{010D})', symbol: 'K\u{010D}'),
+    _CurrencyOption(code: 'DKK', label: 'DKK - Danish Krone (kr)', symbol: 'kr'),
+    _CurrencyOption(code: 'EUR', label: 'EUR - Euro (\u{20AC})', symbol: '\u{20AC}'),
+    _CurrencyOption(code: 'GBP', label: 'GBP - British Pound (\u{00A3})', symbol: '\u{00A3}'),
+    _CurrencyOption(code: 'HKD', label: 'HKD - Hong Kong Dollar (HK\$)', symbol: 'HK\$'),
+    _CurrencyOption(code: 'HUF', label: 'HUF - Hungarian Forint (Ft)', symbol: 'Ft'),
+    _CurrencyOption(code: 'IDR', label: 'IDR - Indonesian Rupiah (Rp)', symbol: 'Rp'),
+    _CurrencyOption(code: 'INR', label: 'INR - Indian Rupee (\u{20B9})', symbol: '\u{20B9}'),
+    _CurrencyOption(code: 'JPY', label: 'JPY - Japanese Yen (\u{00A5})', symbol: '\u{00A5}'),
+    _CurrencyOption(code: 'KRW', label: 'KRW - South Korean Won (\u{20A9})', symbol: '\u{20A9}'),
+    _CurrencyOption(code: 'MYR', label: 'MYR - Malaysian Ringgit (RM)', symbol: 'RM'),
+    _CurrencyOption(code: 'MXN', label: 'MXN - Mexican Peso (\$)', symbol: '\$'),
+    _CurrencyOption(code: 'NOK', label: 'NOK - Norwegian Krone (kr)', symbol: 'kr'),
+    _CurrencyOption(code: 'NZD', label: 'NZD - New Zealand Dollar (NZ\$)', symbol: 'NZ\$'),
+    _CurrencyOption(code: 'PHP', label: 'PHP - Philippine Peso (\u{20B1})', symbol: '\u{20B1}'),
+    _CurrencyOption(code: 'PLN', label: 'PLN - Polish Zloty (z\u{0142})', symbol: 'z\u{0142}'),
+    _CurrencyOption(code: 'RUB', label: 'RUB - Russian Ruble (\u{20BD})', symbol: '\u{20BD}'),
+    _CurrencyOption(code: 'SAR', label: 'SAR - Saudi Riyal (\u{FDFC})', symbol: '\u{FDFC}'),
+    _CurrencyOption(code: 'SEK', label: 'SEK - Swedish Krona (kr)', symbol: 'kr'),
+    _CurrencyOption(code: 'SGD', label: 'SGD - Singapore Dollar (S\$)', symbol: 'S\$'),
+    _CurrencyOption(code: 'THB', label: 'THB - Thai Baht (\u{0E3F})', symbol: '\u{0E3F}'),
+    _CurrencyOption(code: 'TRY', label: 'TRY - Turkish Lira (\u{20BA})', symbol: '\u{20BA}'),
+    _CurrencyOption(code: 'ZAR', label: 'ZAR - South African Rand (R)', symbol: 'R'),
+  ];
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _amountController = TextEditingController();
@@ -57,14 +101,17 @@ class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
       _descriptionController.text = source.description ?? '';
       _selectedFrequency = source.frequency;
       _selectedCategory = source.category ?? 'PRIMARY';
-      _currency = source.currency;
+      _currency = source.currency.toUpperCase();
       _isActive = source.isActive;
     } else {
       // For new income source, use user's preferred currency if available
       final user = AuthService.getCurrentUser();
       if (user?.preferredCurrency != null) {
-        _currency = user!.preferredCurrency!;
+        _currency = user!.preferredCurrency!.toUpperCase();
       }
+    }
+    if (!_currencyOptions.any((option) => option.code == _currency)) {
+      _currency = _currencyOptions.first.code;
     }
     _loadCategoriesAndFrequencies();
   }
@@ -127,6 +174,14 @@ class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
       default:
         return category;
     }
+  }
+
+  String _getCurrencySymbol(String code) {
+    final option = _currencyOptions.firstWhere(
+      (item) => item.code == code,
+      orElse: () => _currencyOptions.first,
+    );
+    return option.symbol;
   }
 
   Future<void> _saveIncomeSource() async {
@@ -256,7 +311,7 @@ class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
                         decoration: InputDecoration(
                           labelText: 'Amount *',
                           hintText: '0.00',
-                          prefixIcon: const Icon(Icons.attach_money),
+                          prefixText: _currency.isNotEmpty ? '${_getCurrencySymbol(_currency)} ' : null,
                           suffixText: _selectedFrequency != 'MONTHLY'
                               ? 'per ${_formatFrequency(_selectedFrequency).toLowerCase()}'
                               : null,
@@ -345,22 +400,29 @@ class _AddEditIncomeSourceDialogState extends State<AddEditIncomeSourceDialog> {
                       ),
                       const SizedBox(height: 16),
                       // Currency
-                      TextFormField(
-                        initialValue: _currency,
+                      DropdownButtonFormField<String>(
+                        value: _currency,
                         decoration: const InputDecoration(
                           labelText: 'Currency *',
-                          prefixIcon: Icon(Icons.monetization_on),
                         ),
-                        maxLength: 10,
+                        items: _currencyOptions
+                            .map(
+                              (option) => DropdownMenuItem(
+                                value: option.code,
+                                child: Text(option.label),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (value) {
-                          _currency = value.trim();
+                          if (value != null) {
+                            setState(() {
+                              _currency = value;
+                            });
+                          }
                         },
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a currency';
-                          }
-                          if (value.length > 10) {
-                            return 'Currency cannot exceed 10 characters';
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a currency';
                           }
                           return null;
                         },

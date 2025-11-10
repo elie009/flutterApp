@@ -6,7 +6,7 @@ class Transaction extends Equatable {
   final DateTime transactionDate;
   final String description;
   final double amount;
-  final String transactionType; // 'credit', 'debit', 'transfer'
+  final String transactionType; // 'CREDIT', 'DEBIT', 'TRANSFER'
   final String? category;
   final double? balanceAfterTransaction;
   final String? merchant;
@@ -30,7 +30,7 @@ class Transaction extends Equatable {
       transactionDate: DateTime.parse(json['transactionDate'] as String),
       description: json['description'] as String,
       amount: JsonParser.parseDoubleRequired(json['amount']),
-      transactionType: JsonParser.parseString(json['transactionType']),
+      transactionType: JsonParser.parseString(json['transactionType']).toUpperCase(),
       category: json['category'] as String?,
       balanceAfterTransaction: JsonParser.parseDouble(json['balanceAfterTransaction']),
       merchant: json['merchant'] as String?,
@@ -52,8 +52,8 @@ class Transaction extends Equatable {
     };
   }
 
-  bool get isIncome => transactionType == 'credit';
-  bool get isExpense => transactionType == 'debit';
+  bool get isIncome => transactionType.toUpperCase() == 'CREDIT';
+  bool get isExpense => transactionType.toUpperCase() == 'DEBIT';
 
   @override
   List<Object?> get props => [

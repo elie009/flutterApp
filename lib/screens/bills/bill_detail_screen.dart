@@ -7,6 +7,7 @@ import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/error_widget.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class BillDetailScreen extends StatefulWidget {
   final String billId;
@@ -381,6 +382,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

@@ -3,6 +3,7 @@ import '../../models/savings_account.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class AddEditSavingsAccountScreen extends StatefulWidget {
   final SavingsAccount? savingsAccount;
@@ -143,155 +144,152 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.savingsAccount != null
-            ? 'Edit Savings Account'
-            : 'Create Savings Account'),
+        title: Text(widget.savingsAccount == null ? 'Add Savings Account' : 'Edit Savings Account'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _accountNameController,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            TextFormField(
+              controller: _accountNameController,
+              decoration: const InputDecoration(
+                labelText: 'Account Name *',
+                hintText: 'e.g., Emergency Fund',
+                prefixIcon: Icon(Icons.account_balance_wallet),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter an account name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedSavingsType,
+              decoration: const InputDecoration(
+                labelText: 'Savings Type *',
+                prefixIcon: Icon(Icons.category),
+              ),
+              items: _savingsTypes.map((type) {
+                return DropdownMenuItem<String>(
+                  value: type['value'] as String,
+                  child: Text(type['label'] as String),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedSavingsType = value;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _targetAmountController,
+              decoration: const InputDecoration(
+                labelText: 'Target Amount *',
+                hintText: '0.00',
+                prefixIcon: Icon(Icons.attach_money),
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter a target amount';
+                }
+                final amount = double.tryParse(value);
+                if (amount == null || amount <= 0) {
+                  return 'Please enter a valid amount greater than 0';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: _selectDate,
+              child: InputDecorator(
                 decoration: const InputDecoration(
-                  labelText: 'Account Name *',
-                  hintText: 'e.g., Emergency Fund',
-                  prefixIcon: Icon(Icons.account_balance_wallet),
+                  labelText: 'Target Date *',
+                  prefixIcon: Icon(Icons.calendar_today),
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter an account name';
-                  }
-                  return null;
-                },
+                child: Text(Formatters.formatDate(_selectedTargetDate)),
               ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedSavingsType,
-                decoration: const InputDecoration(
-                  labelText: 'Savings Type *',
-                  prefixIcon: Icon(Icons.category),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _goalController,
+              decoration: const InputDecoration(
+                labelText: 'Goal (Optional)',
+                hintText: 'e.g., Build emergency fund for unexpected expenses',
+                prefixIcon: Icon(Icons.flag),
+              ),
+              maxLines: 2,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description (Optional)',
+                hintText: 'Additional details about this savings account',
+                prefixIcon: Icon(Icons.description),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _currency,
+              decoration: const InputDecoration(
+                labelText: 'Currency *',
+                prefixIcon: Icon(Icons.monetization_on),
+              ),
+              items: ['USD', 'EUR', 'GBP', 'PHP', 'JPY', 'CNY'].map((curr) {
+                return DropdownMenuItem<String>(
+                  value: curr,
+                  child: Text(curr),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _currency = value;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isSaving ? null : _saveAccount,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                items: _savingsTypes.map((type) {
-                  return DropdownMenuItem<String>(
-                    value: type['value'] as String,
-                    child: Text(type['label'] as String),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedSavingsType = value;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _targetAmountController,
-                decoration: const InputDecoration(
-                  labelText: 'Target Amount *',
-                  hintText: '0.00',
-                  prefixIcon: Icon(Icons.attach_money),
-                ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a target amount';
-                  }
-                  final amount = double.tryParse(value);
-                  if (amount == null || amount <= 0) {
-                    return 'Please enter a valid amount greater than 0';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: _selectDate,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Target Date *',
-                    prefixIcon: Icon(Icons.calendar_today),
-                  ),
-                  child: Text(Formatters.formatDate(_selectedTargetDate)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _goalController,
-                decoration: const InputDecoration(
-                  labelText: 'Goal (Optional)',
-                  hintText: 'e.g., Build emergency fund for unexpected expenses',
-                  prefixIcon: Icon(Icons.flag),
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description (Optional)',
-                  hintText: 'Additional details about this savings account',
-                  prefixIcon: Icon(Icons.description),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _currency,
-                decoration: const InputDecoration(
-                  labelText: 'Currency *',
-                  prefixIcon: Icon(Icons.monetization_on),
-                ),
-                items: ['USD', 'EUR', 'GBP', 'PHP', 'JPY', 'CNY'].map((curr) {
-                  return DropdownMenuItem<String>(
-                    value: curr,
-                    child: Text(curr),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _currency = value;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isSaving ? null : _saveAccount,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          widget.savingsAccount != null
-                              ? 'Update Savings Account'
-                              : 'Create Savings Account',
-                          style: const TextStyle(fontSize: 16),
+                child: _isSaving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
-                ),
+                      )
+                    : Text(
+                        widget.savingsAccount != null
+                            ? 'Update Savings Account'
+                            : 'Create Savings Account',
+                        style: const TextStyle(fontSize: 16),
+                      ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 }
+
 

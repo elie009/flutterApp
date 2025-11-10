@@ -8,6 +8,8 @@ import '../../widgets/error_widget.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/skeleton_loader.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
+import '../bank/add_transaction_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -55,6 +57,100 @@ class _CategoryScreenState extends State<CategoryScreen> {
     } catch (e) {
       _refreshController.refreshFailed();
     }
+  }
+
+  void _handleTakePhoto(BuildContext sheetContext) {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) return;
+    NavigationHelper.showSnackBar(
+      context,
+      'Receipt scanning is coming soon.',
+    );
+  }
+
+  void _handleUploadImage(BuildContext sheetContext) {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) return;
+    NavigationHelper.showSnackBar(
+      context,
+      'Image upload is coming soon.',
+    );
+  }
+
+  Future<void> _navigateToAddTransaction(BuildContext sheetContext) async {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) {
+      return;
+    }
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddTransactionScreen(),
+      ),
+    );
+    if (result == true && mounted) {
+      _loadData(forceRefresh: true);
+    }
+  }
+
+  void _showMoreOptionsModal() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Add Transaction by',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: () => _handleTakePhoto(sheetContext),
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('Take photo'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () => _handleUploadImage(sheetContext),
+                  icon: const Icon(Icons.image_outlined),
+                  label: const Text('Upload image'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () => _navigateToAddTransaction(sheetContext),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: AppTheme.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildCategoryItem({
@@ -260,7 +356,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   onRefresh: _onRefresh,
                   child: SingleChildScrollView(
                     child: Column(
-                    children: [
+                      children: [
                       // Header Section with Green Background
                       Container(
                         width: double.infinity,
@@ -498,9 +594,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 ],
                               ),
                             ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                     
                     // Category Grid
                     ClipRRect(
@@ -540,9 +636,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             _buildCategoryItem(
                               icon: Icons.add,
                               label: 'More',
-                              onTap: () {
-                                // Navigate to More category
-                              },
+                              onTap: _showMoreOptionsModal,
                             ),
                             _buildCategoryItem(
                               icon: Icons.settings,

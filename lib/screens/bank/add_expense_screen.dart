@@ -4,6 +4,7 @@ import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
 import '../../widgets/loading_indicator.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -431,6 +432,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     ],
                   ),
                 ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

@@ -6,6 +6,7 @@ import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart' as custom_error;
+import '../../widgets/bottom_nav_bar.dart';
 import 'add_edit_bank_account_screen.dart';
 import 'add_transaction_screen.dart';
 
@@ -189,6 +190,7 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen>
           ),
         ],
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

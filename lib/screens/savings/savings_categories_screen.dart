@@ -5,6 +5,7 @@ import '../../utils/formatters.dart';
 import '../../widgets/error_widget.dart';
 import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
 import 'savings_account_detail_screen.dart';
 import 'add_edit_savings_account_screen.dart';
 
@@ -365,6 +366,7 @@ class _SavingsCategoriesScreenState extends State<SavingsCategoriesScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addSavingsAccount(context),
         backgroundColor: AppTheme.primaryColor,

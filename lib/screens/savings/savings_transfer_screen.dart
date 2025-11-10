@@ -4,6 +4,7 @@ import '../../models/savings_account.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class SavingsTransferScreen extends StatefulWidget {
   final String savingsAccountId;
@@ -147,343 +148,336 @@ class _SavingsTransferScreenState extends State<SavingsTransferScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transfer Money'),
+        title: const Text('Savings Transfer'),
       ),
+      backgroundColor: const Color(0xFFE8F5E9),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : _errorMessage != null
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadData,
-                        child: const Text('Retry'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red[400],
+                          size: 48,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.red[400]),
+                        ),
+                      ],
+                    ),
                   ),
                 )
-              : _savingsAccount == null
-                  ? const Center(child: Text('Savings account not found'))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Transfer Type Toggle
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Transfer Type',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+              : SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Transfer Type Toggle
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Transfer Type',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    const SizedBox(height: 16),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                _isDeposit = true;
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: _isDeposit
-                                                    ? AppTheme.primaryColor
-                                                    : Colors.grey[200],
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  Icon(
-                                                    Icons.arrow_downward,
-                                                    color: _isDeposit
-                                                        ? Colors.white
-                                                        : Colors.grey,
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    'Deposit',
-                                                    style: TextStyle(
-                                                      color: _isDeposit
-                                                          ? Colors.white
-                                                          : Colors.grey,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'Bank → Savings',
-                                                    style: TextStyle(
-                                                      color: _isDeposit
-                                                          ? Colors.white70
-                                                          : Colors.grey,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                _isDeposit = false;
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: !_isDeposit
-                                                    ? AppTheme.primaryColor
-                                                    : Colors.grey[200],
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  Icon(
-                                                    Icons.arrow_upward,
-                                                    color: !_isDeposit
-                                                        ? Colors.white
-                                                        : Colors.grey,
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    'Withdraw',
-                                                    style: TextStyle(
-                                                      color: !_isDeposit
-                                                          ? Colors.white
-                                                          : Colors.grey,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'Savings → Bank',
-                                                    style: TextStyle(
-                                                      color: !_isDeposit
-                                                          ? Colors.white70
-                                                          : Colors.grey,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            // Savings Account Info
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Savings Account',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      _savingsAccount!.accountName,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text('Current Balance:'),
-                                        Text(
-                                          Formatters.formatCurrency(
-                                              _savingsAccount!.currentBalance),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppTheme.primaryColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (!_isDeposit &&
-                                        _savingsAccount!.currentBalance < 0.01)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: const Row(
-                                            children: [
-                                              Icon(Icons.warning,
-                                                  color: Colors.red, size: 16),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Insufficient balance',
-                                                style: TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize: 12),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            // Bank Account Selection
-                            DropdownButtonFormField<BankAccount>(
-                              value: _selectedBankAccount,
-                              decoration: const InputDecoration(
-                                labelText: 'Bank Account *',
-                                prefixIcon: Icon(Icons.account_balance),
-                              ),
-                              items: _bankAccounts.map((account) {
-                                return DropdownMenuItem<BankAccount>(
-                                  value: account,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
                                     children: [
-                                      Text(account.accountName),
-                                      Text(
-                                        Formatters.formatCurrency(
-                                            account.currentBalance),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _isDeposit = true;
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(16),
+                                            decoration: BoxDecoration(
+                                              color: _isDeposit
+                                                  ? AppTheme.primaryColor
+                                                  : Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Column(
+                                              children: const [
+                                                Icon(Icons.arrow_downward,
+                                                    color: Colors.white),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Deposit to Savings',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _isDeposit = false;
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(16),
+                                            decoration: BoxDecoration(
+                                              color: !_isDeposit
+                                                  ? AppTheme.errorColor
+                                                  : Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Column(
+                                              children: const [
+                                                Icon(Icons.arrow_upward,
+                                                    color: Colors.white),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Withdraw from Savings',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              }).toList(),
-                              onChanged: (account) {
-                                setState(() {
-                                  _selectedBankAccount = account;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please select a bank account';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Amount
-                            TextFormField(
-                              controller: _amountController,
-                              decoration: const InputDecoration(
-                                labelText: 'Amount *',
-                                hintText: '0.00',
-                                prefixIcon: Icon(Icons.attach_money),
+                                ],
                               ),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Please enter an amount';
-                                }
-                                final amount = double.tryParse(value);
-                                if (amount == null || amount <= 0) {
-                                  return 'Please enter a valid amount';
-                                }
-                                if (!_isDeposit &&
-                                    _savingsAccount != null &&
-                                    amount > _savingsAccount!.currentBalance) {
-                                  return 'Insufficient balance';
-                                }
-                                if (_selectedBankAccount != null &&
-                                    _isDeposit &&
-                                    amount >
-                                        _selectedBankAccount!.currentBalance) {
-                                  return 'Insufficient bank balance';
-                                }
-                                return null;
-                              },
                             ),
-                            const SizedBox(height: 16),
-                            // Description
-                            TextFormField(
-                              controller: _descriptionController,
-                              decoration: const InputDecoration(
-                                labelText: 'Description (Optional)',
-                                hintText: 'Add a note about this transfer',
-                                prefixIcon: Icon(Icons.description),
+                          ),
+                          const SizedBox(height: 16),
+                          if (_savingsAccount != null)
+                            _buildAccountSummaryCard(_savingsAccount!),
+                          const SizedBox(height: 16),
+                          if (_bankAccounts.isNotEmpty)
+                            _buildBankAccountSelector(),
+                          const SizedBox(height: 16),
+                          _buildAmountField(),
+                          const SizedBox(height: 16),
+                          _buildDescriptionField(),
+                          const SizedBox(height: 32),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed:
+                                  _isTransferring ? null : _performTransfer,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryColor,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                               ),
-                              maxLines: 2,
-                            ),
-                            const SizedBox(height: 32),
-                            // Transfer Button
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed:
-                                    _isTransferring ? null : _performTransfer,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.primaryColor,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16),
-                                ),
-                                child: _isTransferring
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
-                                        ),
-                                      )
-                                    : Text(
-                                        _isDeposit
-                                            ? 'Transfer to Savings'
-                                            : 'Withdraw from Savings',
-                                        style: const TextStyle(fontSize: 16),
+                              child: _isTransferring
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
                                       ),
-                              ),
+                                    )
+                                  : Text(
+                                      _isDeposit
+                                          ? 'Transfer to Savings'
+                                          : 'Withdraw from Savings',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
+                ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
+    );
+  }
+
+  Widget _buildAccountSummaryCard(SavingsAccount account) {
+    final progress = account.targetAmount > 0
+        ? (account.currentBalance / account.targetAmount).clamp(0.0, 1.0)
+        : 0.0;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  account.accountName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  Formatters.formatCurrency(account.currentBalance),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (account.targetAmount > 0)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Progress'),
+                      Text(
+                        '${(progress * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      minHeight: 8,
+                      value: progress,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppTheme.primaryColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Target: ${Formatters.formatCurrency(account.targetAmount)} by ${Formatters.formatDate(account.targetDate)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBankAccountSelector() {
+    return DropdownButtonFormField<BankAccount>(
+      value: _selectedBankAccount,
+      decoration: const InputDecoration(
+        labelText: 'Linked Bank Account *',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.account_balance_wallet),
+      ),
+      items: _bankAccounts.map((account) {
+        return DropdownMenuItem<BankAccount>(
+          value: account,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                account.accountName,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                '${account.financialInstitution ?? 'Personal'} • Balance: ${Formatters.formatCurrency(account.currentBalance)}',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: (account) {
+        setState(() {
+          _selectedBankAccount = account;
+        });
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select a bank account';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildAmountField() {
+    return TextFormField(
+      controller: _amountController,
+      decoration: const InputDecoration(
+        labelText: 'Amount *',
+        hintText: '0.00',
+        prefixIcon: Icon(Icons.attach_money),
+      ),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Please enter an amount';
+        }
+        final amount = double.tryParse(value);
+        if (amount == null || amount <= 0) {
+          return 'Please enter a valid amount';
+        }
+        if (!_isDeposit && _savingsAccount != null &&
+            amount > _savingsAccount!.currentBalance) {
+          return 'Insufficient balance';
+        }
+        if (_selectedBankAccount != null && _isDeposit &&
+            amount > _selectedBankAccount!.currentBalance) {
+          return 'Insufficient bank balance';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDescriptionField() {
+    return TextFormField(
+      controller: _descriptionController,
+      decoration: const InputDecoration(
+        labelText: 'Description (Optional)',
+        hintText: 'Add a note about this transfer',
+        prefixIcon: Icon(Icons.description),
+      ),
+      maxLines: 2,
     );
   }
 }
+
 

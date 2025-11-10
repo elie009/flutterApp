@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -125,102 +126,106 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
         ],
       ),
-      body: _user == null
-          ? const Center(child: Text('User not found'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // Profile Picture
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppTheme.primaryColor,
-                      child: Text(
-                        _user!.name.substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 32,
-                          color: Colors.white,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _user == null
+              ? const Center(child: Text('Failed to load profile'))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Picture
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: AppTheme.primaryColor,
+                          child: Text(
+                            _user!.name.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Name (Read-only)
-                    TextFormField(
-                      initialValue: _user!.name,
-                      decoration: const InputDecoration(
-                        labelText: 'Name',
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    // Email (Read-only)
-                    TextFormField(
-                      initialValue: _user!.email,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    // Phone (Read-only)
-                    TextFormField(
-                      initialValue: _user!.phone ?? '',
-                      decoration: const InputDecoration(
-                        labelText: 'Phone',
-                        prefixIcon: Icon(Icons.phone),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    // Job Title
-                    TextFormField(
-                      controller: _jobTitleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Job Title',
-                        prefixIcon: Icon(Icons.work),
-                      ),
-                      enabled: _isEditing,
-                    ),
-                    const SizedBox(height: 16),
-                    // Company
-                    TextFormField(
-                      controller: _companyController,
-                      decoration: const InputDecoration(
-                        labelText: 'Company',
-                        prefixIcon: Icon(Icons.business),
-                      ),
-                      enabled: _isEditing,
-                    ),
-                    const SizedBox(height: 16),
-                    // Preferred Currency
-                    TextFormField(
-                      initialValue: _user!.preferredCurrency ?? 'PHP',
-                      decoration: const InputDecoration(
-                        labelText: 'Preferred Currency',
-                        prefixIcon: Icon(Icons.currency_exchange),
-                      ),
-                      enabled: false,
-                    ),
-                    if (_user!.totalMonthlyIncome != null) ...[
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        initialValue:
-                            _user!.totalMonthlyIncome!.toStringAsFixed(2),
-                        decoration: const InputDecoration(
-                          labelText: 'Total Monthly Income',
-                          prefixIcon: Icon(Icons.attach_money),
+                        const SizedBox(height: 24),
+                        // Name (Read-only)
+                        TextFormField(
+                          initialValue: _user!.name,
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                          enabled: false,
                         ),
-                        enabled: false,
-                      ),
-                    ],
-                  ],
+                        const SizedBox(height: 16),
+                        // Email (Read-only)
+                        TextFormField(
+                          initialValue: _user!.email,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: Icon(Icons.email),
+                          ),
+                          enabled: false,
+                        ),
+                        const SizedBox(height: 16),
+                        // Phone (Read-only)
+                        TextFormField(
+                          initialValue: _user!.phone ?? '',
+                          decoration: const InputDecoration(
+                            labelText: 'Phone',
+                            prefixIcon: Icon(Icons.phone),
+                          ),
+                          enabled: false,
+                        ),
+                        const SizedBox(height: 16),
+                        // Job Title
+                        TextFormField(
+                          controller: _jobTitleController,
+                          decoration: const InputDecoration(
+                            labelText: 'Job Title',
+                            prefixIcon: Icon(Icons.work),
+                          ),
+                          enabled: _isEditing,
+                        ),
+                        const SizedBox(height: 16),
+                        // Company
+                        TextFormField(
+                          controller: _companyController,
+                          decoration: const InputDecoration(
+                            labelText: 'Company',
+                            prefixIcon: Icon(Icons.business),
+                          ),
+                          enabled: _isEditing,
+                        ),
+                        const SizedBox(height: 16),
+                        // Preferred Currency
+                        TextFormField(
+                          initialValue: _user!.preferredCurrency ?? 'PHP',
+                          decoration: const InputDecoration(
+                            labelText: 'Preferred Currency',
+                            prefixIcon: Icon(Icons.currency_exchange),
+                          ),
+                          enabled: false,
+                        ),
+                        if (_user!.totalMonthlyIncome != null) ...[
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            initialValue:
+                                _user!.totalMonthlyIncome!.toStringAsFixed(2),
+                            decoration: const InputDecoration(
+                              labelText: 'Total Monthly Income',
+                              prefixIcon: Icon(Icons.attach_money),
+                            ),
+                            enabled: false,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 4),
     );
   }
 

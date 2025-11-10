@@ -6,6 +6,7 @@ import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart' as custom_error;
+import '../../widgets/bottom_nav_bar.dart';
 import 'add_edit_savings_account_screen.dart';
 import 'savings_transfer_screen.dart';
 
@@ -76,6 +77,7 @@ class _SavingsAccountDetailScreenState extends State<SavingsAccountDetailScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
       floatingActionButton: _account != null
           ? FloatingActionButton.extended(
               onPressed: () => _transferMoney(context),

@@ -6,7 +6,9 @@ import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/error_widget.dart';
 import '../../widgets/skeleton_loader.dart';
+import '../../widgets/bottom_nav_bar.dart';
 import '../../utils/theme.dart';
+import 'apply_loan_screen.dart';
 
 class LoansScreen extends StatefulWidget {
   const LoansScreen({super.key});
@@ -86,6 +88,93 @@ class _LoansScreenState extends State<LoansScreen> {
       _selectedStatus = status;
     });
     _loadLoans(refresh: true);
+  }
+
+  void _showLoanActionSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(
+                    Icons.add_circle_outline,
+                    color: Color(0xFF10B981),
+                  ),
+                  title: const Text('Add New Loan'),
+                  subtitle: const Text('Record a new loan in your portfolio'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    if (!mounted) return;
+                    final created = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (context) => const ApplyLoanScreen(),
+                      ),
+                    );
+                    if (created == true && mounted) {
+                      _loadLoans(refresh: true);
+                    }
+                  },
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: const Icon(
+                    Icons.paid_outlined,
+                    color: Color(0xFF10B981),
+                  ),
+                  title: const Text('Log Loan Payment'),
+                  subtitle: const Text('Track a recent payment or repayment'),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    if (!mounted) return;
+                    NavigationHelper.showSnackBar(
+                      context,
+                      'Loan payment logging coming soon',
+                      backgroundColor: AppTheme.primaryColor,
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: const Icon(
+                    Icons.insert_drive_file_outlined,
+                    color: Color(0xFF10B981),
+                  ),
+                  title: const Text('Import Loan Data'),
+                  subtitle: const Text('Upload loan information from external files'),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    if (!mounted) return;
+                    NavigationHelper.showSnackBar(
+                      context,
+                      'Import loan data coming soon',
+                      backgroundColor: AppTheme.primaryColor,
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildSkeletonLoader() {
@@ -169,6 +258,15 @@ class _LoansScreenState extends State<LoansScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 24, bottom: 12),
+        child: FloatingActionButton(
+          onPressed: _showLoanActionSheet,
+          backgroundColor: const Color(0xFF10B981),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: _isLoading && _loans.isEmpty
           ? _buildSkeletonLoader()
           : _errorMessage != null && _loans.isEmpty
@@ -218,9 +316,7 @@ class _LoansScreenState extends State<LoansScreen> {
                                   selected: _selectedStatus == null,
                                   selectedColor: Colors.white,
                                   labelStyle: TextStyle(
-                                    color: _selectedStatus == null
-                                        ? const Color(0xFF10B981)
-                                        : Colors.white,
+                                    color: const Color(0xFF10B981),
                                   ),
                                   onSelected: (_) => _filterByStatus(null),
                                 ),
@@ -230,9 +326,7 @@ class _LoansScreenState extends State<LoansScreen> {
                                   selected: _selectedStatus == 'ACTIVE',
                                   selectedColor: Colors.white,
                                   labelStyle: TextStyle(
-                                    color: _selectedStatus == 'ACTIVE'
-                                        ? const Color(0xFF10B981)
-                                        : Colors.white,
+                                    color: const Color(0xFF10B981),
                                   ),
                                   onSelected: (_) => _filterByStatus('ACTIVE'),
                                 ),
@@ -242,9 +336,7 @@ class _LoansScreenState extends State<LoansScreen> {
                                   selected: _selectedStatus == 'PENDING',
                                   selectedColor: Colors.white,
                                   labelStyle: TextStyle(
-                                    color: _selectedStatus == 'PENDING'
-                                        ? const Color(0xFF10B981)
-                                        : Colors.white,
+                                    color: const Color(0xFF10B981),
                                   ),
                                   onSelected: (_) => _filterByStatus('PENDING'),
                                 ),
@@ -254,9 +346,7 @@ class _LoansScreenState extends State<LoansScreen> {
                                   selected: _selectedStatus == 'COMPLETED',
                                   selectedColor: Colors.white,
                                   labelStyle: TextStyle(
-                                    color: _selectedStatus == 'COMPLETED'
-                                        ? const Color(0xFF10B981)
-                                        : Colors.white,
+                                    color: const Color(0xFF10B981),
                                   ),
                                   onSelected: (_) => _filterByStatus('COMPLETED'),
                                 ),
@@ -368,24 +458,51 @@ class _LoansScreenState extends State<LoansScreen> {
                                           ),
                                         ],
                                       ),
-                                      trailing: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text(
-                                            Formatters.formatCurrency(loan.remainingBalance),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Color(0xFF10B981),
-                                            ),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                Formatters.formatCurrency(loan.remainingBalance),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Color(0xFF10B981),
+                                                ),
+                                              ),
+                                              Text(
+                                                '${Formatters.formatCurrency(loan.monthlyPayment)}/mo',
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            '${Formatters.formatCurrency(loan.monthlyPayment)}/mo',
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                            ),
+                                          PopupMenuButton<String>(
+                                            onSelected: (value) {
+                                              if (value == 'history') {
+                                                // TODO: Navigate to history
+                                              } else if (value == 'delete') {
+                                                // TODO: Show delete confirmation
+                                              }
+                                            },
+                                            itemBuilder: (context) => [
+                                              const PopupMenuItem(
+                                                value: 'history',
+                                                child: Text('History'),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 'delete',
+                                                child: const Text(
+                                                  'Delete',
+                                                  style: TextStyle(color: AppTheme.errorColor),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -404,6 +521,7 @@ class _LoansScreenState extends State<LoansScreen> {
                     ),
                   ],
                 ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

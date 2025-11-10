@@ -107,9 +107,7 @@ class BottomNavBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (currentIndex != index) {
-          context.go(route);
-        }
+        context.go(route);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
@@ -152,9 +150,7 @@ class BottomNavBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (currentIndex != index) {
-          context.go(route);
-        }
+        context.go(route);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),

@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result['success'] == true) {
       if (mounted) {
-        context.go('/dashboard');
+        context.go('/category');
       }
     } else {
       if (mounted) {

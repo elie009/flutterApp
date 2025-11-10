@@ -12,6 +12,7 @@ import '../screens/bills/bills_screen.dart';
 import '../screens/bills/bill_detail_screen.dart';
 import '../screens/loans/loans_screen.dart';
 import '../screens/loans/loan_detail_screen.dart';
+import '../screens/loans/apply_loan_screen.dart';
 import '../screens/income/income_sources_screen.dart';
 import '../screens/bank/bank_accounts_screen.dart';
 import '../screens/category/category_screen.dart';
@@ -43,7 +44,7 @@ class AppRouter {
         if (token != null) {
           final isLoggedIn = await AuthService.isAuthenticated();
           if (isLoggedIn) {
-            return '/dashboard';
+            return '/category';
           }
         }
       }
@@ -65,7 +66,7 @@ class AppRouter {
         return '/launch'; // Redirect to launch screen if not logged in
       }
       if (isLoggedIn && isLoginRoute) {
-        return '/dashboard';
+        return '/category';
       }
       return null;
     },
@@ -139,6 +140,11 @@ class AppRouter {
         path: '/loans',
         name: 'loans',
         builder: (context, state) => const LoansScreen(),
+      ),
+      GoRoute(
+        path: '/loans/apply',
+        name: 'loan-apply',
+        builder: (context, state) => const ApplyLoanScreen(),
       ),
       GoRoute(
         path: '/loans/:id',

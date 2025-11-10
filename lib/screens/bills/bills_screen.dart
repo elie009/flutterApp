@@ -7,6 +7,7 @@ import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -596,6 +597,7 @@ class _BillsScreenState extends State<BillsScreen> {
                     ],
                   ),
                 ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // TODO: Navigate to add bill screen

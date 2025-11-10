@@ -4,6 +4,7 @@ import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
 import '../../widgets/loading_indicator.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class AddEditBankAccountScreen extends StatefulWidget {
   final BankAccount? account;
@@ -320,6 +321,7 @@ class _AddEditBankAccountScreenState extends State<AddEditBankAccountScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

@@ -6,6 +6,7 @@ import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
 import '../../widgets/loading_indicator.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key});
@@ -874,6 +875,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     ],
                   ),
                 ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

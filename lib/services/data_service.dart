@@ -480,6 +480,52 @@ class DataService {
     }
   }
 
+  Future<Loan> applyForLoan({
+    required double principal,
+    required double interestRate,
+    required int term,
+    required String purpose,
+    required double monthlyIncome,
+    required String employmentStatus,
+    String? additionalInfo,
+    double? downPayment,
+    double? processingFee,
+    String? interestComputationMethod,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'principal': principal,
+        'interestRate': interestRate,
+        'term': term,
+        'purpose': purpose,
+        'monthlyIncome': monthlyIncome,
+        'employmentStatus': employmentStatus,
+      };
+
+      if (additionalInfo != null && additionalInfo.isNotEmpty) {
+        payload['additionalInfo'] = additionalInfo;
+      }
+      if (downPayment != null) {
+        payload['downPayment'] = downPayment;
+      }
+      if (processingFee != null) {
+        payload['processingFee'] = processingFee;
+      }
+      if (interestComputationMethod != null && interestComputationMethod.isNotEmpty) {
+        payload['interestComputationMethod'] = interestComputationMethod;
+      }
+
+      final response = await ApiService().post(
+        '/Loans/apply',
+        data: payload,
+      );
+
+      return Loan.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<bool> makeLoanPayment({
     required String loanId,
     required double amount,
@@ -499,6 +545,46 @@ class DataService {
       return response.data['success'] == true;
     } catch (e) {
       return false;
+    }
+  }
+
+  // Disburse loan with optional bank account crediting
+  Future<Map<String, dynamic>> disburseLoan({
+    required String loanId,
+    required String disbursedBy,
+    required String disbursementMethod,
+    String? reference,
+    String? bankAccountId,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'loanId': loanId,
+        'disbursedBy': disbursedBy,
+        'disbursementMethod': disbursementMethod,
+      };
+      if (reference != null && reference.isNotEmpty) {
+        payload['reference'] = reference;
+      }
+      if (bankAccountId != null && bankAccountId.isNotEmpty) {
+        payload['bankAccountId'] = bankAccountId;
+      }
+
+      final response = await ApiService().post(
+        '/admin/transactions/disburse',
+        data: payload,
+      );
+      
+      return {
+        'success': response.data['success'] == true,
+        'data': response.data['data'] as Map<String, dynamic>? ?? {},
+        'message': response.data['message'] as String? ?? 'Loan disbursed successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString(),
+        'data': {},
+      };
     }
   }
 
