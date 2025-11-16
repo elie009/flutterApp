@@ -532,6 +532,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                         final transaction = _transactions[index];
 
                                         return Card(
+                                          color: Colors.white,
                                           margin: const EdgeInsets.symmetric(
                                             horizontal: 16,
                                             vertical: 4,
