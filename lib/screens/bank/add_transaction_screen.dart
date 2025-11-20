@@ -9,7 +9,9 @@ import '../../widgets/loading_indicator.dart';
 import '../../widgets/bottom_nav_bar.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  final Map<String, dynamic>? prefillData;
+  
+  const AddTransactionScreen({super.key, this.prefillData});
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -149,10 +151,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         setState(() {
           _accounts = accounts;
           if (accounts.isNotEmpty) {
-            _selectedAccount = accounts.first;
+            // Use prefill account ID if provided, otherwise use first account
+            if (widget.prefillData != null && widget.prefillData!['bankAccountId'] != null) {
+              _selectedAccount = accounts.firstWhere(
+                (acc) => acc.id == widget.prefillData!['bankAccountId'],
+                orElse: () => accounts.first,
+              );
+            } else {
+              _selectedAccount = accounts.first;
+            }
           }
           _loadingAccounts = false;
         });
+        
+        // Prefill form fields if data is provided
+        if (widget.prefillData != null) {
+          _prefillFormData(widget.prefillData!);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -167,6 +182,49 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         );
       }
     }
+  }
+
+  void _prefillFormData(Map<String, dynamic> data) {
+    setState(() {
+      if (data['amount'] != null) {
+        _amountController.text = data['amount'].toString();
+      }
+      if (data['transactionType'] != null) {
+        _transactionType = data['transactionType'].toString().toUpperCase();
+      }
+      if (data['category'] != null) {
+        _selectedCategory = data['category'].toString();
+        _loadReferenceData();
+      }
+      if (data['description'] != null) {
+        _descriptionController.text = data['description'].toString();
+      }
+      if (data['merchant'] != null) {
+        _merchantController.text = data['merchant'].toString();
+      }
+      if (data['location'] != null) {
+        _locationController.text = data['location'].toString();
+      }
+      if (data['notes'] != null) {
+        _notesController.text = data['notes'].toString();
+      }
+      if (data['referenceNumber'] != null) {
+        _referenceNumberController.text = data['referenceNumber'].toString();
+      }
+      if (data['transactionDate'] != null) {
+        try {
+          _selectedDate = DateTime.parse(data['transactionDate'].toString());
+        } catch (e) {
+          // Keep default date if parsing fails
+        }
+      }
+      if (data['isRecurring'] != null) {
+        _isRecurring = data['isRecurring'] == true || data['isRecurring'] == 'true';
+      }
+      if (data['recurringFrequency'] != null) {
+        _recurringFrequency = data['recurringFrequency'].toString().toUpperCase();
+      }
+    });
   }
 
   Future<void> _loadReferenceData() async {

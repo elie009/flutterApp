@@ -107,6 +107,10 @@ class BottomNavBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        // If we're in a pushed route (like AnalyzerScreen), pop first then navigate
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
         context.go(route);
       },
       child: Container(
@@ -150,6 +154,10 @@ class BottomNavBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        // If we're in a pushed route (like AnalyzerScreen), pop first then navigate
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
         context.go(route);
       },
       child: Container(

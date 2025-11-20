@@ -15,6 +15,7 @@ import 'api_service.dart';
 import 'auth_service.dart';
 import 'storage_service.dart';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 
 class DataService {
   static final DataService _instance = DataService._internal();
@@ -1009,6 +1010,34 @@ class DataService {
     return createTransaction(transactionData);
   }
 
+  // Analyze transaction text
+  Future<BankTransaction> analyzeTransactionText({
+    required String transactionText,
+    String? bankAccountId,
+    String? billId,
+    String? loanId,
+    String? savingsAccountId,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        '/BankAccounts/transactions/analyze-text',
+        data: {
+          'transactionText': transactionText,
+          if (bankAccountId != null) 'bankAccountId': bankAccountId,
+          if (billId != null) 'billId': billId,
+          if (loanId != null) 'loanId': loanId,
+          if (savingsAccountId != null) 'savingsAccountId': savingsAccountId,
+        },
+      );
+      return BankTransaction.fromJson(response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      // Re-throw DioException to preserve response data
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<BankTransaction>> getAccountTransactions(
     String bankAccountId, {
     int page = 1,
@@ -1221,9 +1250,17 @@ class DataService {
   }
 
   // Savings Accounts
-  Future<List<SavingsAccount>> getSavingsAccounts() async {
+  Future<List<SavingsAccount>> getSavingsAccounts({bool? isActive}) async {
     try {
-      final response = await ApiService().get('/Savings/accounts');
+      final queryParams = <String, dynamic>{};
+      if (isActive != null) {
+        queryParams['isActive'] = isActive;
+      }
+      
+      final response = await ApiService().get(
+        '/Savings/accounts',
+        queryParameters: queryParams.isEmpty ? null : queryParams,
+      );
       final data = response.data['data'] as List<dynamic>? ?? [];
       return data
           .map((e) => SavingsAccount.fromJson(e as Map<String, dynamic>))

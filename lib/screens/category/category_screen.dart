@@ -10,6 +10,7 @@ import '../../widgets/skeleton_loader.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
 import '../bank/add_transaction_screen.dart';
+import '../bank/analyzer_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -77,6 +78,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
+  Future<void> _navigateToAnalyzer(BuildContext sheetContext) async {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) {
+      return;
+    }
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnalyzerScreen(),
+      ),
+    );
+    if (result == true && mounted) {
+      _loadData(forceRefresh: true);
+    }
+  }
+
   Future<void> _navigateToAddTransaction(BuildContext sheetContext) async {
     Navigator.of(sheetContext).pop();
     if (!mounted) {
@@ -118,32 +135,64 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () => _handleTakePhoto(sheetContext),
-                  icon: const Icon(Icons.camera_alt_outlined),
-                  label: const Text('Take photo'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: () => _handleUploadImage(sheetContext),
-                  icon: const Icon(Icons.image_outlined),
-                  label: const Text('Upload image'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: () => _navigateToAddTransaction(sheetContext),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: AppTheme.primaryColor,
-                  ),
+                // 2x2 Grid Layout
+                Column(
+                  children: [
+                    // Row 1: Take photo and Upload Image
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _handleTakePhoto(sheetContext),
+                            icon: const Icon(Icons.camera_alt_outlined),
+                            label: const Text('Take photo'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _handleUploadImage(sheetContext),
+                            icon: const Icon(Icons.image_outlined),
+                            label: const Text('Upload Image'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Row 2: Analyzer and Add manually
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _navigateToAnalyzer(sheetContext),
+                            icon: const Icon(Icons.auto_awesome),
+                            label: const Text('Analyzer'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _navigateToAddTransaction(sheetContext),
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add manually'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              backgroundColor: AppTheme.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),

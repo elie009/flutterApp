@@ -237,27 +237,6 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
               ),
               maxLines: 3,
             ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _currency,
-              decoration: const InputDecoration(
-                labelText: 'Currency *',
-                prefixIcon: Icon(Icons.monetization_on),
-              ),
-              items: ['USD', 'EUR', 'GBP', 'PHP', 'JPY', 'CNY'].map((curr) {
-                return DropdownMenuItem<String>(
-                  value: curr,
-                  child: Text(curr),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _currency = value;
-                  });
-                }
-              },
-            ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,

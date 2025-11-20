@@ -8,6 +8,8 @@ import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/error_widget.dart';
 import '../../widgets/skeleton_loader.dart';
 import '../../utils/theme.dart';
+import '../bank/add_transaction_screen.dart';
+import '../bank/analyzer_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -174,73 +176,148 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     _loadTransactions(refresh: true);
   }
 
-  Future<void> _uploadReceipts() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: true,
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
-      );
+  void _handleTakePhoto(BuildContext sheetContext) {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Receipt scanning is coming soon.'),
+      ),
+    );
+  }
 
-      if (result != null && result.files.isNotEmpty) {
-        List<PlatformFile> validFiles = [];
-        List<String> errors = [];
+  void _handleUploadImage(BuildContext sheetContext) {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Image upload is coming soon.'),
+      ),
+    );
+  }
 
-        // Validate file sizes (max 5MB each)
-        const int maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+  Future<void> _navigateToAnalyzer(BuildContext sheetContext) async {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) {
+      return;
+    }
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnalyzerScreen(),
+      ),
+    );
+    if (result == true && mounted) {
+      _loadTransactions(refresh: true);
+    }
+  }
 
-        for (var file in result.files) {
-          if (file.size != null && file.size! > maxSizeInBytes) {
-            errors.add('${file.name} exceeds 5MB limit');
-          } else {
-            validFiles.add(file);
-          }
-        }
+  Future<void> _navigateToAddTransaction(BuildContext sheetContext) async {
+    Navigator.of(sheetContext).pop();
+    if (!mounted) {
+      return;
+    }
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddTransactionScreen(),
+      ),
+    );
+    if (result == true && mounted) {
+      _loadTransactions(refresh: true);
+    }
+  }
 
-        if (validFiles.isEmpty) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(errors.join('\n')),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 4),
-              ),
-            );
-          }
-          return;
-        }
-
-        // Show success message with file count
-        if (mounted) {
-          String message = '${validFiles.length} receipt(s) selected';
-          if (errors.isNotEmpty) {
-            message += '\n${errors.length} file(s) skipped (exceeds 5MB)';
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: const Color(0xFF10B981),
-              duration: const Duration(seconds: 2),
+  void _showMoreOptionsModal() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Add Transaction by',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                // 2x2 Grid Layout
+                Column(
+                  children: [
+                    // Row 1: Take photo and Upload Image
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _handleTakePhoto(sheetContext),
+                            icon: const Icon(Icons.camera_alt_outlined),
+                            label: const Text('Take photo'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _handleUploadImage(sheetContext),
+                            icon: const Icon(Icons.image_outlined),
+                            label: const Text('Upload Image'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Row 2: Analyzer and Add manually
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _navigateToAnalyzer(sheetContext),
+                            icon: const Icon(Icons.auto_awesome),
+                            label: const Text('Analyzer'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _navigateToAddTransaction(sheetContext),
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add manually'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              backgroundColor: AppTheme.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
-          );
-
-          // TODO: Upload files to server/API
-          // Here you would typically upload the files using your API service
-          // For example:
-          // await DataService().uploadReceipts(validFiles);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error selecting files: ${e.toString()}'),
-            backgroundColor: Colors.red,
           ),
         );
-      }
-    }
+      },
+    );
   }
 
   Future<void> _showDateFilterDialog() async {
@@ -488,15 +565,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     ],
                   ),
                 ),
-                // Upload Receipt Button
+                // + More Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: _uploadReceipts,
-                      icon: const Icon(Icons.upload_file),
-                      label: const Text('Upload receipt'),
+                      onPressed: _showMoreOptionsModal,
+                      icon: const Icon(Icons.add),
+                      label: const Text('More'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFF10B981),
                         side: const BorderSide(color: Color(0xFF10B981)),
