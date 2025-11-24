@@ -16,12 +16,16 @@ import '../models/savings_account.dart';
 import '../models/savings_transaction.dart';
 import '../models/analytics_report.dart';
 import '../models/allocation.dart';
+import '../models/audit_log.dart';
+import '../models/receipt.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
 import 'storage_service.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class DataService {
   static final DataService _instance = DataService._internal();
@@ -2164,6 +2168,217 @@ extension DashboardSummaryExtension on DashboardSummary {
     try {
       final response = await ApiService().get('/Allocation/plans/$planId/summary');
       return AllocationSummary.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // ==========================================
+  // AUDIT LOGS METHODS
+  // ==========================================
+
+  // Get audit logs with filtering
+  Future<PaginatedAuditLogs> getAuditLogs(AuditLogQuery query) async {
+    try {
+      final response = await ApiService().get(
+        '/AuditLogs',
+        queryParameters: query.toQueryParams(),
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return PaginatedAuditLogs.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get audit log by ID
+  Future<AuditLog> getAuditLog(String logId) async {
+    try {
+      final response = await ApiService().get('/AuditLogs/$logId');
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return AuditLog.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get audit log summary
+  Future<AuditLogSummary> getAuditLogSummary({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/AuditLogs/summary',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return AuditLogSummary.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Export audit logs to CSV
+  Future<String> exportAuditLogsToCsv(AuditLogQuery query) async {
+    try {
+      final response = await ApiService().post(
+        '/AuditLogs/export/csv',
+        data: query.toQueryParams(),
+        responseType: ResponseType.bytes,
+      );
+
+      // Save to file (implementation depends on your file system access)
+      // For now, return base64 encoded string
+      return response.data.toString();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Export audit logs to PDF
+  Future<String> exportAuditLogsToPdf(AuditLogQuery query) async {
+    try {
+      final response = await ApiService().post(
+        '/AuditLogs/export/pdf',
+        data: query.toQueryParams(),
+        responseType: ResponseType.bytes,
+      );
+
+      // Save to file (implementation depends on your file system access)
+      // For now, return base64 encoded string
+      return response.data.toString();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Receipt Management
+  Future<Receipt> uploadReceipt(File file) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+      });
+
+      final response = await ApiService().post(
+        '/Receipts/upload',
+        data: formData,
+        options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+        ),
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return Receipt.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Receipt> processReceiptOcr(String receiptId) async {
+    try {
+      final response = await ApiService().post('/Receipts/$receiptId/process-ocr');
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return Receipt.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Receipt> getReceipt(String receiptId) async {
+    try {
+      final response = await ApiService().get('/Receipts/$receiptId');
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return Receipt.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Receipt>> getReceipts({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? merchant,
+    double? minAmount,
+    double? maxAmount,
+    bool? isOcrProcessed,
+    String? searchText,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+      };
+
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+      if (merchant != null) {
+        queryParams['merchant'] = merchant;
+      }
+      if (minAmount != null) {
+        queryParams['minAmount'] = minAmount;
+      }
+      if (maxAmount != null) {
+        queryParams['maxAmount'] = maxAmount;
+      }
+      if (isOcrProcessed != null) {
+        queryParams['isOcrProcessed'] = isOcrProcessed;
+      }
+      if (searchText != null && searchText.isNotEmpty) {
+        queryParams['searchText'] = searchText;
+      }
+
+      final response = await ApiService().get(
+        '/Receipts',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => Receipt.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteReceipt(String receiptId) async {
+    try {
+      await ApiService().delete('/Receipts/$receiptId');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Receipt> linkReceiptToExpense(String receiptId, String expenseId) async {
+    try {
+      final response = await ApiService().post('/Receipts/$receiptId/link-expense/$expenseId');
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return Receipt.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<ExpenseMatch>> findMatchingExpenses(String receiptId) async {
+    try {
+      final response = await ApiService().get('/Receipts/$receiptId/match-expenses');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => ExpenseMatch.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
       rethrow;
     }

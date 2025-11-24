@@ -37,6 +37,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   bool _isLoading = false;
   bool _loadingAccounts = true;
   bool _loadingReferenceData = false;
+  bool _showAccountingHelp = false;
 
   // Reference data for smart linking
   List<Bill> _bills = [];
@@ -408,6 +409,97 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           }
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Accounting Help Section
+                      ExpansionTile(
+                        leading: const Icon(Icons.help_outline, color: Colors.blue),
+                        title: const Text(
+                          'Accounting Help',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        initiallyExpanded: _showAccountingHelp,
+                        onExpansionChanged: (expanded) {
+                          setState(() {
+                            _showAccountingHelp = expanded;
+                          });
+                        },
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Transaction Types:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text('• DEBIT: Money going out (expenses, payments, transfers out)'),
+                                const Text('• CREDIT: Money coming in (income, deposits, transfers in)'),
+                                const SizedBox(height: 16),
+                                const Divider(),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Double-Entry Accounting:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Every transaction automatically creates balanced entries:',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Example: Paying a \$150 utility bill',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Debit: Utility Expense → \$150 (expense increases)',
+                                        style: TextStyle(fontSize: 11),
+                                      ),
+                                      Text(
+                                        'Credit: Bank Account → \$150 (asset decreases)',
+                                        style: TextStyle(fontSize: 11),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        '✓ Total Debits = Total Credits',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'The system validates this automatically - you don\'t need to worry about it!',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
 
