@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../models/bill.dart';
+import '../../models/bill_forecast.dart';
+import '../../models/bill_variance.dart';
+import '../../models/bank_account.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/error_widget.dart';
 import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar.dart';
+import '../../utils/double_entry_validation.dart';
 
 class BillDetailScreen extends StatefulWidget {
   final String billId;
@@ -21,8 +25,14 @@ class BillDetailScreen extends StatefulWidget {
 class _BillDetailScreenState extends State<BillDetailScreen> {
   Bill? _bill;
   List<Bill> _childBills = [];
+  BillForecast? _forecast;
+  BillVariance? _variance;
   bool _isLoading = true;
+  bool _isLoadingForecast = false;
+  bool _isLoadingVariance = false;
   String? _errorMessage;
+  List<BankAccount> _bankAccounts = [];
+  bool _isLoadingAccounts = false;
 
   @override
   void initState() {
@@ -56,6 +66,12 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
         _childBills = childBills;
         _isLoading = false;
       });
+
+      // Load forecast and variance if provider and billType are available
+      if (bill.provider != null && bill.billType != null) {
+        _loadForecast(bill.provider!, bill.billType!);
+        _loadVariance(bill.id);
+      }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -64,31 +80,251 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
     }
   }
 
+  Future<void> _loadForecast(String provider, String billType) async {
+    setState(() {
+      _isLoadingForecast = true;
+    });
+
+    try {
+      final forecast = await DataService().getBillForecast(
+        provider: provider,
+        billType: billType,
+        method: 'weighted',
+      );
+
+      if (mounted) {
+        setState(() {
+          _forecast = forecast;
+          _isLoadingForecast = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingForecast = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadVariance(String billId) async {
+    setState(() {
+      _isLoadingVariance = true;
+    });
+
+    try {
+      final variance = await DataService().getBillVariance(billId);
+
+      if (mounted) {
+        setState(() {
+          _variance = variance;
+          _isLoadingVariance = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingVariance = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadBankAccounts() async {
+    setState(() {
+      _isLoadingAccounts = true;
+    });
+
+    try {
+      final accounts = await DataService().getBankAccounts(isActive: true);
+      setState(() {
+        _bankAccounts = accounts;
+        _isLoadingAccounts = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingAccounts = false;
+      });
+    }
+  }
+
+  List<BankAccount> _getAvailableAccounts() {
+    if (_bill == null) return [];
+    final billAmount = _bill!.amount;
+    return _bankAccounts.where((account) {
+      return account.isActive && account.currentBalance >= billAmount;
+    }).toList();
+  }
+
   Future<void> _markAsPaid() async {
+    if (_bill == null) return;
+
+    // Load bank accounts if not already loaded
+    if (_bankAccounts.isEmpty) {
+      await _loadBankAccounts();
+    }
+
+    final availableAccounts = _getAvailableAccounts();
+    
+    if (availableAccounts.isEmpty) {
+      if (mounted) {
+        NavigationHelper.showSnackBar(
+          context,
+          'No bank accounts with sufficient balance. Bill amount: ${Formatters.formatCurrency(_bill!.amount)}',
+          backgroundColor: AppTheme.errorColor,
+        );
+      }
+      return;
+    }
+
+    // Show bank account selection dialog
+    String? selectedAccountId;
+    String? notes;
+
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Mark as Paid'),
-        content: Text('Mark "${_bill?.billName}" as paid?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Mark Bill as Paid'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bill: ${_bill?.billName}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Amount: ${Formatters.formatCurrency(_bill?.amount ?? 0)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Select Bank Account (Double-entry: Debit Expense, Credit Bank Account)',
+                      style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                    ),
+                    const SizedBox(height: 8),
+                    if (_isLoadingAccounts)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      DropdownButtonFormField<String>(
+                        value: selectedAccountId,
+                        decoration: const InputDecoration(
+                          labelText: 'Bank Account',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: availableAccounts.map((account) {
+                          return DropdownMenuItem<String>(
+                            value: account.id,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(account.accountName),
+                                ),
+                                Text(
+                                  Formatters.formatCurrency(account.currentBalance),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setDialogState(() {
+                            selectedAccountId = value;
+                          });
+                        },
+                      ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      decoration: const InputDecoration(
+                        labelText: 'Notes (Optional)',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      onChanged: (value) {
+                        notes = value.isEmpty ? null : value;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: selectedAccountId == null
+                      ? null
+                      : () {
+                          // Double-entry validation
+                          final selectedAccount = availableAccounts.firstWhere(
+                            (acc) => acc.id == selectedAccountId,
+                          );
+
+                          if (selectedAccount.currentBalance < _bill!.amount) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Insufficient balance. Required: ${Formatters.formatCurrency(_bill!.amount)}, Available: ${Formatters.formatCurrency(selectedAccount.currentBalance)}',
+                                ),
+                                backgroundColor: AppTheme.errorColor,
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Validate double-entry: Debit = Credit = Bill Amount
+                          final validation = validateDoubleEntry(
+                            transactionType: 'DEBIT',
+                            amount: _bill!.amount,
+                            bankAccountId: selectedAccountId!,
+                            billId: _bill!.id,
+                            category: 'BILL_PAYMENT',
+                          );
+
+                          if (!validation.isValid) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Double-entry validation failed: ${validation.errors.join(", ")}',
+                                ),
+                                backgroundColor: AppTheme.errorColor,
+                              ),
+                            );
+                            return;
+                          }
+
+                          Navigator.of(context).pop(true);
+                        },
+                  child: const Text('Mark as Paid'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
 
-    if (confirmed == true && _bill != null) {
-      final success = await DataService().markBillAsPaid(_bill!.id);
+    if (confirmed == true && _bill != null && selectedAccountId != null) {
+      final success = await DataService().markBillAsPaid(
+        _bill!.id,
+        notes: notes,
+        bankAccountId: selectedAccountId,
+      );
       if (success && mounted) {
         NavigationHelper.showSnackBar(
           context,
-          'Bill marked as paid',
+          'Bill marked as paid with double-entry accounting',
           backgroundColor: AppTheme.successColor,
         );
         _loadBill();
@@ -262,6 +498,174 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
                               ),
                             ),
                           ),
+                          // Forecast Section
+                          if (_bill!.provider != null && _bill!.billType != null) ...[
+                            const SizedBox(height: 16),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.trending_up,
+                                          color: AppTheme.primaryColor,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          'Next Month Forecast',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    if (_isLoadingForecast)
+                                      const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(16.0),
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      )
+                                    else if (_forecast != null) ...[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            'Estimated Amount',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          Text(
+                                            Formatters.formatCurrency(
+                                                _forecast!.estimatedAmount),
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppTheme.primaryColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            'Method',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppTheme.primaryColor
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              _forecast!.methodDisplay,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            'Confidence',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _forecast!.confidence
+                                                          .toLowerCase() ==
+                                                      'high'
+                                                  ? AppTheme.successColor
+                                                      .withOpacity(0.2)
+                                                  : _forecast!.confidence
+                                                              .toLowerCase() ==
+                                                          'medium'
+                                                      ? AppTheme.warningColor
+                                                          .withOpacity(0.2)
+                                                      : AppTheme.errorColor
+                                                          .withOpacity(0.2),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              _forecast!.confidenceDisplay,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                color: _forecast!.confidence
+                                                            .toLowerCase() ==
+                                                        'high'
+                                                    ? AppTheme.successColor
+                                                    : _forecast!.confidence
+                                                                .toLowerCase() ==
+                                                            'medium'
+                                                        ? AppTheme.warningColor
+                                                        : AppTheme.errorColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (_forecast!.recommendation.isNotEmpty) ...[
+                                        const SizedBox(height: 12),
+                                        const Divider(),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          _forecast!.recommendation,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      ],
+                                    ]
+                                    else
+                                      const Text(
+                                        'Forecast not available',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                           if (_childBills.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Card(

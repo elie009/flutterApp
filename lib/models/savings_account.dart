@@ -6,12 +6,18 @@ class SavingsAccount extends Equatable {
   final String userId;
   final String accountName;
   final String savingsType; // EMERGENCY, VACATION, INVESTMENT, etc.
+  final String? accountType; // REGULAR, HIGH_YIELD, CD, MONEY_MARKET
+  final double? interestRate; // Annual interest rate (e.g., 0.045 for 4.5%)
+  final String? interestCompoundingFrequency; // DAILY, MONTHLY, QUARTERLY, ANNUALLY
+  final DateTime? lastInterestCalculationDate;
+  final DateTime? nextInterestCalculationDate;
   final double targetAmount;
   final double currentBalance;
   final String currency;
   final String? description;
   final String? goal;
   final DateTime targetDate;
+  final DateTime? startDate;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -27,12 +33,18 @@ class SavingsAccount extends Equatable {
     required this.userId,
     required this.accountName,
     required this.savingsType,
+    this.accountType,
+    this.interestRate,
+    this.interestCompoundingFrequency,
+    this.lastInterestCalculationDate,
+    this.nextInterestCalculationDate,
     required this.targetAmount,
     required this.currentBalance,
     this.currency = 'USD',
     this.description,
     this.goal,
     required this.targetDate,
+    this.startDate,
     this.isActive = true,
     required this.createdAt,
     required this.updatedAt,
@@ -69,12 +81,24 @@ class SavingsAccount extends Equatable {
       userId: json['userId'] as String? ?? '',
       accountName: json['accountName'] as String,
       savingsType: json['savingsType'] as String,
+      accountType: json['accountType'] as String?,
+      interestRate: json['interestRate'] != null ? (json['interestRate'] as num).toDouble() : null,
+      interestCompoundingFrequency: json['interestCompoundingFrequency'] as String?,
+      lastInterestCalculationDate: json['lastInterestCalculationDate'] != null
+          ? DateTime.parse(json['lastInterestCalculationDate'] as String)
+          : null,
+      nextInterestCalculationDate: json['nextInterestCalculationDate'] != null
+          ? DateTime.parse(json['nextInterestCalculationDate'] as String)
+          : null,
       targetAmount: targetAmount,
       currentBalance: currentBalance,
       currency: json['currency'] as String? ?? 'USD',
       description: json['description'] as String?,
       goal: json['goal'] as String?,
       targetDate: targetDate,
+      startDate: json['startDate'] != null
+          ? DateTime.parse(json['startDate'] as String)
+          : null,
       isActive: json['isActive'] as bool? ?? true,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
@@ -107,12 +131,18 @@ class SavingsAccount extends Equatable {
       'userId': userId,
       'accountName': accountName,
       'savingsType': savingsType,
+      'accountType': accountType,
+      'interestRate': interestRate,
+      'interestCompoundingFrequency': interestCompoundingFrequency,
+      'lastInterestCalculationDate': lastInterestCalculationDate?.toIso8601String(),
+      'nextInterestCalculationDate': nextInterestCalculationDate?.toIso8601String(),
       'targetAmount': targetAmount,
       'currentBalance': currentBalance,
       'currency': currency,
       'description': description,
       'goal': goal,
       'targetDate': targetDate.toIso8601String(),
+      'startDate': startDate?.toIso8601String(),
       'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -131,12 +161,18 @@ class SavingsAccount extends Equatable {
         userId,
         accountName,
         savingsType,
+        accountType,
+        interestRate,
+        interestCompoundingFrequency,
+        lastInterestCalculationDate,
+        nextInterestCalculationDate,
         targetAmount,
         currentBalance,
         currency,
         description,
         goal,
         targetDate,
+        startDate,
         isActive,
         createdAt,
         updatedAt,

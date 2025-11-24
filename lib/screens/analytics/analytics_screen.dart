@@ -77,6 +77,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         title: const Text('Analytics'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.analytics),
+            tooltip: 'Variance Dashboard',
+            onPressed: () {
+              Navigator.pushNamed(context, '/variance-dashboard');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.trending_up),
+            tooltip: 'Forecasting',
+            onPressed: () {
+              Navigator.pushNamed(context, '/forecasting');
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadAnalytics,
           ),

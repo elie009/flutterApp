@@ -298,7 +298,22 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                     'Interest Rate',
                                     '${_loan!.interestRate}%',
                                   ),
+                                  if (_loan!.effectiveInterestRate != null && 
+                                      _loan!.effectiveInterestRate != _loan!.interestRate) ...[
+                                    const Divider(),
+                                    _buildDetailRow(
+                                      'Effective APR',
+                                      '${_loan!.effectiveInterestRate!.toStringAsFixed(2)}%',
+                                    ),
+                                  ],
                                   const Divider(),
+                                  if (_loan!.loanType != null) ...[
+                                    _buildDetailRow(
+                                      'Loan Type',
+                                      _loan!.loanType!.replaceAll('_', ' '),
+                                    ),
+                                    const Divider(),
+                                  ],
                                   _buildDetailRow(
                                     'Term',
                                     '${_loan!.term} months',
@@ -322,10 +337,77 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                       Formatters.formatDate(_loan!.nextDueDate!),
                                     ),
                                   ],
+                                  if (_loan!.refinancedFromLoanId != null) ...[
+                                    const Divider(),
+                                    _buildDetailRow(
+                                      'Refinanced From',
+                                      'Loan #${_loan!.refinancedFromLoanId!.substring(_loan!.refinancedFromLoanId!.length - 8).toUpperCase()}',
+                                    ),
+                                    if (_loan!.refinancingDate != null) ...[
+                                      const Divider(),
+                                      _buildDetailRow(
+                                        'Refinancing Date',
+                                        Formatters.formatDate(_loan!.refinancingDate!),
+                                      ),
+                                    ],
+                                  ],
                                 ],
                               ),
                             ),
                           ),
+                          // Payoff Projection Card
+                          if (_loan!.status == 'ACTIVE' && _loan!.remainingBalance > 0 && _loan!.monthlyPayment > 0) ...[
+                            const SizedBox(height: 16),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.trending_down,
+                                          color: Colors.red,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          'Payoff Projection',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    _buildProjectionRow(
+                                      'Months Remaining',
+                                      '${(_loan!.remainingBalance / _loan!.monthlyPayment).ceil()} months',
+                                    ),
+                                    const SizedBox(height: 8),
+                                    _buildProjectionRow(
+                                      'Projected Payoff Date',
+                                      Formatters.formatDate(
+                                        DateTime.now().add(
+                                          Duration(
+                                            days: ((_loan!.remainingBalance / _loan!.monthlyPayment).ceil() * 30),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    _buildProjectionRow(
+                                      'Total Payments Remaining',
+                                      Formatters.formatCurrency(
+                                        _loan!.remainingBalance,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 16),
                           Card(
                             child: Padding(
@@ -564,6 +646,28 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         ],
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 2),
+    );
+  }
+
+  Widget _buildProjectionRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 

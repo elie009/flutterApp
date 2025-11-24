@@ -60,5 +60,10 @@ class NavigationHelper {
       ),
     );
   }
+
+  static void navigateToAddUtility(BuildContext context) {
+    // For now, just show a snackbar. Can be extended to navigate to add utility screen
+    showSnackBar(context, 'Add utility feature coming soon');
+  }
 }
 

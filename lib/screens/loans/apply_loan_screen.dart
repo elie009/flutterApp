@@ -29,6 +29,7 @@ class _ApplyLoanScreenState extends State<ApplyLoanScreen> {
   String _selectedPurpose = 'Car Loan';
   String _selectedEmploymentStatus = 'employed';
   String? _selectedInterestMethod;
+  String _selectedLoanType = 'PERSONAL';
 
   static const List<String> _loanPurposeOptions = [
     'Car Loan',
@@ -51,6 +52,17 @@ class _ApplyLoanScreenState extends State<ApplyLoanScreen> {
     'unemployed',
     'retired',
     'student',
+  ];
+
+  static const List<Map<String, String>> _loanTypeOptions = [
+    {'value': 'PERSONAL', 'label': 'Personal Loan'},
+    {'value': 'MORTGAGE', 'label': 'Mortgage'},
+    {'value': 'AUTO', 'label': 'Auto Loan'},
+    {'value': 'STUDENT', 'label': 'Student Loan'},
+    {'value': 'BUSINESS', 'label': 'Business Loan'},
+    {'value': 'CREDIT_CARD', 'label': 'Credit Card'},
+    {'value': 'LINE_OF_CREDIT', 'label': 'Line of Credit'},
+    {'value': 'OTHER', 'label': 'Other'},
   ];
 
   bool get _shouldShowCustomPurpose => _selectedPurpose == 'Other';
@@ -177,6 +189,7 @@ class _ApplyLoanScreenState extends State<ApplyLoanScreen> {
         downPayment: downPayment,
         processingFee: processingFee,
         interestComputationMethod: _selectedInterestMethod,
+        loanType: _selectedLoanType,
       );
 
       if (!mounted) return;
@@ -368,6 +381,29 @@ class _ApplyLoanScreenState extends State<ApplyLoanScreen> {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _selectedLoanType,
+                      decoration: const InputDecoration(
+                        labelText: 'Loan Type',
+                        prefixIcon: Icon(Icons.category_outlined),
+                      ),
+                      items: _loanTypeOptions
+                          .map(
+                            (type) => DropdownMenuItem<String>(
+                              value: type['value'],
+                              child: Text(type['label']!),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedLoanType = value;
+                          });
+                        }
+                      },
+                    ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String?>(
                       value: _selectedInterestMethod,

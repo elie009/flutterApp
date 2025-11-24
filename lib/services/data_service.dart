@@ -1,6 +1,11 @@
 import '../models/transaction.dart';
 import '../models/bill.dart';
+import '../models/utility.dart';
 import '../models/bill_analytics.dart';
+import '../models/bill_forecast.dart';
+import '../models/bill_variance.dart';
+import '../models/financial_prediction.dart';
+import '../models/cash_flow_projection.dart';
 import '../models/loan.dart';
 import '../models/income_source.dart';
 import '../models/bank_account.dart';
@@ -10,6 +15,7 @@ import '../models/dashboard_summary.dart';
 import '../models/savings_account.dart';
 import '../models/savings_transaction.dart';
 import '../models/analytics_report.dart';
+import '../models/allocation.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
@@ -270,13 +276,13 @@ class DataService {
     }
   }
 
-  Future<bool> markBillAsPaid(String billId, {String? notes}) async {
+  Future<bool> markBillAsPaid(String billId, {String? notes, String? bankAccountId}) async {
     try {
       final response = await ApiService().put(
-        '/Bills/$billId/status',
+        '/Bills/$billId/mark-paid',
         data: {
-          'status': 'PAID',
           if (notes != null) 'notes': notes,
+          if (bankAccountId != null) 'bankAccountId': bankAccountId,
         },
       );
       return response.data['success'] == true;
@@ -407,6 +413,71 @@ class DataService {
     }
   }
 
+  // Get bill forecast
+  Future<BillForecast> getBillForecast({
+    required String provider,
+    required String billType,
+    String method = 'weighted', // 'simple', 'weighted', 'seasonal'
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'provider': provider,
+        'billType': billType,
+        'method': method,
+      };
+
+      final response = await ApiService().get(
+        '/Bills/analytics/forecast',
+        queryParameters: queryParams,
+      );
+      
+      return BillForecast.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get bill variance
+  Future<BillVariance> getBillVariance(String billId) async {
+    try {
+      final response = await ApiService().get('/Bills/$billId/variance');
+      return BillVariance.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get variance for multiple bills
+  Future<List<BillVariance>> getBillsVariance({List<String>? billIds}) async {
+    try {
+      // If no bill IDs provided, get all bills first
+      if (billIds == null || billIds.isEmpty) {
+        final billsResult = await getBills(page: 1, limit: 100);
+        final bills = billsResult['bills'] as List<Bill>;
+        billIds = bills
+            .where((bill) => bill.provider != null && bill.billType != null)
+            .map((bill) => bill.id)
+            .toList();
+      }
+
+      // Get variance for each bill
+      final variances = <BillVariance>[];
+      for (final billId in billIds) {
+        try {
+          final variance = await getBillVariance(billId);
+          variances.add(variance);
+        } catch (e) {
+          // Skip bills that fail variance calculation
+          continue;
+        }
+      }
+
+      return variances;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Loans
   Future<List<Loan>> getUserLoans({
     String? status,
@@ -492,6 +563,8 @@ class DataService {
     double? downPayment,
     double? processingFee,
     String? interestComputationMethod,
+    String? loanType,
+    String? refinancedFromLoanId,
   }) async {
     try {
       final payload = <String, dynamic>{
@@ -514,6 +587,12 @@ class DataService {
       }
       if (interestComputationMethod != null && interestComputationMethod.isNotEmpty) {
         payload['interestComputationMethod'] = interestComputationMethod;
+      }
+      if (loanType != null && loanType.isNotEmpty) {
+        payload['loanType'] = loanType;
+      }
+      if (refinancedFromLoanId != null && refinancedFromLoanId.isNotEmpty) {
+        payload['refinancedFromLoanId'] = refinancedFromLoanId;
       }
 
       final response = await ApiService().post(
@@ -1644,6 +1723,450 @@ extension DashboardSummaryExtension on DashboardSummary {
       'totalIncoming': totalIncoming,
       'totalOutgoing': totalOutgoing,
     };
+  }
+
+  // Get financial predictions
+  Future<List<FinancialPrediction>> getFinancialPredictions() async {
+    try {
+      final response = await ApiService().get('/Reports/predictions');
+      final data = response.data['data'] as List<dynamic>?;
+      if (data == null) return [];
+      return data
+          .map((e) => FinancialPrediction.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get cash flow projection
+  Future<CashFlowProjection> getCashFlowProjection({int monthsAhead = 6}) async {
+    try {
+      final response = await ApiService().get(
+        '/Reports/cashflow-projection',
+        queryParameters: {'monthsAhead': monthsAhead},
+      );
+      return CashFlowProjection.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get Balance Sheet
+  Future<BalanceSheet> getBalanceSheet({DateTime? asOfDate}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (asOfDate != null) {
+        queryParams['asOfDate'] = asOfDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/balance-sheet',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return BalanceSheet.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get Cash Flow Statement
+  Future<CashFlowStatement> getCashFlowStatement({
+    DateTime? startDate,
+    DateTime? endDate,
+    String period = 'MONTHLY',
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+      };
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/cashflow-statement',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return CashFlowStatement.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get Income Statement
+  Future<IncomeStatement> getIncomeStatement({
+    DateTime? startDate,
+    DateTime? endDate,
+    String period = 'MONTHLY',
+    bool includeComparison = false,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'period': period,
+        'includeComparison': includeComparison.toString(),
+      };
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await ApiService().get(
+        '/Reports/income-statement',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      return IncomeStatement.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // ==================== UTILITY MANAGEMENT ====================
+
+  Future<Map<String, dynamic>> getUtilities({
+    String? status,
+    String? utilityType,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+      };
+      if (status != null) queryParams['status'] = status;
+      if (utilityType != null) queryParams['utilityType'] = utilityType;
+
+      final response = await ApiService().get(
+        '/utilities',
+        queryParameters: queryParams,
+      );
+
+      final responseData = response.data;
+      List<Utility> utilities = [];
+      Map<String, dynamic>? pagination;
+
+      if (responseData is Map<String, dynamic>) {
+        if (responseData.containsKey('data') && responseData['data'] is Map) {
+          final dataMap = responseData['data'] as Map<String, dynamic>;
+          if (dataMap.containsKey('data') && dataMap['data'] is List) {
+            utilities = (dataMap['data'] as List<dynamic>)
+                .map((e) => Utility.fromJson(e as Map<String, dynamic>))
+                .toList();
+            pagination = dataMap['pagination'] as Map<String, dynamic>?;
+          }
+        } else if (responseData.containsKey('data') && responseData['data'] is List) {
+          utilities = (responseData['data'] as List<dynamic>)
+              .map((e) => Utility.fromJson(e as Map<String, dynamic>))
+              .toList();
+          pagination = responseData['pagination'] as Map<String, dynamic>?;
+        }
+      } else if (responseData is List) {
+        utilities = responseData
+            .map((e) => Utility.fromJson(e as Map<String, dynamic>))
+            .toList();
+        pagination = null;
+      }
+
+      return {
+        'utilities': utilities,
+        'pagination': pagination,
+      };
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Utility> getUtility(String utilityId) async {
+    try {
+      final response = await ApiService().get('/utilities/$utilityId');
+      return Utility.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> markUtilityAsPaid(String utilityId,
+      {String? notes, String? bankAccountId}) async {
+    try {
+      final response = await ApiService().put(
+        '/utilities/$utilityId/mark-paid',
+        data: {
+          if (notes != null) 'notes': notes,
+          if (bankAccountId != null) 'bankAccountId': bankAccountId,
+        },
+      );
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<Utility>> getOverdueUtilities() async {
+    try {
+      final response = await ApiService().get('/utilities/overdue');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => Utility.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Utility>> getUpcomingUtilities({int days = 7}) async {
+    try {
+      final response = await ApiService().get(
+        '/utilities/upcoming',
+        queryParameters: {'days': days},
+      );
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) => Utility.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Utility> createUtility(Map<String, dynamic> utilityData) async {
+    try {
+      final response = await ApiService().post('/utilities', data: utilityData);
+      return Utility.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Utility> updateUtility(
+      String utilityId, Map<String, dynamic> utilityData) async {
+    try {
+      final response =
+          await ApiService().put('/utilities/$utilityId', data: utilityData);
+      return Utility.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteUtility(String utilityId) async {
+    try {
+      final response = await ApiService().delete('/utilities/$utilityId');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // ==================== ALLOCATION PLANNER METHODS ====================
+
+  // Template Operations
+  Future<List<AllocationTemplate>> getAllocationTemplates() async {
+    try {
+      final response = await ApiService().get('/Allocation/templates');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((json) => AllocationTemplate.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AllocationTemplate> getAllocationTemplate(String templateId) async {
+    try {
+      final response = await ApiService().get('/Allocation/templates/$templateId');
+      return AllocationTemplate.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Plan Operations
+  Future<AllocationPlan?> getActiveAllocationPlan() async {
+    try {
+      final response = await ApiService().get('/Allocation/plans/active');
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return AllocationPlan.fromJson(response.data['data'] as Map<String, dynamic>);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<AllocationPlan>> getAllocationPlans() async {
+    try {
+      final response = await ApiService().get('/Allocation/plans');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((json) => AllocationPlan.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AllocationPlan> getAllocationPlan(String planId) async {
+    try {
+      final response = await ApiService().get('/Allocation/plans/$planId');
+      return AllocationPlan.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AllocationPlan> createAllocationPlan(Map<String, dynamic> planData) async {
+    try {
+      final response = await ApiService().post('/Allocation/plans', data: planData);
+      return AllocationPlan.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AllocationPlan> updateAllocationPlan(String planId, Map<String, dynamic> planData) async {
+    try {
+      final response = await ApiService().put('/Allocation/plans/$planId', data: planData);
+      return AllocationPlan.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteAllocationPlan(String planId) async {
+    try {
+      final response = await ApiService().delete('/Allocation/plans/$planId');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<AllocationPlan> applyAllocationTemplate(String templateId, double monthlyIncome) async {
+    try {
+      final response = await ApiService().post(
+        '/Allocation/plans/apply-template',
+        data: {'templateId': templateId, 'monthlyIncome': monthlyIncome},
+      );
+      return AllocationPlan.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Category Operations
+  Future<List<AllocationCategory>> getAllocationCategories(String planId) async {
+    try {
+      final response = await ApiService().get('/Allocation/plans/$planId/categories');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((json) => AllocationCategory.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // History & Tracking
+  Future<List<AllocationHistory>> getAllocationHistory({
+    String? planId,
+    String? categoryId,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? months,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (planId != null) queryParams['planId'] = planId;
+      if (categoryId != null) queryParams['categoryId'] = categoryId;
+      if (startDate != null) queryParams['startDate'] = startDate.toIso8601String();
+      if (endDate != null) queryParams['endDate'] = endDate.toIso8601String();
+      if (months != null) queryParams['months'] = months;
+
+      final response = await ApiService().get('/Allocation/history', queryParameters: queryParams);
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((json) => AllocationHistory.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> recordAllocationHistory(String planId) async {
+    try {
+      final response = await ApiService().post('/Allocation/plans/$planId/record-history');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Recommendations
+  Future<List<AllocationRecommendation>> getAllocationRecommendations({String? planId}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (planId != null) queryParams['planId'] = planId;
+
+      final response = await ApiService().get('/Allocation/recommendations', queryParameters: queryParams);
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((json) => AllocationRecommendation.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> markRecommendationRead(String recommendationId) async {
+    try {
+      final response = await ApiService().post('/Allocation/recommendations/$recommendationId/read');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> applyRecommendation(String recommendationId) async {
+    try {
+      final response = await ApiService().post('/Allocation/recommendations/$recommendationId/apply');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<AllocationRecommendation>> generateAllocationRecommendations(String planId) async {
+    try {
+      final response = await ApiService().post('/Allocation/plans/$planId/generate-recommendations');
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((json) => AllocationRecommendation.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Charts & Calculations
+  Future<AllocationChartData> getAllocationChartData(String planId, {DateTime? periodDate}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (periodDate != null) queryParams['periodDate'] = periodDate.toIso8601String();
+
+      final response = await ApiService().get(
+        '/Allocation/plans/$planId/chart-data',
+        queryParameters: queryParams,
+      );
+      return AllocationChartData.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AllocationSummary> getAllocationSummary(String planId) async {
+    try {
+      final response = await ApiService().get('/Allocation/plans/$planId/summary');
+      return AllocationSummary.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
   }
 }
 

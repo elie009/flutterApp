@@ -290,6 +290,60 @@ class _SavingsAccountDetailScreenState extends State<SavingsAccountDetailScreen>
               ),
             ),
           ),
+          // Projection Card
+          if (!_account!.isGoalCompleted) ...[
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.trending_up,
+                          color: AppTheme.successColor,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Goal Projection',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildProjectionRow(
+                      'Monthly Target',
+                      Formatters.formatCurrency(_account!.monthlyTarget),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildProjectionRow(
+                      'Days Remaining',
+                      '${_account!.daysRemaining} days',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildProjectionRow(
+                      'Projected Completion',
+                      Formatters.formatDate(_account!.targetDate),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Approximately ${(_account!.daysRemaining / 30.0).ceil()} months remaining',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           // Progress Card
           Card(
@@ -387,6 +441,32 @@ class _SavingsAccountDetailScreenState extends State<SavingsAccountDetailScreen>
                       w[0].toUpperCase() + w.substring(1).toLowerCase()
                     ).join(' '),
                   ),
+                  if (_account!.accountType != null) ...[
+                    const Divider(),
+                    _buildInfoRow(
+                      Icons.account_balance,
+                      'Account Type',
+                      _account!.accountType!.split('_').map((w) =>
+                        w[0].toUpperCase() + w.substring(1).toLowerCase()
+                      ).join(' '),
+                    ),
+                  ],
+                  if (_account!.interestRate != null) ...[
+                    const Divider(),
+                    _buildInfoRow(
+                      Icons.percent,
+                      'Interest Rate',
+                      '${(_account!.interestRate! * 100).toStringAsFixed(2)}%${_account!.interestCompoundingFrequency != null ? ' (${_account!.interestCompoundingFrequency!.toLowerCase()})' : ''}',
+                    ),
+                    if (_account!.nextInterestCalculationDate != null) ...[
+                      const Divider(),
+                      _buildInfoRow(
+                        Icons.calendar_today,
+                        'Next Interest Calculation',
+                        Formatters.formatDate(_account!.nextInterestCalculationDate!),
+                      ),
+                    ],
+                  ],
                   if (_account!.goal != null) ...[
                     const Divider(),
                     _buildInfoRow(
@@ -437,6 +517,28 @@ class _SavingsAccountDetailScreenState extends State<SavingsAccountDetailScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProjectionRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 

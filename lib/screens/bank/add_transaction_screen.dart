@@ -5,6 +5,7 @@ import '../../models/loan.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme.dart';
+import '../../utils/double_entry_validation.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/bottom_nav_bar.dart';
 
@@ -950,17 +951,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
-    // Additional validation
-    if (_transactionType == 'DEBIT' && _selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Category is required for debit transactions'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
+    // Recurring frequency validation
     if (_isRecurring && _recurringFrequency == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -972,37 +963,39 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
-    // Category-specific validation
-    if (_transactionType == 'DEBIT') {
-      if (_isBillCategory(_selectedCategory) && _selectedBill == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Bill selection is required for bill-related transactions'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      if (_isLoanCategory(_selectedCategory) && _selectedLoan == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Loan selection is required for loan-related transactions'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      if (_isSavingsCategory(_selectedCategory) &&
-          _selectedSavingsAccount == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Savings account selection is required for savings-related transactions'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
+    // Comprehensive validation with double-entry accounting
+    final amount = double.tryParse(_amountController.text);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid amount'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final validationErrors = validateTransactionWithDoubleEntry(
+      bankAccountId: _selectedAccount!.id,
+      amount: amount,
+      description: _descriptionController.text.trim(),
+      category: _selectedCategory,
+      billId: _selectedBill?.id,
+      savingsAccountId: _selectedSavingsAccount?.id,
+      loanId: _selectedLoan?.id,
+      toBankAccountId: null, // TODO: Add support for bank transfers in Flutter
+      transactionType: _transactionType,
+    );
+
+    if (validationErrors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(validationErrors.join('. ')),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      return;
     }
 
     setState(() {

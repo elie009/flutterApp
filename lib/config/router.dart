@@ -17,11 +17,14 @@ import '../screens/income/income_sources_screen.dart';
 import '../screens/bank/bank_accounts_screen.dart';
 import '../screens/category/category_screen.dart';
 import '../screens/analytics/analytics_screen.dart';
+import '../screens/analytics/forecasting_screen.dart';
+import '../screens/analytics/variance_dashboard_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/profile_screen.dart';
 import '../screens/savings/savings_categories_screen.dart';
 import '../screens/savings/savings_account_detail_screen.dart';
+import '../screens/expenses/expenses_screen.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../utils/navigation_helper.dart';
@@ -119,6 +122,16 @@ class AppRouter {
         builder: (context, state) => const AnalyticsScreen(),
       ),
       GoRoute(
+        path: '/variance-dashboard',
+        name: 'variance-dashboard',
+        builder: (context, state) => const VarianceDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/forecasting',
+        name: 'forecasting',
+        builder: (context, state) => const ForecastingScreen(),
+      ),
+      GoRoute(
         path: '/transactions',
         name: 'transactions',
         builder: (context, state) => const TransactionsScreen(),
@@ -135,6 +148,11 @@ class AppRouter {
           final id = state.pathParameters['id']!;
           return BillDetailScreen(billId: id);
         },
+      ),
+      GoRoute(
+        path: '/expenses',
+        name: 'expenses',
+        builder: (context, state) => const ExpensesScreen(),
       ),
       GoRoute(
         path: '/loans',

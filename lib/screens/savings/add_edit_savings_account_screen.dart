@@ -23,8 +23,11 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
   final _targetAmountController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _goalController = TextEditingController();
+  final _interestRateController = TextEditingController();
 
   String _selectedSavingsType = 'EMERGENCY';
+  String _selectedAccountType = 'REGULAR';
+  String _selectedCompoundingFrequency = 'MONTHLY';
   DateTime _selectedTargetDate = DateTime.now().add(const Duration(days: 365));
   String _currency = 'USD';
   bool _isSaving = false;
@@ -45,6 +48,20 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
     {'value': 'GENERAL', 'label': 'General'},
   ];
 
+  final List<Map<String, dynamic>> _accountTypes = [
+    {'value': 'REGULAR', 'label': 'Regular'},
+    {'value': 'HIGH_YIELD', 'label': 'High-Yield'},
+    {'value': 'CD', 'label': 'Certificate of Deposit (CD)'},
+    {'value': 'MONEY_MARKET', 'label': 'Money Market'},
+  ];
+
+  final List<Map<String, dynamic>> _compoundingFrequencies = [
+    {'value': 'DAILY', 'label': 'Daily'},
+    {'value': 'MONTHLY', 'label': 'Monthly'},
+    {'value': 'QUARTERLY', 'label': 'Quarterly'},
+    {'value': 'ANNUALLY', 'label': 'Annually'},
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +71,11 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
       _descriptionController.text = widget.savingsAccount!.description ?? '';
       _goalController.text = widget.savingsAccount!.goal ?? '';
       _selectedSavingsType = widget.savingsAccount!.savingsType;
+      _selectedAccountType = widget.savingsAccount!.accountType ?? 'REGULAR';
+      _interestRateController.text = widget.savingsAccount!.interestRate != null
+          ? (widget.savingsAccount!.interestRate! * 100).toStringAsFixed(2)
+          : '';
+      _selectedCompoundingFrequency = widget.savingsAccount!.interestCompoundingFrequency ?? 'MONTHLY';
       _selectedTargetDate = widget.savingsAccount!.targetDate;
       _currency = widget.savingsAccount!.currency;
     }
@@ -65,6 +87,7 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
     _targetAmountController.dispose();
     _descriptionController.dispose();
     _goalController.dispose();
+    _interestRateController.dispose();
     super.dispose();
   }
 
@@ -95,6 +118,13 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
       final accountData = {
         'accountName': _accountNameController.text.trim(),
         'savingsType': _selectedSavingsType,
+        'accountType': _selectedAccountType,
+        'interestRate': _interestRateController.text.trim().isNotEmpty
+            ? double.parse(_interestRateController.text) / 100
+            : null,
+        'interestCompoundingFrequency': _interestRateController.text.trim().isNotEmpty
+            ? _selectedCompoundingFrequency
+            : null,
         'targetAmount': double.parse(_targetAmountController.text),
         'description': _descriptionController.text.trim().isEmpty
             ? null
@@ -186,6 +216,71 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
                 }
               },
             ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedAccountType,
+              decoration: const InputDecoration(
+                labelText: 'Account Type',
+                prefixIcon: Icon(Icons.account_balance),
+                helperText: 'Optional: Type of savings account',
+              ),
+              items: _accountTypes.map((type) {
+                return DropdownMenuItem<String>(
+                  value: type['value'] as String,
+                  child: Text(type['label'] as String),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedAccountType = value;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _interestRateController,
+              decoration: const InputDecoration(
+                labelText: 'Interest Rate (%)',
+                hintText: 'e.g., 4.5 for 4.5%',
+                prefixIcon: Icon(Icons.percent),
+                helperText: 'Optional: Annual interest rate',
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              validator: (value) {
+                if (value != null && value.trim().isNotEmpty) {
+                  final rate = double.tryParse(value);
+                  if (rate == null || rate < 0 || rate > 100) {
+                    return 'Please enter a valid rate between 0 and 100';
+                  }
+                }
+                return null;
+              },
+            ),
+            if (_interestRateController.text.trim().isNotEmpty) ...[
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedCompoundingFrequency,
+                decoration: const InputDecoration(
+                  labelText: 'Compounding Frequency',
+                  prefixIcon: Icon(Icons.repeat),
+                ),
+                items: _compoundingFrequencies.map((freq) {
+                  return DropdownMenuItem<String>(
+                    value: freq['value'] as String,
+                    child: Text(freq['label'] as String),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedCompoundingFrequency = value;
+                    });
+                  }
+                },
+              ),
+            ],
             const SizedBox(height: 16),
             TextFormField(
               controller: _targetAmountController,
