@@ -1,28 +1,139 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/bottom_nav_bar_mobile.dart';
+import 'dart:math' as math;
 
-class DashboardScreen extends StatelessWidget {
+// Custom painter for house roof
+class _HousePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFF1FFF3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.70;
+
+    final path = Path()
+      ..moveTo(size.width / 2, 0)
+      ..lineTo(0, size.height)
+      ..lineTo(size.width, size.height)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Custom painter for circular progress arc
+class _CircularProgressPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+
+  _CircularProgressPainter({
+    required this.progress,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+
+    final center = Offset(size.width / 2, size.height);
+    final radius = size.width / 2;
+
+    final startAngle = -90 * math.pi / 180; // Start from top
+    final sweepAngle = 2 * math.pi * progress;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _CircularProgressPainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.color != color;
+}
+
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  // Mock data for savings goal progress
+  double _savingsProgress = 0.0;
+  bool _isLoadingProgress = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavingsProgress();
+  }
+
+  // Endpoint-ready function to fetch savings progress
+  Future<void> _loadSavingsProgress() async {
+    setState(() {
+      _isLoadingProgress = true;
+    });
+
+    try {
+      // TODO: Replace with actual API call
+      // final response = await http.get(Uri.parse('/api/user/savings-progress'));
+      // final data = json.decode(response.body);
+      // _savingsProgress = data['progress'] / 100.0; // Convert percentage to 0-1 range
+
+      // Mock API call delay
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Mock data - 75% progress
+      setState(() {
+        _savingsProgress = 0.75;
+        _isLoadingProgress = false;
+      });
+    } catch (e) {
+      // Handle error - fallback to 0 progress
+      setState(() {
+        _savingsProgress = 0.0;
+        _isLoadingProgress = false;
+      });
+      debugPrint('Error loading savings progress: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     return Scaffold(
+      backgroundColor: const Color(0xFF00D09E),
       body: Container(
-        width: 430,
-        height: 932,
+        width: screenWidth,
+        height: screenHeight,
         decoration: const BoxDecoration(
           color: Color(0xFF00D09E),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
             // White bottom section
             Positioned(
               left: 0,
               top: 292,
-              width: 430,
-              height: 640,
+              right: 0,
+              bottom: 0, // Will be above bottom navigation bar
               child: Container(
                 decoration: const BoxDecoration(
                   color: Color(0xFFF1FFF3),
@@ -48,7 +159,7 @@ class DashboardScreen extends StatelessWidget {
             Positioned(
               left: 0,
               top: 0,
-              width: 430,
+              right: 0,
               height: 32,
               child: Stack(
                 children: [
@@ -184,7 +295,7 @@ class DashboardScreen extends StatelessWidget {
               left: 240,
               top: 370,
               child: Text(
-                '\$4.000.00',
+                '\4.000.00',
                 style: TextStyle(
                   color: Color(0xFF052224),
                   fontSize: 15,
@@ -198,7 +309,7 @@ class DashboardScreen extends StatelessWidget {
               left: 240,
               top: 432,
               child: Text(
-                '-\$100.00',
+                '-\100.00',
                 style: TextStyle(
                   color: Color(0xFF0068FF),
                   fontSize: 15,
@@ -227,7 +338,7 @@ class DashboardScreen extends StatelessWidget {
               left: 60,
               top: 152,
               child: Text(
-                '\$7,783.00',
+                '\7,783.00',
                 style: TextStyle(
                   color: Color(0xFFF1FFF3),
                   fontSize: 24,
@@ -255,7 +366,7 @@ class DashboardScreen extends StatelessWidget {
               left: 249,
               top: 152,
               child: Text(
-                '-\$1.187.40',
+                '-\1.187.40',
                 style: TextStyle(
                   color: Color(0xFF0068FF),
                   fontSize: 24,
@@ -357,39 +468,35 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
-            // Progress indicators
+            // Income indicator (up arrow)
             Positioned(
               left: 60,
               top: 139,
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(3),
+              child: Transform.rotate(
+                angle: -90 * 3.14159 / 180, // -90 degrees (pointing up)
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 12,
+                  color: Color(0xFF052224),
                 ),
               ),
             ),
 
+            // Expense indicator (down arrow)
             Positioned(
               left: 249,
               top: 139,
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(3),
+              child: Transform.rotate(
+                angle: 90 * 3.14159 / 180, // 90 degrees (pointing down)
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 12,
+                  color: Color(0xFF052224),
                 ),
               ),
             ),
 
+            // Checkmark icon
             Positioned(
               left: 60,
               top: 243,
@@ -402,14 +509,10 @@ class DashboardScreen extends StatelessWidget {
                     width: 1,
                   ),
                 ),
-                child: Container(
-                  margin: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF052224),
-                      width: 1,
-                    ),
-                  ),
+                child: const Icon(
+                  Icons.check,
+                  size: 8,
+                  color: Color(0xFF052224),
                 ),
               ),
             ),
@@ -600,16 +703,54 @@ class DashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: Center(
-                  child: Container(
-                    width: 26,
-                    height: 23.48,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFF1FFF3),
-                        width: 1.77,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 7.5,
+                        top: 7.5,
+                        child: Container(
+                          width: 26,
+                          height: 23.48,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFFF1FFF3),
+                              width: 1.77,
+                            ),
+                            borderRadius: BorderRadius.circular(0.44),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(0.44),
-                    ),
+                      Positioned(
+                        left: 10,
+                        top: 10,
+                        child: Container(
+                          width: 20,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFFF1FFF3),
+                              width: 1.77,
+                            ),
+                            borderRadius: BorderRadius.circular(0.44),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 12.5,
+                        top: 12.5,
+                        child: Container(
+                          width: 14,
+                          height: 12.5,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFFF1FFF3),
+                              width: 1.77,
+                            ),
+                            borderRadius: BorderRadius.circular(0.44),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -709,7 +850,7 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
-            // Groceries icon
+            // Groceries icon (shopping bag)
             Positioned(
               left: 37,
               top: 664,
@@ -721,15 +862,61 @@ class DashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: Center(
-                  child: Container(
-                    width: 16.76,
-                    height: 27.44,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFF1FFF3),
-                        width: 1.70,
+                  child: Stack(
+                    children: [
+                      // Bag body
+                      Positioned(
+                        left: 20,
+                        top: 13,
+                        child: Container(
+                          width: 16.76,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFFF1FFF3),
+                              width: 1.70,
+                            ),
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(2),
+                              bottomRight: Radius.circular(2),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      // Bag handles
+                      Positioned(
+                        left: 18,
+                        top: 13,
+                        child: Container(
+                          width: 3,
+                          height: 7,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: const Color(0xFFF1FFF3),
+                                width: 1.70,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 35,
+                        top: 13,
+                        child: Container(
+                          width: 3,
+                          height: 7,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: const Color(0xFFF1FFF3),
+                                width: 1.70,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -829,7 +1016,7 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
-            // Rent icon
+            // Rent icon (house/key)
             Positioned(
               left: 37,
               top: 744,
@@ -841,39 +1028,302 @@ class DashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: Center(
-                  child: Container(
-                    width: 28.37,
-                    height: 24.82,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFF1FFF3),
-                        width: 1.70,
+                  child: Stack(
+                    children: [
+                      // House shape with roof
+                      Positioned(
+                        left: 14,
+                        top: 14,
+                        child: Container(
+                          width: 28.37,
+                          height: 24.82,
+                          child: Stack(
+                            children: [
+                              // Roof (triangle)
+                              Positioned(
+                                left: 0,
+                                top: 0,
+                                child: CustomPaint(
+                                  size: const Size(28.37, 12),
+                                  painter: _HousePainter(),
+                                ),
+                              ),
+                              // House body
+                              Positioned(
+                                left: 0,
+                                top: 12,
+                                child: Container(
+                                  width: 28.37,
+                                  height: 12.82,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: const Color(0xFFF1FFF3),
+                                      width: 1.70,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Door
+                              Positioned(
+                                left: 9,
+                                top: 16,
+                                child: Container(
+                                  width: 10,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: const Color(0xFFF1FFF3),
+                                      width: 1.70,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Food icon (fork and knife)
+            Positioned(
+              left: 203,
+              top: 413,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Transform.rotate(
+                    angle: -45 * 3.14159 / 180,
+                    child: const Icon(
+                      Icons.restaurant,
+                      size: 19.144,
+                      color: Color(0xFF052224),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Divider between Revenue and Food last week
+            Positioned(
+              left: 210,
+              top: 403,
+              child: SizedBox(
+                width: 120,
+                height: 2,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFFFFF),
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ),
+            ),
+
+            // Salary icon (stack of money)
+            Positioned(
+              left: 197,
+              top: 355,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    child: Container(
+                      width: 31,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFF052224),
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0.88,
-                          top: 0.88,
-                          child: Container(
-                            width: 26.64,
-                            height: 23.09,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFF1FFF3),
-                                width: 1.70,
+                  ),
+                  Positioned(
+                    left: 2,
+                    top: 2,
+                    child: Container(
+                      width: 27,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFF052224),
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 4,
+                    top: 4,
+                    child: Container(
+                      width: 23,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFF052224),
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Divider between Revenue and Food last week
+            Positioned(
+              left: 186,
+              top: 350,
+              child: SizedBox(
+                width: 2,
+                height: 100,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFFFFF),
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ),
+            ),
+
+            // Circular Progress Bar for Savings Goal with Car Icon
+            Positioned(
+              left: 73,
+              top: 348,
+              child: SizedBox(
+                width: 71,
+                height: 71,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer circle background
+                    SizedBox(
+                      width: 68.344,
+                      height: 68.344,
+                      child: CircularProgressIndicator(
+                        value: 1.0,
+                        backgroundColor: const Color(0xFFF1FFF3),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF1FFF3)),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    // Progress circle (filled portion)
+                    _isLoadingProgress
+                        ? const SizedBox(
+                            width: 68.344,
+                            height: 68.344,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00D09E)),
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : Transform.rotate(
+                            angle: -90 * math.pi / 180, // Start from top (-90 degrees)
+                            child: SizedBox(
+                              width: 68.344,
+                              height: 68.344,
+                              child: CircularProgressIndicator(
+                                value: _savingsProgress,
+                                backgroundColor: Colors.transparent,
+                                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
+                                strokeWidth: 3,
+                                strokeCap: StrokeCap.round,
                               ),
                             ),
                           ),
-                        ),
-                        const Positioned(
-                          left: 4.76,
-                          top: 3.90,
-                          child: Text(
-                            '•',
-                            style: TextStyle(
-                              color: Color(0xFFF1FFF3),
-                              fontSize: 8,
+                    // Car icon for savings goal - positioned at center
+                    const Icon(
+                      Icons.directions_car,
+                      size: 14.338,
+                      color: Color(0xFF052224),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Savings on goals text
+            Positioned(
+              left: 108.5,
+              top: 422,
+              child: SizedBox(
+                width: 63,
+                child: Text(
+                  'Savings on goals',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF093030),
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                    height: 1.496,
+                  ),
+                ),
+              ),
+            ),
+
+
+            // Notification icon (bell)
+            Positioned(
+              left: 364,
+              top: 61,
+              child: GestureDetector(
+                onTap: () {
+                  // Navigate to notifications if needed
+                },
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFDFF7E2),
+                    borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                  ),
+                  child: Center(
+                    child: Stack(
+                      children: [
+                        // Bell shape
+                        Positioned(
+                          left: 7.71,
+                          top: 5.14,
+                          child: Container(
+                            width: 14.57,
+                            height: 18.86,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xFF052224),
+                                width: 1.29,
+                              ),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                                bottomLeft: Radius.circular(2),
+                                bottomRight: Radius.circular(2),
+                              ),
+                            ),
+                            child: Stack(
+                              children: [
+                                // Bell clapper
+                                Positioned(
+                                  left: 6,
+                                  bottom: 2,
+                                  child: Container(
+                                    width: 2.5,
+                                    height: 3,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF052224),
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -883,222 +1333,122 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Chart elements in the green card
-            Positioned(
-              left: 203,
-              top: 413,
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
+        decoration: const BoxDecoration(
+          color: Color(0xFFDFF7E2),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(70),
+            topRight: Radius.circular(70),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Home page (active) - with green background circle
+            GestureDetector(
+              onTap: () {
+                // Already on home page
+              },
               child: Container(
-                width: 19.14,
-                height: 34.06,
+                width: 57,
+                height: 53,
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF093030),
-                    width: 2.08,
-                  ),
+                  color: const Color(0xFF00D09E), // Active highlight
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: const Icon(
+                  Icons.home,
+                  color: Colors.white,
+                  size: 25,
                 ),
               ),
             ),
 
-            Positioned(
-              left: 197,
-              top: 355,
-              child: Container(
-                width: 31,
-                height: 28,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF093030),
-                    width: 2.11,
-                  ),
-                  borderRadius: BorderRadius.circular(0.53),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 90,
-              top: 372.79,
-              child: Container(
-                width: 37.57,
-                height: 21.75,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1.98,
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 73,
-              top: 416.29,
-              child: Transform.rotate(
-                angle: -88 * 3.14159 / 180, // -88 degrees in radians
-                child: Container(
-                  width: 68.34,
-                  height: 68.34,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFFF1FFF3),
-                      width: 2.32,
-                    ),
-                    borderRadius: BorderRadius.circular(9999),
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 107.41,
-              top: 416.73,
-              child: Transform.rotate(
-                angle: -88 * 3.14159 / 180, // -88 degrees in radians
-                child: Container(
-                  width: 66.48,
-                  height: 33.01,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF0068FF),
-                      width: 3.25,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 77,
-              top: 422,
+            // Analysis page (bar chart icon)
+            GestureDetector(
+              onTap: () => context.go('/analysis'),
               child: SizedBox(
-                width: 63,
-                height: 33,
-                child: Text(
-                  'Savings on goals',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                  ),
+                width: 31,
+                height: 30,
+                child: const Icon(
+                  Icons.bar_chart,
+                  color: Color(0xFF052224),
+                  size: 30,
                 ),
               ),
             ),
 
-            // Bottom Navigation
-            Positioned(
-              left: 0,
-              top: 824,
-              width: 430,
-              height: 108,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
+            // Transactions page (double arrow icon)
+            GestureDetector(
+              onTap: () => context.go('/transactions'),
+              child: SizedBox(
+                width: 33,
+                height: 25,
+                child: const Icon(
+                  Icons.swap_horiz,
+                  color: Color(0xFF052224),
+                  size: 25,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+            ),
+
+            // Category page (stack of cards icon)
+            GestureDetector(
+              onTap: () => context.go('/category'),
+              child: SizedBox(
+                width: 27,
+                height: 23,
+                child: Stack(
                   children: [
-                    // Home page (active)
-                    Transform.translate(
-                      offset: const Offset(0, -10), // Move up for highlight effect
-                      child: Container(
-                        width: 57,
-                        height: 53,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00D09E), // Active highlight
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: Container(
-                          width: 25,
-                          height: 31,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF052224),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Search page
-                    GestureDetector(
-                      onTap: () => context.go('/analysis'),
-                      child: Container(
-                        width: 31,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFF052224),
-                            width: 2,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.search,
-                          color: Color(0xFF052224),
-                          size: 16,
-                        ),
-                      ),
-                    ),
-
-                    // Category page
-                    GestureDetector(
-                      onTap: () => context.go('/category'),
+                    // Bottom card
+                    Positioned(
+                      left: 0,
+                      top: 3,
                       child: Container(
                         width: 27,
-                        height: 23,
+                        height: 20,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: const Color(0xFF052224),
                             width: 2,
                           ),
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
                     ),
-
-                    // Transaction page
-                    GestureDetector(
-                      onTap: () => context.go('/transactions'),
+                    // Middle card
+                    Positioned(
+                      left: 2,
+                      top: 1,
                       child: Container(
-                        width: 33,
-                        height: 25,
+                        width: 23,
+                        height: 18,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: const Color(0xFF052224),
-                            width: 2,
+                            width: 1.5,
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.account_balance_wallet,
-                          color: Color(0xFF052224),
-                          size: 14,
+                          borderRadius: BorderRadius.circular(1),
                         ),
                       ),
                     ),
-
-                    // Profile page
-                    GestureDetector(
-                      onTap: () => context.go('/profile'),
+                    // Top card
+                    Positioned(
+                      left: 4,
+                      top: 0,
                       child: Container(
-                        width: 22,
-                        height: 27,
+                        width: 19,
+                        height: 16,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: const Color(0xFF052224),
-                            width: 2,
+                            width: 1.5,
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.person,
-                          color: Color(0xFF052224),
-                          size: 14,
+                          borderRadius: BorderRadius.circular(1),
                         ),
                       ),
                     ),
@@ -1107,35 +1457,22 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
-            // Notification icon
-            Positioned(
-              left: 364,
-              top: 61,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
-                      ),
-                    ),
-                  ),
+            // Profile page (person icon)
+            GestureDetector(
+              onTap: () => context.go('/profile'),
+              child: SizedBox(
+                width: 22,
+                height: 27,
+                child: const Icon(
+                  Icons.person_outline,
+                  color: Color(0xFF052224),
+                  size: 27,
                 ),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarMobile(currentIndex: 0),
     );
   }
 }
