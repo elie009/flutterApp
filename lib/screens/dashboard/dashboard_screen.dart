@@ -1396,63 +1396,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // Category page (stack of cards icon)
+            // Category page (transaction icon - wallet/receipt)
             GestureDetector(
               onTap: () => context.go('/category'),
               child: SizedBox(
                 width: 27,
                 height: 23,
-                child: Stack(
-                  children: [
-                    // Bottom card
-                    Positioned(
-                      left: 0,
-                      top: 3,
-                      child: Container(
-                        width: 27,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFF052224),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    // Middle card
-                    Positioned(
-                      left: 2,
-                      top: 1,
-                      child: Container(
-                        width: 23,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFF052224),
-                            width: 1.5,
-                          ),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                      ),
-                    ),
-                    // Top card
-                    Positioned(
-                      left: 4,
-                      top: 0,
-                      child: Container(
-                        width: 19,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFF052224),
-                            width: 1.5,
-                          ),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: const Icon(
+                  Icons.account_balance_wallet,
+                  color: Color(0xFF052224),
+                  size: 23,
                 ),
               ),
             ),
