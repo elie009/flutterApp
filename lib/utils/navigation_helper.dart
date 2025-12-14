@@ -11,6 +11,25 @@ class NavigationHelper {
     }
   }
 
+  static Future<T?> navigateToWithResult<T>(BuildContext context, String route,
+      {Map<String, String>? params, Object? extra}) async {
+    try {
+      if (params != null) {
+        return await context.pushNamed<T>(route, pathParameters: params, extra: extra);
+      } else {
+        return await context.pushNamed<T>(route, extra: extra);
+      }
+    } catch (e) {
+      // Fallback to goNamed if pushNamed fails
+      if (params != null) {
+        context.goNamed(route, pathParameters: params, extra: extra);
+      } else {
+        context.goNamed(route, extra: extra);
+      }
+      return null;
+    }
+  }
+
   static void navigateBack(BuildContext context) {
     if (context.canPop()) {
       context.pop();

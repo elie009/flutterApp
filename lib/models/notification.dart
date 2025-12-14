@@ -7,6 +7,7 @@ class AppNotification extends Equatable {
   final String message;
   final bool isRead;
   final DateTime createdAt;
+  final Map<String, dynamic>? templateVariables; // Contains billId, loanId, etc.
 
   const AppNotification({
     required this.id,
@@ -15,6 +16,7 @@ class AppNotification extends Equatable {
     required this.message,
     required this.isRead,
     required this.createdAt,
+    this.templateVariables,
   });
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,9 @@ class AppNotification extends Equatable {
       message: json['message'] as String,
       isRead: json['isRead'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      templateVariables: json['templateVariables'] != null
+          ? Map<String, dynamic>.from(json['templateVariables'] as Map)
+          : null,
     );
   }
 
@@ -36,6 +41,7 @@ class AppNotification extends Equatable {
       'message': message,
       'isRead': isRead,
       'createdAt': createdAt.toIso8601String(),
+      if (templateVariables != null) 'templateVariables': templateVariables,
     };
   }
 
@@ -47,6 +53,7 @@ class AppNotification extends Equatable {
         message,
         isRead,
         createdAt,
+        templateVariables,
       ];
 }
 

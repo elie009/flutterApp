@@ -81,7 +81,7 @@ class AuthService {
   static Future<Map<String, dynamic>> register({
     required String name,
     required String email,
-    required String phone,
+    required String country,
     required String password,
     required String confirmPassword,
   }) async {
@@ -91,7 +91,7 @@ class AuthService {
         data: {
           'name': name,
           'email': email,
-          'phone': phone,
+          'country': country,
           'password': password,
           'confirmPassword': confirmPassword,
         },
@@ -172,6 +172,9 @@ class AuthService {
 
   // Update user profile
   static Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? phone,
+    String? email,
     String? jobTitle,
     String? company,
     String? preferredCurrency,
@@ -180,6 +183,9 @@ class AuthService {
       final response = await ApiService().put(
         '/UserProfile',
         data: {
+          if (name != null) 'name': name,
+          if (phone != null) 'phone': phone,
+          if (email != null) 'email': email,
           if (jobTitle != null) 'jobTitle': jobTitle,
           if (company != null) 'company': company,
           if (preferredCurrency != null) 'preferredCurrency': preferredCurrency,

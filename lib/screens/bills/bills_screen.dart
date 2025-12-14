@@ -7,6 +7,8 @@ import '../../utils/navigation_helper.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/shimmer_loading.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/theme.dart';
 
 class BillsScreen extends StatefulWidget {
@@ -171,7 +173,7 @@ class _BillsScreenState extends State<BillsScreen> {
           // Bills List
           Expanded(
             child: _isLoading && _bills.isEmpty
-                ? const LoadingIndicator(message: 'Loading bills...')
+                ? const ShimmerList(itemCount: 5, itemHeight: 100)
                 : _errorMessage != null && _bills.isEmpty
                     ? ErrorDisplay(
                         message: _errorMessage!,
@@ -183,11 +185,14 @@ class _BillsScreenState extends State<BillsScreen> {
                         onLoading: _onLoadMore,
                         enablePullUp: true,
                         child: _bills.isEmpty
-                            ? const Center(
-                                child: Text(
-                                  'No bills found',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
+                            ? EmptyState(
+                                icon: Icons.receipt_long,
+                                title: 'No Bills Found',
+                                message: 'You don\'t have any bills yet. Add your first bill to get started!',
+                                actionLabel: 'Add Bill',
+                                onAction: () {
+                                  // TODO: Navigate to add bill screen
+                                },
                               )
                             : ListView.builder(
                                 itemCount: _bills.length,
@@ -281,6 +286,13 @@ class _BillsScreenState extends State<BillsScreen> {
                       ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          NavigationHelper.navigateTo(context, 'add-bill');
+        },
+        backgroundColor: AppTheme.primaryColor,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );

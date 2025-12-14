@@ -5,6 +5,8 @@ import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/shimmer_loading.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/theme.dart';
 
 class IncomeSourcesScreen extends StatefulWidget {
@@ -95,7 +97,7 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
         title: const Text('Income Sources'),
       ),
       body: _isLoading
-          ? const LoadingIndicator(message: 'Loading income sources...')
+          ? const ShimmerList(itemCount: 5, itemHeight: 100)
           : _errorMessage != null
               ? ErrorDisplay(
                   message: _errorMessage!,
@@ -140,11 +142,20 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
                     // Income Sources List
                     Expanded(
                       child: _incomeSources.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'No income sources found',
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                          ? EmptyState(
+                              icon: Icons.attach_money,
+                              title: 'No Income Sources',
+                              message: 'Add your income sources to track your monthly earnings.',
+                              actionLabel: 'Add Income Source',
+                              onAction: () async {
+                                final result = await NavigationHelper.navigateToWithResult<bool>(
+                                  context,
+                                  'income-add-edit',
+                                );
+                                if (result == true) {
+                                  _loadIncomeSources();
+                                }
+                              },
                             )
                           : ListView.builder(
                               itemCount: _incomeSources.length,
@@ -185,8 +196,14 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
                                       children: [
                                         IconButton(
                                           icon: const Icon(Icons.edit),
-                                          onPressed: () {
-                                            // TODO: Navigate to edit screen
+                                          onPressed: () async {
+                                            final result = await NavigationHelper.navigateToWithResult<bool>(
+                                              context,
+                                              'income-add-edit',
+                                            );
+                                            if (result == true) {
+                                              _loadIncomeSources();
+                                            }
                                           },
                                         ),
                                         IconButton(
@@ -205,8 +222,14 @@ class _IncomeSourcesScreenState extends State<IncomeSourcesScreen> {
                   ],
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Navigate to add income source screen
+        onPressed: () async {
+          final result = await NavigationHelper.navigateToWithResult<bool>(
+            context,
+            'income-add-edit',
+          );
+          if (result == true) {
+            _loadIncomeSources();
+          }
         },
         child: const Icon(Icons.add),
       ),

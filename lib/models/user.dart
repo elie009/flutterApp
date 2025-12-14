@@ -8,6 +8,7 @@ class User extends Equatable {
   final String? jobTitle;
   final String? company;
   final String? preferredCurrency;
+  final String? profilePicture;
   final double? totalMonthlyIncome;
   final double? netMonthlyIncome;
 
@@ -19,6 +20,7 @@ class User extends Equatable {
     this.jobTitle,
     this.company,
     this.preferredCurrency,
+    this.profilePicture,
     this.totalMonthlyIncome,
     this.netMonthlyIncome,
   });
@@ -32,6 +34,7 @@ class User extends Equatable {
       jobTitle: json['jobTitle'] as String?,
       company: json['company'] as String?,
       preferredCurrency: json['preferredCurrency'] as String?,
+      profilePicture: json['profilePicture'] as String?,
       totalMonthlyIncome: json['totalMonthlyIncome'] != null
           ? (json['totalMonthlyIncome'] as num).toDouble()
           : null,
@@ -50,6 +53,7 @@ class User extends Equatable {
       'jobTitle': jobTitle,
       'company': company,
       'preferredCurrency': preferredCurrency,
+      'profilePicture': profilePicture,
       'totalMonthlyIncome': totalMonthlyIncome,
       'netMonthlyIncome': netMonthlyIncome,
     };
@@ -64,6 +68,7 @@ class User extends Equatable {
         jobTitle,
         company,
         preferredCurrency,
+        profilePicture,
         totalMonthlyIncome,
         netMonthlyIncome,
       ];

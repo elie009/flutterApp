@@ -16,6 +16,21 @@ class DataService {
   factory DataService() => _instance;
   DataService._internal();
 
+  // Recent Activity
+  Future<Map<String, dynamic>> getRecentActivity() async {
+    try {
+      final response = await ApiService().get('/Dashboard/recent-activity');
+      
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+      
+      throw Exception('Failed to get recent activity');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Dashboard Summary
   Future<DashboardSummary> getDashboardSummary() async {
     try {
@@ -172,7 +187,7 @@ class DataService {
 
   Future<List<Bill>> getOverdueBills() async {
     try {
-      final response = await ApiService().get('/Bills/overdue');
+      final response = await ApiService().get('/Bills/summary');
       final data = response.data['data'] as List<dynamic>? ?? [];
       return data.map((e) => Bill.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
@@ -346,6 +361,10 @@ class DataService {
   }) async {
     try {
       final userId = AuthService.getCurrentUser()?.id ?? '';
+      if (userId.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+
       final queryParams = <String, dynamic>{
         'page': page,
         'limit': limit,
@@ -354,12 +373,18 @@ class DataService {
       };
 
       final response = await ApiService().get(
-        '/notifications/$userId',
+        '/Notifications/user/$userId',
         queryParameters: queryParams,
       );
 
-      final data = response.data['data'] as List<dynamic>? ?? [];
-      return data
+      // Handle the API response structure: { success: true, data: { data: [...], page: 1, ... } }
+      final responseData = response.data['data'] as Map<String, dynamic>?;
+      if (responseData == null) {
+        return [];
+      }
+
+      final notificationsData = responseData['data'] as List<dynamic>? ?? [];
+      return notificationsData
           .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
           .toList();
     } catch (e) {
@@ -367,9 +392,33 @@ class DataService {
     }
   }
 
+  Future<int> getUnreadNotificationCount() async {
+    try {
+      final userId = AuthService.getCurrentUser()?.id ?? '';
+      if (userId.isEmpty) {
+        return 0;
+      }
+
+      final response = await ApiService().get(
+        '/Notifications/user/$userId/unread-count',
+      );
+
+      final count = response.data['data'] as int? ?? 0;
+      return count;
+    } catch (e) {
+      // Fallback: count unread from getNotifications
+      try {
+        final notifications = await getNotifications(status: 'unread', limit: 100);
+        return notifications.where((n) => !n.isRead).length;
+      } catch (e) {
+        return 0;
+      }
+    }
+  }
+
   Future<bool> markNotificationAsRead(String notificationId) async {
     try {
-      final response = await ApiService().put('/notifications/$notificationId/read');
+      final response = await ApiService().put('/Notifications/$notificationId/read');
       return response.data['success'] == true;
     } catch (e) {
       return false;

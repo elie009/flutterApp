@@ -52,6 +52,8 @@ class UtilityHub360App extends StatelessWidget {
       title: 'UtilityHub360',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       routerConfig: AppRouter.router,
     );
   }

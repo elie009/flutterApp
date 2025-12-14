@@ -1,234 +1,477 @@
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
-import '../../services/auth_service.dart';
-import '../../utils/navigation_helper.dart';
-import '../../widgets/loading_indicator.dart';
-import '../../utils/theme.dart';
+import 'package:go_router/go_router.dart';
+import '../../widgets/bottom_nav_bar_mobile.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _jobTitleController = TextEditingController();
-  final _companyController = TextEditingController();
-  bool _isLoading = false;
-  bool _isEditing = false;
-  User? _user;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfile();
-  }
-
-  Future<void> _loadProfile() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final user = await AuthService.getUserProfile();
-    setState(() {
-      _user = user ?? AuthService.getCurrentUser();
-      _jobTitleController.text = _user?.jobTitle ?? '';
-      _companyController.text = _user?.company ?? '';
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final result = await AuthService.updateProfile(
-      jobTitle: _jobTitleController.text.trim().isEmpty
-          ? null
-          : _jobTitleController.text.trim(),
-      company: _companyController.text.trim().isEmpty
-          ? null
-          : _companyController.text.trim(),
-    );
-
-    setState(() {
-      _isLoading = false;
-      _isEditing = false;
-    });
-
-    if (result['success'] == true) {
-      _user = result['user'] as User;
-      if (mounted) {
-        NavigationHelper.showSnackBar(
-          context,
-          'Profile updated successfully',
-          backgroundColor: AppTheme.successColor,
-        );
-      }
-    } else {
-      if (mounted) {
-        NavigationHelper.showSnackBar(
-          context,
-          result['message'] as String? ?? 'Failed to update profile',
-          backgroundColor: AppTheme.errorColor,
-        );
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isLoading && _user == null) {
-      return const Scaffold(
-        body: LoadingIndicator(message: 'Loading profile...'),
-      );
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          if (_isEditing)
-            TextButton(
-              onPressed: _saveProfile,
-              child: const Text(
-                'Save',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                setState(() {
-                  _isEditing = true;
-                });
-              },
-            ),
-          if (_isEditing)
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                setState(() {
-                  _isEditing = false;
-                  _jobTitleController.text = _user?.jobTitle ?? '';
-                  _companyController.text = _user?.company ?? '';
-                });
-              },
-            ),
-        ],
-      ),
-      body: _user == null
-          ? const Center(child: Text('User not found'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // Profile Picture
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppTheme.primaryColor,
-                      child: Text(
-                        _user!.name.substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 32,
-                          color: Colors.white,
+      body: Container(
+        width: 430,
+        height: 932,
+        decoration: const BoxDecoration(
+          color: Color(0xFF00D09E),
+          borderRadius: BorderRadius.all(Radius.circular(40)),
+        ),
+        child: Stack(
+          children: [
+            // White bottom section
+            Positioned(
+              left: 0,
+              top: 176,
+              width: 430,
+              height: 756,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF1FFF3),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(70),
+                    topRight: Radius.circular(70),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(37, 0, 37, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 76), // Space for profile avatar
+
+                      // User name
+                      const Center(
+                        child: Text(
+                          'John Smith',
+                          style: TextStyle(
+                            color: Color(0xFF0E3E3E),
+                            fontSize: 20,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Name (Read-only)
-                    TextFormField(
-                      initialValue: _user!.name,
-                      decoration: const InputDecoration(
-                        labelText: 'Name',
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    // Email (Read-only)
-                    TextFormField(
-                      initialValue: _user!.email,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    // Phone (Read-only)
-                    TextFormField(
-                      initialValue: _user!.phone ?? '',
-                      decoration: const InputDecoration(
-                        labelText: 'Phone',
-                        prefixIcon: Icon(Icons.phone),
-                      ),
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    // Job Title
-                    TextFormField(
-                      controller: _jobTitleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Job Title',
-                        prefixIcon: Icon(Icons.work),
-                      ),
-                      enabled: _isEditing,
-                    ),
-                    const SizedBox(height: 16),
-                    // Company
-                    TextFormField(
-                      controller: _companyController,
-                      decoration: const InputDecoration(
-                        labelText: 'Company',
-                        prefixIcon: Icon(Icons.business),
-                      ),
-                      enabled: _isEditing,
-                    ),
-                    const SizedBox(height: 16),
-                    // Preferred Currency
-                    TextFormField(
-                      initialValue: _user!.preferredCurrency ?? 'PHP',
-                      decoration: const InputDecoration(
-                        labelText: 'Preferred Currency',
-                        prefixIcon: Icon(Icons.currency_exchange),
-                      ),
-                      enabled: false,
-                    ),
-                    if (_user!.totalMonthlyIncome != null) ...[
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        initialValue:
-                            _user!.totalMonthlyIncome!.toStringAsFixed(2),
-                        decoration: const InputDecoration(
-                          labelText: 'Total Monthly Income',
-                          prefixIcon: Icon(Icons.attach_money),
+
+                      const SizedBox(height: 6),
+
+                      // User ID
+                      Center(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'ID: ',
+                                style: TextStyle(
+                                  color: Color(0xFF093030),
+                                  fontSize: 13,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '25030024',
+                                style: TextStyle(
+                                  color: Color(0xFF093030),
+                                  fontSize: 13,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        enabled: false,
+                      ),
+
+                      const SizedBox(height: 72),
+
+                      // Menu items
+                      Column(
+                        children: [
+                          // Edit Profile
+                          GestureDetector(
+                            onTap: () => context.go('/edit-profile'),
+                            child: _buildMenuItem(
+                              icon: _buildEditProfileIcon(),
+                              label: 'Edit Profile',
+                            ),
+                          ),
+
+                          const SizedBox(height: 34),
+
+                          // Security
+                          GestureDetector(
+                            onTap: () => context.go('/security'),
+                            child: _buildMenuItem(
+                              icon: _buildSecurityIcon(),
+                              label: 'Security',
+                            ),
+                          ),
+
+                          const SizedBox(height: 34),
+
+                          // Setting
+                          GestureDetector(
+                            onTap: () => context.go('/settings'),
+                            child: _buildMenuItem(
+                              icon: _buildSettingsIcon(),
+                              label: 'Setting',
+                            ),
+                          ),
+
+                          const SizedBox(height: 34),
+
+                          // Help
+                          GestureDetector(
+                            onTap: () {
+                              // TODO: Navigate to help screen
+                            },
+                            child: _buildMenuItem(
+                              icon: _buildHelpIcon(),
+                              label: 'Help',
+                            ),
+                          ),
+
+                          const SizedBox(height: 34),
+
+                          // Logout
+                          GestureDetector(
+                            onTap: () {
+                              // TODO: Implement logout
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Logout'),
+                                  content: const Text('Are you sure you want to logout?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        // TODO: Implement actual logout logic
+                                      },
+                                      child: const Text('Logout'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: _buildMenuItem(
+                              icon: _buildLogoutIcon(),
+                              label: 'Logout',
+                            ),
+                          ),
+                        ],
                       ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
+
+            // Status bar
+            Positioned(
+              left: 0,
+              top: 0,
+              width: 430,
+              height: 32,
+              child: Stack(
+                children: [
+                  const Positioned(
+                    left: 37,
+                    top: 9,
+                    child: Text(
+                      '16:04',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'League Spartan',
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+
+                  // Status icons
+                  Positioned(
+                    left: 338,
+                    top: 9,
+                    child: Container(
+                      width: 13,
+                      height: 11,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    left: 356,
+                    top: 11,
+                    child: Container(
+                      width: 15,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(58),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 377,
+                    top: 12,
+                    child: Container(
+                      width: 12,
+                      height: 7,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    left: 376,
+                    top: 11,
+                    child: Container(
+                      width: 17,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 1),
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Back button
+            Positioned(
+              left: 38,
+              top: 69,
+              child: Container(
+                width: 19,
+                height: 16,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFF1FFF3),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+
+            // Title
+            const Positioned(
+              left: 153,
+              top: 64,
+              child: SizedBox(
+                width: 125,
+                child: Text(
+                  'Profile',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF093030),
+                    fontSize: 20,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    height: 1.10,
+                  ),
+                ),
+              ),
+            ),
+
+            // Profile avatar
+            Positioned(
+              left: 157,
+              top: 117,
+              child: Container(
+                width: 117,
+                height: 117,
+                decoration: const BoxDecoration(
+                  color: Colors.grey, // Placeholder color
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 60,
+                  ),
+                ),
+              ),
+            ),
+
+            // Notification icon
+            Positioned(
+              left: 364,
+              top: 61,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFDFF7E2),
+                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                ),
+                child: Center(
+                  child: Container(
+                    width: 14.57,
+                    height: 18.86,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF093030),
+                        width: 1.29,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: const BottomNavBarMobile(currentIndex: 4),
     );
   }
 
-  @override
-  void dispose() {
-    _jobTitleController.dispose();
-    _companyController.dispose();
-    super.dispose();
+  Widget _buildMenuItem({required Widget icon, required String label}) {
+    return Row(
+      children: [
+        icon,
+        const SizedBox(width: 13),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF093030),
+            fontSize: 15,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEditProfileIcon() {
+    return Container(
+      width: 57,
+      height: 53,
+      decoration: BoxDecoration(
+        color: const Color(0xFF6DB6FE),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 22.48,
+          height: 28.12,
+          child: Icon(
+            Icons.edit,
+            color: Color(0xFFF1FFF3),
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecurityIcon() {
+    return Container(
+      width: 57,
+      height: 53,
+      decoration: BoxDecoration(
+        color: const Color(0xFF3299FF),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 26.96,
+          height: 28.54,
+          child: Icon(
+            Icons.security,
+            color: Color(0xFFF1FFF3),
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsIcon() {
+    return Container(
+      width: 57,
+      height: 53,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0068FF),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 27.52,
+          height: 28.34,
+          child: Icon(
+            Icons.settings,
+            color: Color(0xFFF1FFF3),
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHelpIcon() {
+    return Container(
+      width: 57,
+      height: 53,
+      decoration: BoxDecoration(
+        color: const Color(0xFF6DB6FE),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: const Center(
+        child: Stack(
+          children: [
+            SizedBox(
+              width: 30.87,
+              height: 28.93,
+              child: Icon(
+                Icons.help,
+                color: Color(0xFFF1FFF3),
+                size: 20,
+              ),
+            ),
+            Positioned(
+              left: 27.45,
+              top: 29.22,
+              child: SizedBox(
+                width: 1.98,
+                height: 1.98,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF1FFF3),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutIcon() {
+    return Container(
+      width: 57,
+      height: 53,
+      decoration: BoxDecoration(
+        color: const Color(0xFF3299FF),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 18,
+          height: 26.98,
+          child: Icon(
+            Icons.logout,
+            color: Color(0xFFF1FFF3),
+            size: 18,
+          ),
+        ),
+      ),
+    );
   }
 }
-

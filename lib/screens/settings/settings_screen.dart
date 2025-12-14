@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
-import '../../widgets/bottom_nav_bar.dart';
+import '../../utils/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,7 +22,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    // TODO: Load biometric setting from storage
+    final biometricEnabled = await StorageService.getBool('biometric_enabled') ?? false;
+    if (mounted) {
+      setState(() {
+        _biometricEnabled = biometricEnabled;
+      });
+    }
   }
 
   Future<void> _handleLogout() async {
@@ -126,11 +132,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Biometric Authentication'),
             subtitle: const Text('Use fingerprint or face ID to login'),
             value: _biometricEnabled,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() {
                 _biometricEnabled = value;
               });
-              // TODO: Save biometric setting
+              await StorageService.saveBool('biometric_enabled', value);
+              if (mounted) {
+                NavigationHelper.showSnackBar(
+                  context,
+                  value ? 'Biometric authentication enabled' : 'Biometric authentication disabled',
+                  backgroundColor: value ? AppTheme.successColor : Colors.grey,
+                );
+              }
             },
           ),
           const Divider(),
@@ -157,7 +170,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 3),
     );
   }
 

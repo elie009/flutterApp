@@ -10,6 +10,7 @@ class DashboardSummary extends Equatable {
   final double pendingBillsAmount;
   final List<Bill> upcomingPayments;
   final List<Transaction> recentTransactions;
+  final Map<String, dynamic> spendingByCategory;
 
   const DashboardSummary({
     required this.totalBalance,
@@ -18,6 +19,7 @@ class DashboardSummary extends Equatable {
     required this.pendingBillsAmount,
     required this.upcomingPayments,
     required this.recentTransactions,
+    this.spendingByCategory = const {},
   });
 
   factory DashboardSummary.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class DashboardSummary extends Equatable {
               ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      spendingByCategory: (json['spendingByCategory'] as Map<String, dynamic>?) ?? {},
     );
   }
 
@@ -45,6 +48,7 @@ class DashboardSummary extends Equatable {
         pendingBillsAmount,
         upcomingPayments,
         recentTransactions,
+        spendingByCategory,
       ];
 }
 
