@@ -402,6 +402,31 @@ class DataService {
     }
   }
 
+  // Get savings goals progress percentage
+  Future<double> getSavingsProgress() async {
+    try {
+      final response = await ApiService().get('/Savings/progress');
+      
+      if (response.data != null && response.data['success'] == true) {
+        final data = response.data['data'];
+        if (data != null) {
+          if (data is num) {
+            // Convert percentage (0-100) to decimal (0.0-1.0) for CircularProgressIndicator
+            return (data.toDouble() / 100.0).clamp(0.0, 1.0);
+          } else if (data is String) {
+            final parsed = double.tryParse(data);
+            if (parsed != null) return (parsed / 100.0).clamp(0.0, 1.0);
+          }
+        }
+      }
+      
+      return 0.0;
+    } catch (e) {
+      debugPrint('Error getting savings progress: $e');
+      return 0.0;
+    }
+  }
+
   // Notifications
   Future<List<AppNotification>> getNotifications({
     String? status,

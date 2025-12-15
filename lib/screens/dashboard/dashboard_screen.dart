@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
+import '../../services/api_service.dart';
 import '../../utils/formatters.dart';
+import '../../models/transaction.dart';
+import '../../models/bank_account.dart';
 import 'dart:math' as math;
 
 // Custom painter for house roof
@@ -82,11 +85,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _totalExpense = 0.0;
   bool _isLoadingBalance = true;
 
+  // Savings goals progress
+  double _savingsProgressPercentage = 0.0;
+  bool _isLoadingSavingsProgress = true;
+
+  // Current month credit and debit
+  double _currentMonthCredit = 0.0;
+  double _currentMonthDebit = 0.0;
+  bool _isLoadingCreditDebit = true;
+
   @override
   void initState() {
     super.initState();
     _loadSavingsProgress();
     _loadBalanceData();
+    _loadSavingsGoalsProgress();
+    _loadCreditDebitData();
   }
 
   // Endpoint-ready function to fetch savings progress
@@ -147,6 +161,126 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _isLoadingBalance = false;
       });
       debugPrint('Error loading balance data: $e');
+    }
+  }
+
+  // Fetch savings goals progress
+  Future<void> _loadSavingsGoalsProgress() async {
+    setState(() {
+      _isLoadingSavingsProgress = true;
+    });
+
+    try {
+      final dataService = DataService();
+      final progress = await dataService.getSavingsProgress();
+      
+      setState(() {
+        _savingsProgressPercentage = progress;
+        _isLoadingSavingsProgress = false;
+      });
+    } catch (e) {
+      setState(() {
+        _savingsProgressPercentage = 0.0;
+        _isLoadingSavingsProgress = false;
+      });
+      debugPrint('Error loading savings goals progress: $e');
+    }
+  }
+
+  // Fetch current month credit and debit (using most recent month with transactions)
+  Future<void> _loadCreditDebitData() async {
+    setState(() {
+      _isLoadingCreditDebit = true;
+    });
+
+    try {
+      // Use the bank accounts transactions endpoint directly
+      final response = await ApiService().get(
+        '/BankAccounts/transactions',
+        queryParameters: {'limit': 200},
+      );
+
+      final transactionsData = response.data['data'] as List<dynamic>? ?? [];
+      
+      if (transactionsData.isEmpty) {
+        setState(() {
+          _currentMonthCredit = 0.0;
+          _currentMonthDebit = 0.0;
+          _isLoadingCreditDebit = false;
+        });
+        return;
+      }
+
+      // Parse transactions and sort by date (most recent first)
+      final List<Map<String, dynamic>> transactions = transactionsData
+          .map<Map<String, dynamic>>((e) {
+            final transactionDate = e['transactionDate'] != null
+                ? DateTime.parse(e['transactionDate'] as String)
+                : (e['processedAt'] != null
+                    ? DateTime.parse(e['processedAt'] as String)
+                    : DateTime.now());
+            return {
+              'amount': (e['amount'] as num).toDouble(),
+              'transactionType': (e['transactionType'] as String? ?? '').toUpperCase(),
+              'transactionDate': transactionDate,
+            };
+          })
+          .toList();
+
+      transactions.sort((a, b) => (b['transactionDate'] as DateTime).compareTo(a['transactionDate'] as DateTime));
+
+      // Find the most recent month that has transactions
+      final mostRecentTransaction = transactions.first;
+      final mostRecentDate = mostRecentTransaction['transactionDate'] as DateTime;
+      final mostRecentMonth = DateTime(mostRecentDate.year, mostRecentDate.month);
+
+      // Calculate totals for the most recent month
+      double creditTotal = 0.0;
+      double debitTotal = 0.0;
+
+      for (var transaction in transactions) {
+        final transactionDate = transaction['transactionDate'] as DateTime;
+        final transactionMonth = DateTime(transactionDate.year, transactionDate.month);
+
+        // Only count transactions from the most recent month
+        if (transactionMonth.year == mostRecentMonth.year &&
+            transactionMonth.month == mostRecentMonth.month) {
+          final transactionType = transaction['transactionType'] as String;
+          final amount = transaction['amount'] as double;
+
+          if (transactionType == 'CREDIT') {
+            creditTotal += amount;
+          } else if (transactionType == 'DEBIT') {
+            debitTotal += amount;
+          }
+        }
+      }
+
+      setState(() {
+        _currentMonthCredit = creditTotal;
+        _currentMonthDebit = debitTotal;
+        _isLoadingCreditDebit = false;
+      });
+    } catch (e) {
+      // Fallback: try using the summary endpoint
+      try {
+        final dataService = DataService();
+        final summary = await dataService.getBankAccountsSummary();
+        
+        setState(() {
+          _currentMonthCredit = (summary['currentMonthIncoming'] as num?)?.toDouble() ?? 0.0;
+          _currentMonthDebit = (summary['currentMonthOutgoing'] as num?)?.toDouble() ?? 0.0;
+          _isLoadingCreditDebit = false;
+        });
+      } catch (fallbackError) {
+        setState(() {
+          _currentMonthCredit = 0.0;
+          _currentMonthDebit = 0.0;
+          _isLoadingCreditDebit = false;
+        });
+        debugPrint('Error loading credit/debit data: $e');
+        debugPrint('Fallback also failed: $fallbackError');
+      }
     }
   }
 
@@ -301,12 +435,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // Revenue and expense labels in card
+            // Total Credit label in card
             const Positioned(
               left: 240,
               top: 350,
               child: Text(
-                'Revenue Last Week',
+                'Total Credit',
                 style: TextStyle(
                   color: Color(0xFF052224),
                   fontSize: 12,
@@ -316,11 +450,101 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
+            // Savings Goals Progress (beside Revenue Last Week)
+            Positioned(
+              left: 70,
+              top: 350,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Savings Goals',
+                    style: TextStyle(
+                      color: Color(0xFF052224),
+                      fontSize: 12,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _isLoadingSavingsProgress
+                      ? const SizedBox(
+                          width: 70,
+                          height: 70,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF052224)),
+                          ),
+                        )
+                      : SizedBox(
+                          width: 70,
+                          height: 70,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Background circle
+                              SizedBox(
+                                width: 70,
+                                height: 70,
+                                child: CircularProgressIndicator(
+                                  value: 1.0,
+                                  backgroundColor: const Color(0xFFDFF7E2),
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFDFF7E2)),
+                                  strokeWidth: 8,
+                                ),
+                              ),
+                              // Progress circle
+                              Transform.rotate(
+                                angle: -90 * math.pi / 180, // Start from top
+                                child: SizedBox(
+                                  width: 70,
+                                  height: 70,
+                                  child: CircularProgressIndicator(
+                                    value: _savingsProgressPercentage,
+                                    backgroundColor: Colors.transparent,
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
+                                    strokeWidth: 8,
+                                    strokeCap: StrokeCap.round,
+                                  ),
+                                ),
+                              ),
+                              // Percentage text in center
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '${(_savingsProgressPercentage * 100).toStringAsFixed(0)}%',
+                                    style: const TextStyle(
+                                      color: Color(0xFF052224),
+                                      fontSize: 14,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const Text(
+                                    'Goal',
+                                    style: TextStyle(
+                                      color: Color(0xFF052224),
+                                      fontSize: 8,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                ],
+              ),
+            ),
+
+            // Total Debit label in card
             const Positioned(
               left: 240,
               top: 412,
               child: Text(
-                'Food Last Week',
+                'Total Debit',
                 style: TextStyle(
                   color: Color(0xFF052224),
                   fontSize: 12,
@@ -330,32 +554,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            const Positioned(
+            Positioned(
               left: 240,
               top: 370,
-              child: Text(
-                '\4.000.00',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              child: _isLoadingCreditDebit
+                  ? const SizedBox(
+                      width: 80,
+                      height: 15,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
+                      ),
+                    )
+                  : Text(
+                      Formatters.formatCurrency(_currentMonthCredit),
+                      style: const TextStyle(
+                        color: Color(0xFF0068FF),
+                        fontSize: 15,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
             ),
 
-            const Positioned(
+            Positioned(
               left: 240,
               top: 432,
-              child: Text(
-                '-\100.00',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              child: _isLoadingCreditDebit
+                  ? const SizedBox(
+                      width: 80,
+                      height: 15,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                      ),
+                    )
+                  : Text(
+                      _currentMonthDebit > 0 
+                          ? '-${Formatters.formatCurrency(_currentMonthDebit)}'
+                          : Formatters.formatCurrency(0.0),
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 15,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
             ),
 
             // Balance display section
@@ -514,10 +758,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Vertical separator line
             Positioned(
               left: 216,
-              top: 178,
+              top: 140,
               child: Container(
-                width: 42,
-                height: 0,
+                width: 0,
+                height: 42,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: const Color(0xFFDFF7E2),
@@ -527,7 +771,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // Income indicator (up arrow)
+            // Vertical separator line
+            Positioned(
+              left: 176,
+              top: 350,
+              child: Container(
+                width: 0,
+                height: 100,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFDFF7E2),
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+
+            
             Positioned(
               left: 60,
               top: 139,
@@ -1149,22 +1409,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             // Food icon (fork and knife)
             Positioned(
-              left: 203,
+              left: 193,
               top: 413,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Transform.rotate(
-                    angle: -45 * 3.14159 / 180,
-                    child: const Icon(
-                      Icons.restaurant,
-                      size: 19.144,
-                      color: Color(0xFF052224),
-                    ),
+                  const Icon(
+                    Icons.remove,
+                    size: 40,
+                    color: Color(0xFF052224),
                   ),
                 ],
               ),
             ),
+            // Food icon (fork and knife)
+            Positioned(
+              left: 193,
+              top: 357,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.add, // Use 'remove' as the standard 'minus' icon to represent a negative sign
+                    size: 40,
+                    color: Color(0xFF052224),
+                  ),
+                ],
+              ),
+            ),
+
 
             // Divider between Revenue and Food last week
             Positioned(
