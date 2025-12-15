@@ -55,6 +55,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (confirmed == true) {
       await AuthService.logout();
       if (mounted) {
+        // Navigate directly to login page
+        // The router will allow this since user is now logged out
         context.go('/login');
       }
     }

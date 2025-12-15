@@ -6,8 +6,9 @@ class Formatters {
   static final DateFormat dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   static final DateFormat displayDateTimeFormat = DateFormat('MMM dd, yyyy HH:mm');
 
-  static String formatCurrency(double amount, {String symbol = '₱'}) {
-    return '$symbol${amount.toStringAsFixed(2).replaceAllMapped(
+  static String formatCurrency(double? amount, {String symbol = '₱'}) {
+    final safeAmount = amount ?? 0.0;
+    return '$symbol${safeAmount.toStringAsFixed(2).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
         )}';

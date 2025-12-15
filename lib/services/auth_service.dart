@@ -3,19 +3,59 @@ import '../config/app_config.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
 
 class AuthService {
   static User? _currentUser;
   static bool get isLoggedIn => _currentUser != null;
 
-  // Initialize API service
-  static void init() {
+  // Initialize API service and restore user session
+  static Future<void> init() async {
     ApiService().init();
+    // Restore user session from storage
+    await _restoreUserFromStorage();
   }
 
   // Check if user is authenticated
   static bool isAuthenticated() {
     return _currentUser != null;
+  }
+
+  // Restore user from storage
+  static Future<void> _restoreUserFromStorage() async {
+    try {
+      // Check if we have a token
+      final token = await StorageService.getToken();
+      if (token == null || token.isEmpty) {
+        return;
+      }
+
+      // Try to restore user data
+      final userDataString = StorageService.getString(AppConfig.userKey);
+      if (userDataString != null && userDataString.isNotEmpty) {
+        try {
+          final userData = jsonDecode(userDataString) as Map<String, dynamic>;
+          _currentUser = User.fromJson(userData);
+          // Update API service auth header
+          await ApiService().updateAuthHeader(token);
+        } catch (e) {
+          // If user data is corrupted, try to fetch from API
+          final user = await getUserProfile();
+          if (user != null) {
+            _currentUser = user;
+          }
+        }
+      } else {
+        // No user data but have token, try to fetch from API
+        final user = await getUserProfile();
+        if (user != null) {
+          _currentUser = user;
+        }
+      }
+    } catch (e) {
+      // Silently fail - user will need to login again
+      _currentUser = null;
+    }
   }
 
   // Get current user
@@ -53,10 +93,10 @@ class AuthService {
         // Set current user
         _currentUser = User.fromJson(userData);
 
-        // Save user data
+        // Save user data as JSON
         await StorageService.saveString(
           AppConfig.userKey,
-          userData.toString(),
+          jsonEncode(userData),
         );
 
         return {
@@ -152,6 +192,8 @@ class AuthService {
   static Future<void> logout() async {
     _currentUser = null;
     await StorageService.clearTokens();
+    // Clear user data from storage
+    await StorageService.remove(AppConfig.userKey);
     await ApiService().updateAuthHeader(null);
   }
 

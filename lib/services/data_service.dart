@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../models/transaction.dart';
 import '../models/bill.dart';
 import '../models/loan.dart';
@@ -350,6 +351,54 @@ class DataService {
       return response.data['data'] as Map<String, dynamic>;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  // Get total balance across all accounts (excluding credit cards)
+  Future<double> getTotalBalance() async {
+    try {
+      final response = await ApiService().get('/BankAccounts/total-balance');
+      
+      if (response.data != null && response.data['success'] == true) {
+        final data = response.data['data'];
+        if (data != null) {
+          if (data is num) {
+            return data.toDouble();
+          } else if (data is String) {
+            final parsed = double.tryParse(data);
+            if (parsed != null) return parsed;
+          }
+        }
+      }
+      
+      return 0.0;
+    } catch (e) {
+      debugPrint('Error getting total balance: $e');
+      return 0.0;
+    }
+  }
+
+  // Get total debt from credit card accounts
+  Future<double> getTotalDebt() async {
+    try {
+      final response = await ApiService().get('/BankAccounts/total-debt');
+      
+      if (response.data != null && response.data['success'] == true) {
+        final data = response.data['data'];
+        if (data != null) {
+          if (data is num) {
+            return data.toDouble();
+          } else if (data is String) {
+            final parsed = double.tryParse(data);
+            if (parsed != null) return parsed;
+          }
+        }
+      }
+      
+      return 0.0;
+    } catch (e) {
+      debugPrint('Error getting total debt: $e');
+      return 0.0;
     }
   }
 

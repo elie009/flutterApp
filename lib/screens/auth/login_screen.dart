@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    AuthService.init();
+    // AuthService is already initialized in main.dart
   }
 
   @override
@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result['success'] == true) {
       if (mounted) {
-        context.go('/category');
+        context.go('/');
       }
     } else {
       if (mounted) {
@@ -304,14 +304,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 60),
 
                         // Forgot Password Link
-                        const Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontFamily: 'League Spartan',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            height: 13 / 14,
-                            color: Color(0xFF093030), // Letters and Icons
+                        GestureDetector(
+                          onTap: () {
+                            context.go('/forgot-password');
+                          },
+                          child: const Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              fontFamily: 'League Spartan',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              height: 13 / 14,
+                              color: Color(0xFF093030), // Letters and Icons
+                            ),
                           ),
                         ),
 
@@ -465,14 +470,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 140),
 
                         // Don't have an account? Sign Up
-                        const Text(
-                          "Don't have an account? Sign Up",
-                          style: TextStyle(
-                            fontFamily: 'League Spartan',
-                            fontSize: 13,
-                            fontWeight: FontWeight.w300,
-                            height: 15 / 13, // 115% line height
-                            color: Color(0xFF093030), // Letters and Icons
+                        GestureDetector(
+                          onTap: () {
+                            context.go('/register');
+                          },
+                          child: const Text(
+                            "Don't have an account? Sign Up",
+                            style: TextStyle(
+                              fontFamily: 'League Spartan',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300,
+                              height: 15 / 13, // 115% line height
+                              color: Color(0xFF093030), // Letters and Icons
+                            ),
                           ),
                         ),
 

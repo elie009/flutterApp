@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
+import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -134,28 +135,35 @@ class ProfileScreen extends StatelessWidget {
 
                           // Logout
                           GestureDetector(
-                            onTap: () {
-                              // TODO: Implement logout
-                              showDialog(
+                            onTap: () async {
+                              final confirmed = await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: const Text('Logout'),
                                   content: const Text('Are you sure you want to logout?'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
+                                      onPressed: () => Navigator.of(context).pop(false),
                                       child: const Text('Cancel'),
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        // TODO: Implement actual logout logic
-                                      },
+                                    ElevatedButton(
+                                      onPressed: () => Navigator.of(context).pop(true),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                      ),
                                       child: const Text('Logout'),
                                     ),
                                   ],
                                 ),
                               );
+
+                              if (confirmed == true) {
+                                await AuthService.logout();
+                                // Navigate directly to login page
+                                if (context.mounted) {
+                                  context.go('/login');
+                                }
+                              }
                             },
                             child: _buildMenuItem(
                               icon: _buildLogoutIcon(),

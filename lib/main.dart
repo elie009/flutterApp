@@ -20,7 +20,9 @@ void main() async {
 
   // Initialize API service
   ApiService().init();
-  AuthService.init();
+  
+  // Initialize auth service and restore user session
+  await AuthService.init();
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(

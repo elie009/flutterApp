@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
+import '../../services/data_service.dart';
+import '../../utils/formatters.dart';
 import 'dart:math' as math;
 
 // Custom painter for house roof
@@ -75,10 +77,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _savingsProgress = 0.0;
   bool _isLoadingProgress = true;
 
+  // Balance and expense data
+  double _totalBalance = 0.0;
+  double _totalExpense = 0.0;
+  bool _isLoadingBalance = true;
+
   @override
   void initState() {
     super.initState();
     _loadSavingsProgress();
+    _loadBalanceData();
   }
 
   // Endpoint-ready function to fetch savings progress
@@ -108,6 +116,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _isLoadingProgress = false;
       });
       debugPrint('Error loading savings progress: $e');
+    }
+  }
+
+  // Fetch balance and expense data from backend
+  Future<void> _loadBalanceData() async {
+    setState(() {
+      _isLoadingBalance = true;
+    });
+
+    try {
+      final dataService = DataService();
+      
+      // Fetch total balance and total expense (debt) in parallel
+      final results = await Future.wait([
+        dataService.getTotalBalance(),
+        dataService.getTotalDebt(),
+      ]);
+
+      setState(() {
+        _totalBalance = results[0] ?? 0.0;
+        _totalExpense = results[1] ?? 0.0;
+        _isLoadingBalance = false;
+      });
+    } catch (e) {
+      // Handle error - fallback to 0
+      setState(() {
+        _totalBalance = 0.0;
+        _totalExpense = 0.0;
+        _isLoadingBalance = false;
+      });
+      debugPrint('Error loading balance data: $e');
     }
   }
 
@@ -226,25 +265,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // Back button (top left)
-            Positioned(
-              left: 38,
-              top: 69,
-              child: GestureDetector(
-                onTap: () {
-                  // Navigate back or to previous screen
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFFF1FFF3),
-                  size: 19,
-                ),
-              ),
-            ),
-
             // Welcome message
             const Positioned(
               left: 38,
@@ -353,18 +373,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            const Positioned(
+            Positioned(
               left: 60,
               top: 152,
-              child: Text(
-                '\7,783.00',
-                style: TextStyle(
-                  color: Color(0xFFF1FFF3),
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              child: _isLoadingBalance
+                  ? const SizedBox(
+                      width: 100,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF1FFF3)),
+                      ),
+                    )
+                  : Text(
+                      Formatters.formatCurrency(_totalBalance ?? 0.0),
+                      style: const TextStyle(
+                        color: Color(0xFFF1FFF3),
+                        fontSize: 24,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
             ),
 
             const Positioned(
@@ -381,18 +410,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            const Positioned(
+            Positioned(
               left: 249,
               top: 152,
-              child: Text(
-                '-\1.187.40',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: _isLoadingBalance
+                  ? const SizedBox(
+                      width: 100,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
+                      ),
+                    )
+                  : Text(
+                      (_totalExpense ?? 0.0) > 0 
+                          ? '-${Formatters.formatCurrency(_totalExpense ?? 0.0)}'
+                          : Formatters.formatCurrency(0.0),
+                      style: const TextStyle(
+                        color: Color(0xFF0068FF),
+                        fontSize: 24,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
 
             // Progress bar

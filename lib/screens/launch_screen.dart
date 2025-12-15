@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../services/auth_service.dart';
 
 class LaunchScreen extends StatefulWidget {
   const LaunchScreen({super.key});
@@ -12,10 +13,14 @@ class _LaunchScreenState extends State<LaunchScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto navigate to login after 3 seconds
+    // Check authentication and navigate accordingly after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        context.go('/login');
+        if (AuthService.isAuthenticated()) {
+          context.go('/');
+        } else {
+          context.go('/login');
+        }
       }
     });
   }
