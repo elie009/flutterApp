@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/bottom_nav_bar_mobile.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 
 class TransactionsScreen extends StatelessWidget {
   const TransactionsScreen({super.key});
@@ -8,6 +8,7 @@ class TransactionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF1FFF3),
       body: Container(
         width: 430,
         height: 932,
@@ -431,7 +432,7 @@ class TransactionsScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarMobile(currentIndex: 3),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 2),
     );
   }
 

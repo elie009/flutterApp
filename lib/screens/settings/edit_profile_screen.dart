@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -92,16 +94,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
     }
 
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     return Scaffold(
       body: Container(
-        width: 430,
-        height: 932,
+        width: screenWidth,
+        height: screenHeight,
         decoration: const BoxDecoration(
           color: Color(0xFF00D09E),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
+            // White bottom section
+            Positioned(
+              left: 0,
+              bottom: 0,
+              right: 0,
+              top: 176,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF1FFF3),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(70),
+                    topRight: Radius.circular(70),
+                  ),
+                ),
+              ),
+            ),
             // Status bar
             Positioned(
               left: 0,
@@ -131,138 +153,164 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
 
-            // Back button
+            // Back button (arrow icon)
             Positioned(
               left: 38,
               top: 69,
               child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 19,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFFF1FFF3),
-                      width: 2,
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    context.go('/profile');
+                  }
+                },
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Color(0xFFF1FFF3),
+                  size: 19,
+                ),
+              ),
+            ),
+
+            // Title (centered)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 64,
+              child: const SizedBox(
+                width: 148,
+                child: Center(
+                  child: Text(
+                    'Edit my Profile',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF093030),
+                      fontSize: 20,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      height: 1.10,
                     ),
                   ),
                 ),
               ),
             ),
 
-            // Title
-            const Positioned(
-              left: 141,
-              top: 64,
-              child: SizedBox(
-                width: 148,
+            // Profile picture (centered)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 117,
+              child: Center(
+                child: Container(
+                  width: 117,
+                  height: 117,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: _user?.profilePicture != null
+                        ? DecorationImage(
+                            image: NetworkImage(_user!.profilePicture!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                    color: _user?.profilePicture == null ? const Color(0xFF6CB5FD) : null,
+                  ),
+                  child: _user?.profilePicture == null
+                      ? Center(
+                          child: Text(
+                            _user?.name.isNotEmpty == true
+                                ? _user!.name.substring(0, 1).toUpperCase()
+                                : 'U',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 48,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+            ),
+
+            // Camera icon on profile picture (bottom right of profile picture)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 209,
+              child: Center(
+                child: Transform.translate(
+                  offset: const Offset(46, 46), // Position at bottom right of 117x117 circle
+                  child: GestureDetector(
+                    onTap: () {
+                      // TODO: Open image picker
+                    },
+                    child: Container(
+                      width: 25,
+                      height: 25,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF00D09E),
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 13.571,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // User name (centered)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 267,
+              child: Center(
                 child: Text(
-                  'Edit my Profile',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+                  _user?.name ?? 'User',
+                  style: const TextStyle(
                     color: Color(0xFF093030),
                     fontSize: 20,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ),
 
-            // Profile picture
+            // User ID (centered)
             Positioned(
-              left: 157,
-              top: 117,
-              child: Container(
-                width: 117,
-                height: 117,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: _user?.profilePicture != null
-                        ? NetworkImage(_user!.profilePicture!)
-                        : AssetImage('assets/images/default_avatar.png') as ImageProvider,
-                    fit: BoxFit.cover,
-                  ),
-                  color: _user?.profilePicture == null ? const Color(0xFF6CB5FD) : null,
-                ),
-                child: _user?.profilePicture == null
-                    ? Center(
-                        child: Text(
-                          _user?.name.substring(0, 1).toUpperCase() ?? 'U',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 48,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w700,
-                          ),
+              left: 0,
+              right: 0,
+              top: 288,
+              child: Center(
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'ID: ',
+                        style: TextStyle(
+                          color: Color(0xFF093030),
+                          fontSize: 13,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
                         ),
-                      )
-                    : null,
-              ),
-            ),
-
-            // Edit icon on profile picture
-            Positioned(
-              left: 236,
-              top: 209,
-              child: Container(
-                width: 25,
-                height: 25,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF00D09E),
-                  borderRadius: BorderRadius.all(Radius.circular(21.43)),
-                ),
-                child: const Icon(
-                  Icons.edit,
-                  size: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-
-            // User name
-            Positioned(
-              left: 157,
-              top: 252,
-              child: Text(
-                _user?.name ?? 'User',
-                style: const TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 20,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-
-            // User ID
-            Positioned(
-              left: 175,
-              top: 278,
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'ID: ',
-                      style: TextStyle(
-                        color: Color(0xFF093030),
-                        fontSize: 13,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                    TextSpan(
-                      text: _user?.id.toString() ?? '00000000',
-                      style: const TextStyle(
-                        color: Color(0xFF093030),
-                        fontSize: 13,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w300,
+                      TextSpan(
+                        text: _user?.id.toString() ?? '25030024',
+                        style: const TextStyle(
+                          color: Color(0xFF093030),
+                          fontSize: 13,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w300,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -291,6 +339,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            // Dark theme toggle switch (positioned on right)
+            Positioned(
+              right: 36,
+              top: 650,
+              child: Transform.rotate(
+                angle: 3.14159, // 180 degrees in radians
+                child: Switch(
+                  value: _darkThemeEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      _darkThemeEnabled = value;
+                    });
+                  },
+                  activeColor: const Color(0xFF00D09E),
+                  inactiveThumbColor: Colors.white,
+                  inactiveTrackColor: const Color(0xFFDFF7E2),
+                ),
+              ),
+            ),
+
+            // Push notifications toggle switch (positioned on right)
+            Positioned(
+              right: 36,
+              top: 702,
+              child: Transform.rotate(
+                angle: 3.14159, // 180 degrees in radians
+                child: Opacity(
+                  opacity: _pushNotificationsEnabled ? 1.0 : 0.51,
+                  child: Switch(
+                    value: _pushNotificationsEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _pushNotificationsEnabled = value;
+                      });
+                    },
+                    activeColor: const Color(0xFF00D09E),
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: const Color(0xFFDFF7E2),
+                  ),
+                ),
               ),
             ),
 
@@ -455,21 +546,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 13),
-                    Transform.rotate(
-                      angle: 3.14159, // 180 degrees in radians
-                      child: Switch(
-                        value: _darkThemeEnabled,
-                        onChanged: (value) {
-                          setState(() {
-                            _darkThemeEnabled = value;
-                          });
-                        },
-                        activeColor: const Color(0xFF00D09E),
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: const Color(0xFFDFF7E2),
-                      ),
-                    ),
 
                     const SizedBox(height: 61),
 
@@ -487,182 +563,107 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 13),
-                    Transform.rotate(
-                      angle: 3.14159, // 180 degrees in radians
-                      child: Opacity(
-                        opacity: _pushNotificationsEnabled ? 1.0 : 0.51,
-                        child: Switch(
-                          value: _pushNotificationsEnabled,
-                          onChanged: (value) {
-                            setState(() {
-                              _pushNotificationsEnabled = value;
-                            });
-                          },
-                          activeColor: const Color(0xFF00D09E),
-                          inactiveThumbColor: Colors.white,
-                          inactiveTrackColor: const Color(0xFFDFF7E2),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
             ),
 
-            // Update Profile button
-            Positioned(
-              left: 123,
-              top: 754,
-              child: GestureDetector(
-                onTap: _updateProfile,
-                child: Container(
-                  width: 169,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00D09E),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Update Profile',
-                    style: TextStyle(
-                      color: Color(0xFF093030),
-                      fontSize: 15,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Notification icon
-            Positioned(
-              left: 364,
-              top: 61,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Bottom Navigation
+            // Update Profile button (centered)
             Positioned(
               left: 0,
-              top: 824,
-              width: 430,
-              height: 108,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
+              right: 0,
+              top: 754,
+              child: Center(
+                child: GestureDetector(
+                  onTap: _updateProfile,
+                  child: Container(
+                    width: 169,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00D09E),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'Update Profile',
+                      style: TextStyle(
+                        color: Color(0xFF093030),
+                        fontSize: 15,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Home icon
-                    Container(
-                      width: 25,
-                      height: 31,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
+              ),
+            ),
 
-                    // Analysis icon
-                    Container(
-                      width: 31,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Transactions icon
-                    Container(
-                      width: 33,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Categories icon
-                    Container(
-                      width: 27,
-                      height: 23,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Profile icon (active)
-                    Stack(
+            // Notification icon (bell)
+            Positioned(
+              right: 36,
+              top: 61,
+              child: GestureDetector(
+                onTap: () {
+                  context.go('/notifications');
+                },
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFDFF7E2),
+                    borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                  ),
+                  child: Center(
+                    child: Stack(
                       children: [
+                        // Bell shape
                         Positioned(
-                          left: -17,
-                          top: -12,
+                          left: 7.71,
+                          top: 5.14,
                           child: Container(
-                            width: 57,
-                            height: 53,
+                            width: 14.57,
+                            height: 18.86,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E),
-                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(
+                                color: const Color(0xFF052224),
+                                width: 1.29,
+                              ),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                                bottomLeft: Radius.circular(2),
+                                bottomRight: Radius.circular(2),
+                              ),
                             ),
-                          ),
-                        ),
-                        Container(
-                          width: 22,
-                          height: 27,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF052224),
-                              width: 2,
+                            child: Stack(
+                              children: [
+                                // Bell clapper
+                                Positioned(
+                                  left: 6,
+                                  bottom: 2,
+                                  child: Container(
+                                    width: 2.5,
+                                    height: 3,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF052224),
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
     );
   }
 

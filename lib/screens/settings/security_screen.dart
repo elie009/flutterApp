@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/bottom_nav_bar_mobile.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 
 class SecurityScreen extends StatelessWidget {
   const SecurityScreen({super.key});
@@ -104,14 +104,18 @@ class SecurityScreen extends StatelessWidget {
             Positioned(
               left: 38,
               top: 69,
-              child: Container(
-                width: 19,
-                height: 16,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFF1FFF3),
-                    width: 2,
-                  ),
+              child: GestureDetector(
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    context.go('/profile');
+                  }
+                },
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Color(0xFFF1FFF3),
+                  size: 19,
                 ),
               ),
             ),
@@ -342,7 +346,7 @@ class SecurityScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarMobile(currentIndex: 4),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
     );
   }
 }

@@ -125,6 +125,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               NavigationHelper.navigateTo(context, 'notifications');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.category),
+            title: const Text('Transaction Categories'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              NavigationHelper.navigateTo(context, 'transaction-categories');
+            },
+          ),
           const Divider(),
           _buildSectionHeader('Security'),
           SwitchListTile(

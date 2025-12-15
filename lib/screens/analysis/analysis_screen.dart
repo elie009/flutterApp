@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/bottom_nav_bar_mobile.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({super.key});
@@ -15,6 +15,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+    backgroundColor: const Color(0xFFFFFFFF),
       body: Container(
         width: 430,
         height: 932,
@@ -663,7 +664,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarMobile(currentIndex: 1),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 1),
     );
   }
 

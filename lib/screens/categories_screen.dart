@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/bottom_nav_bar_mobile.dart';
+import '../widgets/bottom_nav_bar_figma.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -457,10 +457,10 @@ class CategoriesScreen extends StatelessWidget {
             // Vertical separator line
             Positioned(
               left: 216,
-              top: 178,
+              top: 150,
               child: Container(
-                width: 42,
-                height: 0,
+                width: 0,
+                height: 42,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: const Color(0xFFDFF7E2),
@@ -527,14 +527,6 @@ class CategoriesScreen extends StatelessWidget {
               ),
             ),
 
-            // Bottom Navigation
-            Positioned(
-              left: 0,
-              top: 824,
-              width: 430,
-              height: 108,
-              child: BottomNavBarMobile(currentIndex: 2),
-            ),
 
             // Notification icon
             Positioned(
@@ -564,6 +556,7 @@ class CategoriesScreen extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 3),
     );
   }
 

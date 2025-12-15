@@ -5,6 +5,7 @@ import '../models/income_source.dart';
 import '../models/bank_account.dart';
 import '../models/notification.dart';
 import '../models/dashboard_summary.dart';
+import '../models/transaction_category.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
@@ -419,6 +420,61 @@ class DataService {
   Future<bool> markNotificationAsRead(String notificationId) async {
     try {
       final response = await ApiService().put('/Notifications/$notificationId/read');
+      return response.data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Categories
+  Future<List<dynamic>> getCategories({String? type}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (type != null) {
+        queryParams['type'] = type;
+      }
+
+      final response = await ApiService().get(
+        '/categories',
+        queryParameters: queryParams.isEmpty ? null : queryParams,
+        timeout: AppConfig.categoriesApiTimeout,
+      );
+
+      final data = response.data['data'] as List<dynamic>? ?? 
+                   (response.data is List ? response.data as List<dynamic> : []);
+      return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Transaction Categories
+  Future<List<TransactionCategory>> getTransactionCategories({String? type}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (type != null) {
+        queryParams['type'] = type;
+      }
+      
+      final response = await ApiService().get(
+        '/Categories',
+        queryParameters: queryParams.isEmpty ? null : queryParams,
+      );
+      
+      final data = response.data['data'] as List<dynamic>?;
+      if (data == null) {
+        return [];
+      }
+      
+      return data.map((e) => TransactionCategory.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteTransactionCategory(String categoryId) async {
+    try {
+      final response = await ApiService().delete('/Categories/$categoryId');
       return response.data['success'] == true;
     } catch (e) {
       return false;

@@ -2,6 +2,7 @@ class AppConfig {
   // API Configuration
   static const String baseUrl = 'http://localhost:5000/api';
   static const Duration apiTimeout = Duration(seconds: 30);
+  static const Duration categoriesApiTimeout = Duration(seconds: 180); // Extended timeout for categories API (3 minutes)
   static const Duration cacheTimeout = Duration(minutes: 5);
 
   // App Information

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/bottom_nav_bar_mobile.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 import 'dart:math' as math;
 
 // Custom painter for house roof
@@ -117,7 +117,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
-      backgroundColor: const Color(0xFF00D09E),
+      backgroundColor: const Color(0xFFF1FFF3),
       body: Container(
         width: screenWidth,
         height: screenHeight,
@@ -223,6 +223,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            // Back button (top left)
+            Positioned(
+              left: 38,
+              top: 69,
+              child: GestureDetector(
+                onTap: () {
+                  // Navigate back or to previous screen
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Color(0xFFF1FFF3),
+                  size: 19,
+                ),
               ),
             ),
 
@@ -1336,96 +1355,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
-        decoration: const BoxDecoration(
-          color: Color(0xFFDFF7E2),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(70),
-            topRight: Radius.circular(70),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Home page (active) - with green background circle
-            GestureDetector(
-              onTap: () {
-                // Already on home page
-              },
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00D09E), // Active highlight
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: const Icon(
-                  Icons.home,
-                  color: Colors.white,
-                  size: 25,
-                ),
-              ),
-            ),
-
-            // Analysis page (bar chart icon)
-            GestureDetector(
-              onTap: () => context.go('/analysis'),
-              child: SizedBox(
-                width: 31,
-                height: 30,
-                child: const Icon(
-                  Icons.bar_chart,
-                  color: Color(0xFF052224),
-                  size: 30,
-                ),
-              ),
-            ),
-
-            // Transactions page (double arrow icon)
-            GestureDetector(
-              onTap: () => context.go('/transactions'),
-              child: SizedBox(
-                width: 33,
-                height: 25,
-                child: const Icon(
-                  Icons.swap_horiz,
-                  color: Color(0xFF052224),
-                  size: 25,
-                ),
-              ),
-            ),
-
-            // Category page (transaction icon - wallet/receipt)
-            GestureDetector(
-              onTap: () => context.go('/category'),
-              child: SizedBox(
-                width: 27,
-                height: 23,
-                child: const Icon(
-                  Icons.account_balance_wallet,
-                  color: Color(0xFF052224),
-                  size: 23,
-                ),
-              ),
-            ),
-
-            // Profile page (person icon)
-            GestureDetector(
-              onTap: () => context.go('/profile'),
-              child: SizedBox(
-                width: 22,
-                height: 27,
-                child: const Icon(
-                  Icons.person_outline,
-                  color: Color(0xFF052224),
-                  size: 27,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 0),
     );
   }
 }

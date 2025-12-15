@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/bottom_nav_bar_mobile.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -325,7 +325,7 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarMobile(currentIndex: 4),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
     );
   }
 

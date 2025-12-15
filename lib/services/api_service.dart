@@ -52,12 +52,24 @@ class ApiService {
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
+    Duration? timeout,
   }) async {
     try {
+      // Create options with custom timeout if provided
+      Options? finalOptions = options;
+      if (timeout != null) {
+        // Set receiveTimeout and sendTimeout via Options
+        // connectTimeout will use the base configuration (30s should be sufficient for connection)
+        finalOptions = (options ?? Options()).copyWith(
+          receiveTimeout: timeout,
+          sendTimeout: timeout,
+        );
+      }
+
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,
-        options: options,
+        options: finalOptions,
       );
       return response;
     } on DioException catch (e) {
