@@ -93,6 +93,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _currentMonthCredit = 0.0;
   double _currentMonthDebit = 0.0;
   bool _isLoadingCreditDebit = true;
+  
+  // Period filter (daily, weekly, monthly)
+  String _selectedPeriod = 'monthly';
 
   @override
   void initState() {
@@ -187,8 +190,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  // Fetch current month credit and debit (using most recent month with transactions)
-  Future<void> _loadCreditDebitData() async {
+  // Fetch current month credit and debit (using most recent period with transactions)
+  Future<void> _loadCreditDebitData({String? period}) async {
+    final selectedPeriod = period ?? _selectedPeriod;
     setState(() {
       _isLoadingCreditDebit = true;
     });
@@ -229,22 +233,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       transactions.sort((a, b) => (b['transactionDate'] as DateTime).compareTo(a['transactionDate'] as DateTime));
 
-      // Find the most recent month that has transactions
-      final mostRecentTransaction = transactions.first;
-      final mostRecentDate = mostRecentTransaction['transactionDate'] as DateTime;
-      final mostRecentMonth = DateTime(mostRecentDate.year, mostRecentDate.month);
+      // Calculate date range based on selected period
+      DateTime now = DateTime.now();
+      DateTime periodStart;
+      DateTime periodEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-      // Calculate totals for the most recent month
+      if (selectedPeriod == 'daily') {
+        // Today
+        periodStart = DateTime(now.year, now.month, now.day);
+      } else if (selectedPeriod == 'weekly') {
+        // Last 7 days
+        periodStart = now.subtract(const Duration(days: 7));
+        periodStart = DateTime(periodStart.year, periodStart.month, periodStart.day);
+      } else {
+        // Monthly - current month
+        periodStart = DateTime(now.year, now.month, 1);
+        periodEnd = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+      }
+
+      // Calculate totals for the selected period
       double creditTotal = 0.0;
       double debitTotal = 0.0;
 
       for (var transaction in transactions) {
         final transactionDate = transaction['transactionDate'] as DateTime;
-        final transactionMonth = DateTime(transactionDate.year, transactionDate.month);
 
-        // Only count transactions from the most recent month
-        if (transactionMonth.year == mostRecentMonth.year &&
-            transactionMonth.month == mostRecentMonth.month) {
+        // Only count transactions within the selected period
+        if (transactionDate.isAfter(periodStart.subtract(const Duration(seconds: 1))) &&
+            transactionDate.isBefore(periodEnd.add(const Duration(seconds: 1)))) {
           final transactionType = transaction['transactionType'] as String;
           final amount = transaction['amount'] as double;
 
@@ -260,7 +276,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _currentMonthCredit = creditTotal;
         _currentMonthDebit = debitTotal;
         _isLoadingCreditDebit = false;
+        if (period != null) {
+          _selectedPeriod = period;
+        }
       });
+      debugPrint('Selected period: $_selectedPeriod');
     } catch (e) {
       // Fallback: try using the summary endpoint
       try {
@@ -840,9 +860,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Positioned(
               left: 36,
               top: 503,
-              width: 358,
-              height: 60,
               child: Container(
+                width: 358,
+                height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFFDFF7E2),
@@ -852,61 +872,94 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Daily
-                    Container(
-                      width: 95,
-                      height: 31,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDFF7E2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Daily',
-                        style: TextStyle(
-                          color: Color(0xFF052224),
-                          fontSize: 15,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        setState(() {
+                          _selectedPeriod = 'daily';
+                        });
+                        _loadCreditDebitData(period: 'daily');
+                      },
+                      child: Container(
+                        width: 95,
+                        height: _selectedPeriod == 'daily' ? 50 : 31,
+                        decoration: BoxDecoration(
+                          color: _selectedPeriod == 'daily'
+                              ? const Color(0xFF00D09E)
+                              : const Color(0xFFDFF7E2),
+                          borderRadius: BorderRadius.circular(_selectedPeriod == 'daily' ? 19 : 10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Daily',
+                          style: TextStyle(
+                            color: const Color(0xFF052224),
+                            fontSize: 15,
+                            fontFamily: 'Poppins',
+                            fontWeight: _selectedPeriod == 'daily' ? FontWeight.w600 : FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
 
                     // Weekly
-                    Container(
-                      width: 95,
-                      height: 31,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDFF7E2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Weekly',
-                        style: TextStyle(
-                          color: Color(0xFF052224),
-                          fontSize: 15,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        setState(() {
+                          _selectedPeriod = 'weekly';
+                        });
+                        _loadCreditDebitData(period: 'weekly');
+                      },
+                      child: Container(
+                        width: 95,
+                        height: _selectedPeriod == 'weekly' ? 50 : 31,
+                        decoration: BoxDecoration(
+                          color: _selectedPeriod == 'weekly'
+                              ? const Color(0xFF00D09E)
+                              : const Color(0xFFDFF7E2),
+                          borderRadius: BorderRadius.circular(_selectedPeriod == 'weekly' ? 19 : 10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Weekly',
+                          style: TextStyle(
+                            color: const Color(0xFF052224),
+                            fontSize: 15,
+                            fontFamily: 'Poppins',
+                            fontWeight: _selectedPeriod == 'weekly' ? FontWeight.w600 : FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
 
-                    // Monthly (selected)
-                    Container(
-                      width: 95,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00D09E),
-                        borderRadius: BorderRadius.circular(19),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Monthly',
-                        style: TextStyle(
-                          color: Color(0xFF052224),
-                          fontSize: 15,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
+                    // Monthly
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        setState(() {
+                          _selectedPeriod = 'monthly';
+                        });
+                        _loadCreditDebitData(period: 'monthly');
+                      },
+                      child: Container(
+                        width: 95,
+                        height: _selectedPeriod == 'monthly' ? 50 : 31,
+                        decoration: BoxDecoration(
+                          color: _selectedPeriod == 'monthly'
+                              ? const Color(0xFF00D09E)
+                              : const Color(0xFFDFF7E2),
+                          borderRadius: BorderRadius.circular(_selectedPeriod == 'monthly' ? 19 : 10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Monthly',
+                          style: TextStyle(
+                            color: const Color(0xFF052224),
+                            fontSize: 15,
+                            fontFamily: 'Poppins',
+                            fontWeight: _selectedPeriod == 'monthly' ? FontWeight.w600 : FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
