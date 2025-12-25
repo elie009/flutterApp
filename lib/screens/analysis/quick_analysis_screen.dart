@@ -897,3 +897,4 @@ class QuickAnalysisScreen extends StatelessWidget {
     );
   }
 }
+

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
 import '../../services/api_service.dart';
@@ -578,12 +579,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               left: 240,
               top: 370,
               child: _isLoadingCreditDebit
-                  ? const SizedBox(
-                      width: 80,
-                      height: 15,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
+                  ? Shimmer.fromColors(
+                      baseColor: const Color(0xFF0068FF).withOpacity(0.3),
+                      highlightColor: const Color(0xFF0068FF).withOpacity(0.6),
+                      period: const Duration(milliseconds: 1500),
+                      child: Container(
+                        width: 80,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0068FF).withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
                     )
                   : Text(
@@ -601,12 +607,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               left: 240,
               top: 432,
               child: _isLoadingCreditDebit
-                  ? const SizedBox(
-                      width: 80,
-                      height: 15,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ? Shimmer.fromColors(
+                      baseColor: Colors.red.withOpacity(0.3),
+                      highlightColor: Colors.red.withOpacity(0.6),
+                      period: const Duration(milliseconds: 1500),
+                      child: Container(
+                        width: 80,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
                     )
                   : Text(
@@ -641,12 +652,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               left: 60,
               top: 152,
               child: _isLoadingBalance
-                  ? const SizedBox(
-                      width: 100,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF1FFF3)),
+                  ? Shimmer.fromColors(
+                      baseColor: const Color(0xFFF1FFF3).withOpacity(0.3),
+                      highlightColor: const Color(0xFFF1FFF3).withOpacity(0.6),
+                      period: const Duration(milliseconds: 1500),
+                      child: Container(
+                        width: 150,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1FFF3).withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     )
                   : Text(
@@ -678,12 +694,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               left: 249,
               top: 152,
               child: _isLoadingBalance
-                  ? const SizedBox(
-                      width: 100,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
+                  ? Shimmer.fromColors(
+                      baseColor: const Color(0xFF0068FF).withOpacity(0.3),
+                      highlightColor: const Color(0xFF0068FF).withOpacity(0.6),
+                      period: const Duration(milliseconds: 1500),
+                      child: Container(
+                        width: 150,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0068FF).withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     )
                   : Text(

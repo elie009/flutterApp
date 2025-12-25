@@ -550,3 +550,4 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
     return months[month - 1];
   }
 }
+

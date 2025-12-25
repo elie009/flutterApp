@@ -221,3 +221,4 @@ class AuthSelectionScreen extends StatelessWidget {
     );
   }
 }
+
