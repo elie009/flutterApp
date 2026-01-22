@@ -898,3 +898,6 @@ class QuickAnalysisScreen extends StatelessWidget {
   }
 }
 
+
+
+

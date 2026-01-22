@@ -34,117 +34,88 @@ class BottomNavBarFigma extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
-      decoration: const BoxDecoration(
-        color: Color(0xFFDFF7E2),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(70),
-          topRight: Radius.circular(70),
-        ),
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(50),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Home page
-          GestureDetector(
-            onTap: () => _navigateTo(context, 0),
-            child: Container(
-              width: 57,
-              height: 53,
-              decoration: BoxDecoration(
-                color: currentIndex == 0
-                    ? const Color(0xFF00D09E) // Active highlight
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Icon(
-                Icons.home,
-                color: currentIndex == 0 ? Colors.white : const Color(0xFF052224),
-                size: 25,
-              ),
-            ),
+          _buildNavItem(
+            context: context,
+            index: 0,
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home,
           ),
 
           // Analysis page (bar chart icon)
-          GestureDetector(
-            onTap: () => _navigateTo(context, 1),
-            child: Container(
-              width: 57,
-              height: 53,
-              decoration: BoxDecoration(
-                color: currentIndex == 1
-                    ? const Color(0xFF00D09E) // Active highlight
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Icon(
-                Icons.bar_chart,
-                color: currentIndex == 1 ? Colors.white : const Color(0xFF052224),
-                size: 30,
-              ),
-            ),
+          _buildNavItem(
+            context: context,
+            index: 1,
+            icon: Icons.bar_chart_outlined,
+            activeIcon: Icons.bar_chart,
           ),
 
           // Transactions page (double arrow icon)
-          GestureDetector(
-            onTap: () => _navigateTo(context, 2),
-            child: Container(
-              width: 57,
-              height: 53,
-              decoration: BoxDecoration(
-                color: currentIndex == 2
-                    ? const Color(0xFF00D09E) // Active highlight
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Icon(
-                Icons.swap_horiz,
-                color: currentIndex == 2 ? Colors.white : const Color(0xFF052224),
-                size: 25,
-              ),
-            ),
+          _buildNavItem(
+            context: context,
+            index: 2,
+            icon: Icons.swap_horiz_rounded,
+            activeIcon: Icons.swap_horiz_rounded,
           ),
 
-          // Category page (transaction icon - wallet/receipt)
-          GestureDetector(
-            onTap: () => _navigateTo(context, 3),
-            child: Container(
-              width: 57,
-              height: 53,
-              decoration: BoxDecoration(
-                color: currentIndex == 3
-                    ? const Color(0xFF00D09E) // Active highlight
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Icon(
-                Icons.account_balance_wallet,
-                color: currentIndex == 3 ? Colors.white : const Color(0xFF052224),
-                size: 23,
-              ),
-            ),
+          // Category page (layers/stack icon)
+          _buildNavItem(
+            context: context,
+            index: 3,
+            icon: Icons.layers_outlined,
+            activeIcon: Icons.layers,
           ),
 
           // Profile page (person icon)
-          GestureDetector(
-            onTap: () => _navigateTo(context, 4),
-            child: Container(
-              width: 57,
-              height: 53,
-              decoration: BoxDecoration(
-                color: currentIndex == 4
-                    ? const Color(0xFF00D09E) // Active highlight
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Icon(
-                Icons.person_outline,
-                color: currentIndex == 4 ? Colors.white : const Color(0xFF052224),
-                size: 27,
-              ),
-            ),
+          _buildNavItem(
+            context: context,
+            index: 4,
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required BuildContext context,
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+  }) {
+    final isActive = currentIndex == index;
+    
+    return GestureDetector(
+      onTap: () => _navigateTo(context, index),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: isActive ? const Color(0xFFE8F5E9) : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          isActive ? activeIcon : icon,
+          color: isActive ? const Color(0xFF00D09E) : const Color(0xFF666666),
+          size: 28,
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
@@ -8,6 +9,7 @@ import 'dart:convert';
 class AuthService {
   static User? _currentUser;
   static bool get isLoggedIn => _currentUser != null;
+  static bool _isLoggingOut = false;
 
   // Initialize API service and restore user session
   static Future<void> init() async {
@@ -19,6 +21,36 @@ class AuthService {
   // Check if user is authenticated
   static bool isAuthenticated() {
     return _currentUser != null;
+  }
+
+  // Check authentication and redirect to login if not authenticated
+  static Future<bool> checkAuthAndRedirect(BuildContext context) async {
+    if (!isAuthenticated()) {
+      // Clear any stale data
+      await logout();
+      // Redirect to login
+      if (context.mounted) {
+        context.go('/landing');
+      }
+      return false;
+    }
+    return true;
+  }
+
+  // Verify token is still valid
+  static Future<bool> verifyTokenValid() async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null || token.isEmpty) {
+        return false;
+      }
+      
+      // Try to get user profile to verify token
+      final user = await getUserProfile();
+      return user != null;
+    } catch (e) {
+      return false;
+    }
   }
 
   // Restore user from storage
@@ -190,11 +222,24 @@ class AuthService {
 
   // Logout
   static Future<void> logout() async {
+    if (_isLoggingOut) {
+      debugPrint('⚠️ Logout already in progress, skipping...');
+      return;
+    }
+    
+    _isLoggingOut = true;
+    debugPrint('🔓 Starting logout...');
     _currentUser = null;
+    debugPrint('🔓 Cleared current user');
     await StorageService.clearTokens();
+    debugPrint('🔓 Cleared tokens');
     // Clear user data from storage
     await StorageService.remove(AppConfig.userKey);
+    debugPrint('🔓 Cleared user data from storage');
     await ApiService().updateAuthHeader(null);
+    debugPrint('🔓 Cleared API auth header');
+    debugPrint('✅ Logout complete - isAuthenticated: ${isAuthenticated()}');
+    _isLoggingOut = false;
   }
 
   // Get user profile

@@ -158,10 +158,49 @@ class SecurityScreen extends StatelessWidget {
               ),
             ),
 
+            // Setup Login PIN menu item
+            Positioned(
+              left: 38,
+              top: 233,
+              child: GestureDetector(
+                onTap: () => context.go('/pin-setup'),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 157,
+                      child: Text(
+                        'Setup Login PIN',
+                        style: TextStyle(
+                          color: Color(0xFF093030),
+                          fontSize: 15,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 190),
+                    Transform.rotate(
+                      angle: 180 * 3.14159 / 180, // 180 degrees in radians
+                      child: Container(
+                        width: 7,
+                        height: 13,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xFF093030),
+                            width: 2.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             // Change pin menu item
             Positioned(
               left: 38,
-              top: 263,
+              top: 293,
               child: GestureDetector(
                 onTap: () => context.go('/change-pin'),
                 child: Row(
@@ -200,7 +239,7 @@ class SecurityScreen extends StatelessWidget {
             // Fingerprint menu item
             Positioned(
               left: 38,
-              top: 337,
+              top: 367,
               child: GestureDetector(
                 onTap: () => context.go('/fingerprint'),
                 child: Row(
@@ -239,7 +278,7 @@ class SecurityScreen extends StatelessWidget {
             // Terms and conditions menu item
             Positioned(
               left: 38,
-              top: 411,
+              top: 441,
               child: GestureDetector(
                 onTap: () => context.go('/terms-conditions'),
                 child: Row(
@@ -275,7 +314,7 @@ class SecurityScreen extends StatelessWidget {
             // Separator lines
             Positioned(
               left: 38,
-              top: 306,
+              top: 276,
               child: Container(
                 width: 354,
                 height: 0,
@@ -290,7 +329,7 @@ class SecurityScreen extends StatelessWidget {
 
             Positioned(
               left: 38,
-              top: 386,
+              top: 336,
               child: Container(
                 width: 354,
                 height: 0,
@@ -305,7 +344,22 @@ class SecurityScreen extends StatelessWidget {
 
             Positioned(
               left: 38,
-              top: 466,
+              top: 416,
+              child: Container(
+                width: 354,
+                height: 0,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFDFF7E2),
+                    width: 1.01,
+                  ),
+                ),
+              ),
+            ),
+
+            Positioned(
+              left: 38,
+              top: 496,
               child: Container(
                 width: 354,
                 height: 0,

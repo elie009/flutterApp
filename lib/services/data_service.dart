@@ -42,36 +42,51 @@ class DataService {
         // Could check timestamp here for expiry
       }
 
-      final response = await ApiService().get('/BankAccounts/summary');
+      // Get total balance from the new endpoint
+      debugPrint('📊 getDashboardSummary: Fetching total balance from /BankAccounts/total-balance');
+      final balanceResponse = await ApiService().get('/BankAccounts/total-balance');
+      debugPrint('📊 getDashboardSummary: Got response: ${balanceResponse.data}');
       
-      // Also get bill analytics
-      final billResponse = await ApiService().get('/BillAnalytics/summary');
-      
-      // Get recent transactions
-      final transactionsResponse = await ApiService().get(
-        '/Transactions',
-        queryParameters: {'limit': 5},
-      );
+      // Get recent transactions (handle 404 gracefully)
+      List<Transaction> transactions = [];
+      try {
+        final transactionsResponse = await ApiService().get(
+          '/Transactions',
+          queryParameters: {'limit': 5},
+        );
+        final transactionsData = transactionsResponse.data['data'] as List<dynamic>? ?? [];
+        transactions = transactionsData
+            .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } catch (e) {
+        debugPrint('⚠️ getDashboardSummary: Transactions API error (ignoring): $e');
+        // Continue without transactions
+      }
 
       // Parse and combine data
-      final totalBalance = (response.data['totalBalance'] as num?)?.toDouble() ?? 0.0;
-      final monthlyIncome = (response.data['monthlyIncome'] as num?)?.toDouble() ?? 0.0;
+      final totalBalance = (balanceResponse.data['data'] as num?)?.toDouble() ?? 0.0;
+      debugPrint('📊 getDashboardSummary: Parsed total balance: \$$totalBalance');
+      final monthlyIncome = 0.0; // Removed from old endpoint
       
-      final pendingBillsCount = billResponse.data['pendingCount'] as int? ?? 0;
-      final pendingBillsAmount = (billResponse.data['pendingAmount'] as num?)?.toDouble() ?? 0.0;
-      
-      final transactions = (transactionsResponse.data['data'] as List<dynamic>?)
-          ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [];
+      // Bill analytics removed - set to defaults
+      final pendingBillsCount = 0;
+      final pendingBillsAmount = 0.0;
 
-      // Get upcoming bills (next 7 days)
-      final upcomingBillsResponse = await ApiService().get(
-        '/Bills/upcoming',
-        queryParameters: {'days': 7},
-      );
-      final upcomingBills = (upcomingBillsResponse.data['data'] as List<dynamic>?)
-          ?.map((e) => Bill.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [];
+      // Get upcoming bills (next 7 days) - handle errors gracefully
+      List<Bill> upcomingBills = [];
+      try {
+        final upcomingBillsResponse = await ApiService().get(
+          '/Bills/upcoming',
+          queryParameters: {'days': 7},
+        );
+        final billsData = upcomingBillsResponse.data['data'] as List<dynamic>? ?? [];
+        upcomingBills = billsData
+            .map((e) => Bill.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } catch (e) {
+        debugPrint('⚠️ getDashboardSummary: Bills API error (ignoring): $e');
+        // Continue without bills
+      }
 
       final summary = DashboardSummary(
         totalBalance: totalBalance,
@@ -357,23 +372,32 @@ class DataService {
   // Get total balance across all accounts (excluding credit cards)
   Future<double> getTotalBalance() async {
     try {
+      debugPrint('📊 Fetching total balance from /BankAccounts/total-balance');
+      
       final response = await ApiService().get('/BankAccounts/total-balance');
       
       if (response.data != null && response.data['success'] == true) {
         final data = response.data['data'];
+        
         if (data != null) {
+          double totalBalance = 0.0;
+          
+          // Handle different data types
           if (data is num) {
-            return data.toDouble();
+            totalBalance = data.toDouble();
           } else if (data is String) {
-            final parsed = double.tryParse(data);
-            if (parsed != null) return parsed;
+            totalBalance = double.tryParse(data) ?? 0.0;
           }
+          
+          debugPrint('📊 Total Balance: \$${totalBalance.toStringAsFixed(2)}');
+          return totalBalance;
         }
       }
       
+      debugPrint('⚠️ No data returned from total balance API');
       return 0.0;
     } catch (e) {
-      debugPrint('Error getting total balance: $e');
+      debugPrint('❌ Error getting total balance: $e');
       return 0.0;
     }
   }

@@ -22,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    final biometricEnabled = await StorageService.getBool('biometric_enabled') ?? false;
+    final biometricEnabled = StorageService.getBool('biometric_enabled') ?? false;
     if (mounted) {
       setState(() {
         _biometricEnabled = biometricEnabled;
@@ -31,6 +31,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _handleLogout() async {
+    debugPrint('🚪 Logout button pressed');
+    
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -53,12 +55,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (confirmed == true) {
+      debugPrint('🚪 User confirmed logout');
+      
+      // Save the navigator before async gap
+      final navigator = GoRouter.of(context);
+      
+      // Perform logout (clears tokens and user state)
       await AuthService.logout();
-      if (mounted) {
-        // Navigate directly to login page
-        // The router will allow this since user is now logged out
-        context.go('/login');
-      }
+      
+      debugPrint('🚪 Navigating to /landing');
+      // Force navigation to landing page using saved navigator
+      // The router redirect will handle the rest
+      navigator.go('/landing');
+      debugPrint('🚪 Navigation command sent');
+    } else {
+      debugPrint('🚪 User cancelled logout');
     }
   }
 
@@ -143,10 +154,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('Use fingerprint or face ID to login'),
             value: _biometricEnabled,
             onChanged: (value) async {
+              // Save the scaffold messenger before async gap
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              
               setState(() {
                 _biometricEnabled = value;
               });
               await StorageService.saveBool('biometric_enabled', value);
+              
               if (mounted) {
                 NavigationHelper.showSnackBar(
                   context,

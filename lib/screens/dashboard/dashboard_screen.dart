@@ -1,73 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
-import '../../services/api_service.dart';
-import '../../utils/formatters.dart';
 import '../../models/transaction.dart';
 import '../../models/bank_account.dart';
-import 'dart:math' as math;
-
-// Custom painter for house roof
-class _HousePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFF1FFF3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.70;
-
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(0, size.height)
-      ..lineTo(size.width, size.height)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Custom painter for circular progress arc
-class _CircularProgressPainter extends CustomPainter {
-  final double progress;
-  final Color color;
-
-  _CircularProgressPainter({
-    required this.progress,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    final center = Offset(size.width / 2, size.height);
-    final radius = size.width / 2;
-
-    final startAngle = -90 * math.pi / 180; // Start from top
-    final sweepAngle = 2 * math.pi * progress;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      sweepAngle,
-      false,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _CircularProgressPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.color != color;
-}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -77,1672 +14,791 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // Mock data for savings goal progress
-  double _savingsProgress = 0.0;
-  bool _isLoadingProgress = true;
-
-  // Balance and expense data
-  double _totalBalance = 0.0;
-  double _totalExpense = 0.0;
-  bool _isLoadingBalance = true;
-
-  // Savings goals progress
-  double _savingsProgressPercentage = 0.0;
-  bool _isLoadingSavingsProgress = true;
-
-  // Current month credit and debit
-  double _currentMonthCredit = 0.0;
-  double _currentMonthDebit = 0.0;
-  bool _isLoadingCreditDebit = true;
-  
-  // Period filter (daily, weekly, monthly)
-  String _selectedPeriod = 'monthly';
+  String _selectedPeriod = 'Monthly';
+  bool _isLoading = true;
+  double _totalBalance = 0.0; // Will be updated from API
+  double _totalExpense = -1187.40;
+  List<Transaction> _recentTransactions = [];
+  List<BankAccount> _bankAccounts = []; // Changed to list for carousel
+  final PageController _pageController = PageController(viewportFraction: 0.9);
+  int _currentPage = 0; // Track current page for indicators
 
   @override
   void initState() {
     super.initState();
-    _loadSavingsProgress();
-    _loadBalanceData();
-    _loadSavingsGoalsProgress();
-    _loadCreditDebitData();
+    _loadData();
   }
 
-  // Endpoint-ready function to fetch savings progress
-  Future<void> _loadSavingsProgress() async {
-    setState(() {
-      _isLoadingProgress = true;
-    });
-
-    try {
-      // TODO: Replace with actual API call
-      // final response = await http.get(Uri.parse('/api/user/savings-progress'));
-      // final data = json.decode(response.body);
-      // _savingsProgress = data['progress'] / 100.0; // Convert percentage to 0-1 range
-
-      // Mock API call delay
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Mock data - 75% progress
-      setState(() {
-        _savingsProgress = 0.75;
-        _isLoadingProgress = false;
-      });
-    } catch (e) {
-      // Handle error - fallback to 0 progress
-      setState(() {
-        _savingsProgress = 0.0;
-        _isLoadingProgress = false;
-      });
-      debugPrint('Error loading savings progress: $e');
+  Future<void> _loadData({bool showLoading = true}) async {
+    if (showLoading) {
+      setState(() => _isLoading = true);
     }
-  }
-
-  // Fetch balance and expense data from backend
-  Future<void> _loadBalanceData() async {
-    setState(() {
-      _isLoadingBalance = true;
-    });
-
     try {
-      final dataService = DataService();
+      // Load dashboard data
+      debugPrint('📊 Dashboard: Loading data...');
+      final summary = await DataService().getDashboardSummary();
+      debugPrint('📊 Dashboard: Got summary with totalBalance: ${summary.totalBalance}');
       
-      // Fetch total balance and total expense (debt) in parallel
-      final results = await Future.wait([
-        dataService.getTotalBalance(),
-        dataService.getTotalDebt(),
-      ]);
-
-      setState(() {
-        _totalBalance = results[0] ?? 0.0;
-        _totalExpense = results[1] ?? 0.0;
-        _isLoadingBalance = false;
-      });
-    } catch (e) {
-      // Handle error - fallback to 0
-      setState(() {
-        _totalBalance = 0.0;
-        _totalExpense = 0.0;
-        _isLoadingBalance = false;
-      });
-      debugPrint('Error loading balance data: $e');
-    }
-  }
-
-  // Fetch savings goals progress
-  Future<void> _loadSavingsGoalsProgress() async {
-    setState(() {
-      _isLoadingSavingsProgress = true;
-    });
-
-    try {
-      final dataService = DataService();
-      final progress = await dataService.getSavingsProgress();
-      
-      setState(() {
-        _savingsProgressPercentage = progress;
-        _isLoadingSavingsProgress = false;
-      });
-    } catch (e) {
-      setState(() {
-        _savingsProgressPercentage = 0.0;
-        _isLoadingSavingsProgress = false;
-      });
-      debugPrint('Error loading savings goals progress: $e');
-    }
-  }
-
-  // Fetch current month credit and debit (using most recent period with transactions)
-  Future<void> _loadCreditDebitData({String? period}) async {
-    final selectedPeriod = period ?? _selectedPeriod;
-    setState(() {
-      _isLoadingCreditDebit = true;
-    });
-
-    try {
-      // Use the bank accounts transactions endpoint directly
-      final response = await ApiService().get(
-        '/BankAccounts/transactions',
-        queryParameters: {'limit': 200},
-      );
-
-      final transactionsData = response.data['data'] as List<dynamic>? ?? [];
-      
-      if (transactionsData.isEmpty) {
-        setState(() {
-          _currentMonthCredit = 0.0;
-          _currentMonthDebit = 0.0;
-          _isLoadingCreditDebit = false;
-        });
-        return;
-      }
-
-      // Parse transactions and sort by date (most recent first)
-      final List<Map<String, dynamic>> transactions = transactionsData
-          .map<Map<String, dynamic>>((e) {
-            final transactionDate = e['transactionDate'] != null
-                ? DateTime.parse(e['transactionDate'] as String)
-                : (e['processedAt'] != null
-                    ? DateTime.parse(e['processedAt'] as String)
-                    : DateTime.now());
-            return {
-              'amount': (e['amount'] as num).toDouble(),
-              'transactionType': (e['transactionType'] as String? ?? '').toUpperCase(),
-              'transactionDate': transactionDate,
-            };
-          })
-          .toList();
-
-      transactions.sort((a, b) => (b['transactionDate'] as DateTime).compareTo(a['transactionDate'] as DateTime));
-
-      // Calculate date range based on selected period
-      DateTime now = DateTime.now();
-      DateTime periodStart;
-      DateTime periodEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-      if (selectedPeriod == 'daily') {
-        // Today
-        periodStart = DateTime(now.year, now.month, now.day);
-      } else if (selectedPeriod == 'weekly') {
-        // Last 7 days
-        periodStart = now.subtract(const Duration(days: 7));
-        periodStart = DateTime(periodStart.year, periodStart.month, periodStart.day);
-      } else {
-        // Monthly - current month
-        periodStart = DateTime(now.year, now.month, 1);
-        periodEnd = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
-      }
-
-      // Calculate totals for the selected period
-      double creditTotal = 0.0;
-      double debitTotal = 0.0;
-
-      for (var transaction in transactions) {
-        final transactionDate = transaction['transactionDate'] as DateTime;
-
-        // Only count transactions within the selected period
-        if (transactionDate.isAfter(periodStart.subtract(const Duration(seconds: 1))) &&
-            transactionDate.isBefore(periodEnd.add(const Duration(seconds: 1)))) {
-          final transactionType = transaction['transactionType'] as String;
-          final amount = transaction['amount'] as double;
-
-          if (transactionType == 'CREDIT') {
-            creditTotal += amount;
-          } else if (transactionType == 'DEBIT') {
-            debitTotal += amount;
-          }
-        }
-      }
-
-      setState(() {
-        _currentMonthCredit = creditTotal;
-        _currentMonthDebit = debitTotal;
-        _isLoadingCreditDebit = false;
-        if (period != null) {
-          _selectedPeriod = period;
-        }
-      });
-      debugPrint('Selected period: $_selectedPeriod');
-    } catch (e) {
-      // Fallback: try using the summary endpoint
+      // Load accounts (handle errors gracefully) - fetch only active accounts
+      List<BankAccount> accounts = [];
       try {
-        final dataService = DataService();
-        final summary = await dataService.getBankAccountsSummary();
-        
-        setState(() {
-          _currentMonthCredit = (summary['currentMonthIncoming'] as num?)?.toDouble() ?? 0.0;
-          _currentMonthDebit = (summary['currentMonthOutgoing'] as num?)?.toDouble() ?? 0.0;
-          _isLoadingCreditDebit = false;
-        });
-      } catch (fallbackError) {
-        setState(() {
-          _currentMonthCredit = 0.0;
-          _currentMonthDebit = 0.0;
-          _isLoadingCreditDebit = false;
-        });
-        debugPrint('Error loading credit/debit data: $e');
-        debugPrint('Fallback also failed: $fallbackError');
+        accounts = await DataService().getBankAccounts(isActive: true);
+        debugPrint('📊 Dashboard: Loaded ${accounts.length} active bank accounts');
+      } catch (e) {
+        debugPrint('⚠️ Dashboard: Error loading bank accounts (ignoring): $e');
+        // Continue without accounts
+      }
+      
+      // Load transactions (handle errors gracefully)
+      List<Transaction> transactions = [];
+      try {
+        transactions = await DataService().getTransactions(limit: 5);
+        debugPrint('📊 Dashboard: Loaded ${transactions.length} transactions');
+      } catch (e) {
+        debugPrint('⚠️ Dashboard: Error loading transactions (ignoring): $e');
+        // Continue without transactions
+      }
+
+      setState(() {
+        _totalBalance = summary.totalBalance; // Use API value
+        _totalExpense = _calculateExpense(transactions);
+        _recentTransactions = transactions;
+        _bankAccounts = accounts; // Store all accounts for carousel
+        _isLoading = false;
+      });
+      debugPrint('✅ Dashboard: State updated with _totalBalance: $_totalBalance');
+    } catch (e, stackTrace) {
+      debugPrint('❌ Dashboard: Error loading data: $e');
+      debugPrint('❌ Dashboard: Stack trace: $stackTrace');
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading data: $e')),
+        );
       }
     }
+  }
+
+  double _calculateExpense(List<Transaction> transactions) {
+    double total = 0;
+    for (var t in transactions) {
+      if (t.isExpense) {
+        total += t.amount;
+      }
+    }
+    return -total;
+  }
+
+  /// Get last 4 digits from IBAN (preferred) or accountNumber (fallback)
+  String _getLastFourDigits(BankAccount account) {
+    // Prefer IBAN, fallback to accountNumber
+    final number = account.iban ?? account.accountNumber;
+    if (number != null && number.length >= 4) {
+      return number.substring(number.length - 4);
+    }
+    return "0000";
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    
     return Scaffold(
-      backgroundColor: const Color(0xFFF1FFF3),
-      body: Container(
-        width: screenWidth,
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // White bottom section
-            Positioned(
-              left: 0,
-              top: 292,
-              right: 0,
-              bottom: 0, // Will be above bottom navigation bar
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3),
-                ),
-              ),
-            ),
-
-            // Green summary card
-            Positioned(
-              left: 37,
-              top: 325,
-              width: 357,
-              height: 152,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00D09E),
-                  borderRadius: BorderRadius.circular(31),
-                ),
-              ),
-            ),
-
-            // Status bar
-            Positioned(
-              left: 0,
-              top: 0,
-              right: 0,
-              height: 32,
-              child: Stack(
-                children: [
-                  // Time
-                  const Positioned(
-                    left: 37,
-                    top: 9,
-                    child: Text(
-                      '16:04',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'League Spartan',
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: () async {
+                  debugPrint('🔄 Dashboard: Pull to refresh triggered');
+                  await _loadData(showLoading: false);
+                },
+                color: const Color(0xFF00D09E),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling even when content is small
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 15),
+                      
+                      // Notification Icon
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8E8E8),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.notifications_outlined,
+                                size: 20,
+                                color: Color(0xFF333333),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
 
-                  // Status icons
-                  Positioned(
-                    left: 338,
-                    top: 9,
-                    child: Container(
-                      width: 13,
-                      height: 11,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    left: 356,
-                    top: 11,
-                    child: Container(
-                      width: 15,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(58),
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 377,
-                    top: 12,
-                    child: Container(
-                      width: 12,
-                      height: 7,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    left: 376,
-                    top: 11,
-                    child: Container(
-                      width: 17,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 1),
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
-            // Welcome message
-            const Positioned(
-              left: 38,
-              top: 60,
-              child: SizedBox(
-                width: 278,
-                child: Text(
-                  'Hi, Welcome Back',
-                  style: TextStyle(
-                    color: Color(0xFF052224),
-                    fontSize: 20,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                      // Circular Total Balance
+                      _buildCircularBalance(),
+
+                      const SizedBox(height: 20),
+
+                      // Action Buttons
+                      _buildActionButtons(),
+
+                      const SizedBox(height: 15),
+
+                      // Bank Cards Carousel
+                      _buildBankCardsCarousel(),
+
+                      const SizedBox(height: 15),
+
+                      // Period Switcher
+                      _buildPeriodSwitcher(),
+
+                      const SizedBox(height: 15),
+
+                      // Transactions List
+                      _buildTransactionsList(),
+
+                      const SizedBox(height: 100), // Space for bottom nav
+                    ],
                   ),
                 ),
               ),
-            ),
+      ),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 0),
+    );
+  }
 
-            const Positioned(
-              left: 38,
-              top: 86,
-              child: SizedBox(
-                width: 169,
-                child: Text(
-                  'Good Morning',
-                  style: TextStyle(
-                    color: Color(0xFF052224),
-                    fontSize: 14,
-                    fontFamily: 'League Spartan',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
+  Widget _buildCircularBalance() {
+    return Container(
+      width: 170,
+      height: 170,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+      
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF00D09E).withOpacity(0.28),
+            spreadRadius: 2,
+            blurRadius: 16
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.account_balance_wallet_outlined,
+                size: 16,
+                color: Color(0xFF666666),
               ),
-            ),
-
-            // Total Credit label in card
-            const Positioned(
-              left: 240,
-              top: 350,
-              child: Text(
-                'Total Credit',
+              SizedBox(width: 5),
+              Text(
+                'Total Balance',
                 style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 12,
                   fontFamily: 'Poppins',
+                  fontSize: 12,
                   fontWeight: FontWeight.w400,
+                  color: Color(0xFF666666),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            NumberFormat('#,##0.00').format(_totalBalance),
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF00D09E),
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Total Across All Accounts',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF999999),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildActionButton('SAVINGS', const Color(0xFF00D09E)),
+          _buildActionButton('LOANS', const Color(0xFF00D09E)),
+          _buildActionButton('BILLS', const Color(0xFF00D09E)),
+          _buildActionButton('REPORTS', const Color(0xFF00D09E)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(String label, Color primaryColor) {
+    return Container(
+      width: 80,
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: primaryColor, // Use the primary color for the border
+          width: 1,
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: primaryColor, // Use primary color for the text
+        ),
+      ),
+    );
+  }
+
+  /// Build carousel of bank cards
+  Widget _buildBankCardsCarousel() {
+    if (_bankAccounts.isEmpty) {
+      // Show default card when no accounts
+      return _buildBankCard(account: null, width: 320);
+    }
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 190, // Increased height for ATM card design
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: _bankAccounts.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: _buildBankCard(account: _bankAccounts[index], width: 300),
+              );
+            },
+          ),
+        ),
+        // Page indicators
+        if (_bankAccounts.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _bankAccounts.length,
+                (index) => Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentPage == index
+                        ? const Color(0xFF00D09E)
+                        : const Color(0xFFCCCCCC),
+                  ),
                 ),
               ),
             ),
+          ),
+      ],
+    );
+  }
 
-            // Savings Goals Progress (beside Revenue Last Week)
-            Positioned(
-              left: 70,
-              top: 350,
+  /// Build a virtual ATM card design
+  /// To adjust the width of the bank card, pass a width value when calling this method.
+  /// Example usage: _buildBankCard(account: account, width: 350)
+  Widget _buildBankCard({required BankAccount? account, double? width}) {
+    // Card dimensions: Standard ATM card ratio (85.6mm x 53.98mm ≈ 1.59:1)
+    // Reduced height by 10% for more compact design
+    final cardWidth = width ?? 340.0;
+    final cardHeight = (cardWidth / 1.59) * 0.9; // Reduced by 10%
+    
+    // Determine card gradient based on account type
+    List<Color> cardColors;
+    if (account == null) {
+      cardColors = [
+        const Color(0xFF1A1A2E),
+        const Color(0xFF16213E),
+        const Color(0xFF0F3460),
+      ];
+    } else {
+      switch (account.accountType.toLowerCase()) {
+        case 'checking':
+          cardColors = [
+            const Color(0xFF1A1A2E),
+            const Color(0xFF16213E),
+            const Color(0xFF0F3460),
+          ];
+          break;
+        case 'savings':
+          cardColors = [
+            const Color(0xFF0F4C75),
+            const Color(0xFF3282B8),
+            const Color(0xFFBBE1FA),
+          ];
+          break;
+        case 'credit_card':
+          cardColors = [
+            const Color(0xFF2D1B69),
+            const Color(0xFF8B5CF6),
+            const Color(0xFFA78BFA),
+          ];
+          break;
+        default:
+          cardColors = [
+            const Color(0xFF1A1A2E),
+            const Color(0xFF16213E),
+            const Color(0xFF0F3460),
+          ];
+      }
+    }
+
+    return Container(
+      width: cardWidth,
+      height: cardHeight,
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: cardColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: cardColors.first.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+            spreadRadius: -5,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            // Background pattern
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _CardPatternPainter(),
+              ),
+            ),
+            // Card content
+            Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Savings Goals',
-                    style: TextStyle(
-                      color: Color(0xFF052224),
-                      fontSize: 12,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                    ),
+                  // Top section: Chip and Bank logo area
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // EMV Chip
+                      Container(
+                        width: 40,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.amber.shade700,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Stack(
+                          children: [
+                            // Chip lines
+                            Positioned(
+                              left: 6,
+                              top: 6,
+                              child: Container(
+                                width: 28,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.shade900,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                            // Chip shine
+                            Positioned(
+                              left: 8,
+                              top: 8,
+                              child: Container(
+                                width: 12,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Card type indicator
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          account?.accountType.toUpperCase() ?? 'CHECKING',
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  _isLoadingSavingsProgress
-                      ? const SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF052224)),
-                          ),
-                        )
-                      : SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Background circle
-                              SizedBox(
-                                width: 70,
-                                height: 70,
-                                child: CircularProgressIndicator(
-                                  value: 1.0,
-                                  backgroundColor: const Color(0xFFDFF7E2),
-                                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFDFF7E2)),
-                                  strokeWidth: 8,
-                                ),
-                              ),
-                              // Progress circle
-                              Transform.rotate(
-                                angle: -90 * math.pi / 180, // Start from top
-                                child: SizedBox(
-                                  width: 70,
-                                  height: 70,
-                                  child: CircularProgressIndicator(
-                                    value: _savingsProgressPercentage,
-                                    backgroundColor: Colors.transparent,
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
-                                    strokeWidth: 8,
-                                    strokeCap: StrokeCap.round,
-                                  ),
-                                ),
-                              ),
-                              // Percentage text in center
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${(_savingsProgressPercentage * 100).toStringAsFixed(0)}%',
-                                    style: const TextStyle(
-                                      color: Color(0xFF052224),
-                                      fontSize: 14,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const Text(
-                                    'Goal',
-                                    style: TextStyle(
-                                      color: Color(0xFF052224),
-                                      fontSize: 8,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                ],
-              ),
-            ),
-
-            // Total Debit label in card
-            const Positioned(
-              left: 240,
-              top: 412,
-              child: Text(
-                'Total Debit',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 240,
-              top: 370,
-              child: _isLoadingCreditDebit
-                  ? Shimmer.fromColors(
-                      baseColor: const Color(0xFF0068FF).withOpacity(0.3),
-                      highlightColor: const Color(0xFF0068FF).withOpacity(0.6),
-                      period: const Duration(milliseconds: 1500),
-                      child: Container(
-                        width: 80,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0068FF).withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                    )
-                  : Text(
-                      Formatters.formatCurrency(_currentMonthCredit),
-                      style: const TextStyle(
-                        color: Color(0xFF0068FF),
-                        fontSize: 15,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-            ),
-
-            Positioned(
-              left: 240,
-              top: 432,
-              child: _isLoadingCreditDebit
-                  ? Shimmer.fromColors(
-                      baseColor: Colors.red.withOpacity(0.3),
-                      highlightColor: Colors.red.withOpacity(0.6),
-                      period: const Duration(milliseconds: 1500),
-                      child: Container(
-                        width: 80,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                    )
-                  : Text(
-                      _currentMonthDebit > 0 
-                          ? '-${Formatters.formatCurrency(_currentMonthDebit)}'
-                          : Formatters.formatCurrency(0.0),
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontSize: 15,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-            ),
-
-            // Balance display section
-            const Positioned(
-              left: 78,
-              top: 136,
-              child: Text(
-                'Total Balance',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 60,
-              top: 152,
-              child: _isLoadingBalance
-                  ? Shimmer.fromColors(
-                      baseColor: const Color(0xFFF1FFF3).withOpacity(0.3),
-                      highlightColor: const Color(0xFFF1FFF3).withOpacity(0.6),
-                      period: const Duration(milliseconds: 1500),
-                      child: Container(
-                        width: 150,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF1FFF3).withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    )
-                  : Text(
-                      Formatters.formatCurrency(_totalBalance ?? 0.0),
-                      style: const TextStyle(
-                        color: Color(0xFFF1FFF3),
-                        fontSize: 24,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-            ),
-
-            const Positioned(
-              left: 268,
-              top: 137,
-              child: Text(
-                'Total Expense',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 249,
-              top: 152,
-              child: _isLoadingBalance
-                  ? Shimmer.fromColors(
-                      baseColor: const Color(0xFF0068FF).withOpacity(0.3),
-                      highlightColor: const Color(0xFF0068FF).withOpacity(0.6),
-                      period: const Duration(milliseconds: 1500),
-                      child: Container(
-                        width: 150,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0068FF).withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    )
-                  : Text(
-                      (_totalExpense ?? 0.0) > 0 
-                          ? '-${Formatters.formatCurrency(_totalExpense ?? 0.0)}'
-                          : Formatters.formatCurrency(0.0),
-                      style: const TextStyle(
-                        color: Color(0xFF0068FF),
-                        fontSize: 24,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-            ),
-
-            // Progress bar
-            Positioned(
-              left: 50,
-              top: 200,
-              child: Container(
-                width: 330,
-                height: 27,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF052224),
-                  borderRadius: BorderRadius.circular(13.50),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 99, // 30% of 330
-                      height: 27,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1FFF3),
-                        borderRadius: BorderRadius.circular(13.50),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '30%',
+                  
+                  const Spacer(),
+                  
+                  // Card number section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'CARD NUMBER',
                         style: TextStyle(
-                          color: Color(0xFF052224),
-                          fontSize: 12,
                           fontFamily: 'Poppins',
+                          fontSize: 8,
                           fontWeight: FontWeight.w400,
+                          color: Colors.white70,
+                          letterSpacing: 1.5,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Progress bar filled part
-            Positioned(
-              left: 119,
-              top: 200,
-              child: Container(
-                width: 261,
-                height: 27,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1FFF3),
-                  borderRadius: BorderRadius.circular(13.50),
-                ),
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 19),
-                child: const Text(
-                  '\$20,000.00',
-                  style: TextStyle(
-                    color: Color(0xFF052224),
-                    fontSize: 13,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 81,
-              top: 237,
-              child: Text(
-                '30% of your expenses, looks good.',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            // Vertical separator line
-            Positioned(
-              left: 216,
-              top: 140,
-              child: Container(
-                width: 0,
-                height: 42,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFDFF7E2),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-
-            // Vertical separator line
-            Positioned(
-              left: 176,
-              top: 350,
-              child: Container(
-                width: 0,
-                height: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFDFF7E2),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-
-            
-            Positioned(
-              left: 60,
-              top: 139,
-              child: Transform.rotate(
-                angle: -90 * 3.14159 / 180, // -90 degrees (pointing up)
-                child: const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 12,
-                  color: Color(0xFF052224),
-                ),
-              ),
-            ),
-
-            // Expense indicator (down arrow)
-            Positioned(
-              left: 249,
-              top: 139,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees (pointing down)
-                child: const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 12,
-                  color: Color(0xFF052224),
-                ),
-              ),
-            ),
-
-            // Checkmark icon
-            Positioned(
-              left: 60,
-              top: 243,
-              child: Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.check,
-                  size: 8,
-                  color: Color(0xFF052224),
-                ),
-              ),
-            ),
-
-            // Segmented control (Daily/Weekly/Monthly)
-            Positioned(
-              left: 36,
-              top: 503,
-              child: Container(
-                width: 358,
-                height: 60,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Daily
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        setState(() {
-                          _selectedPeriod = 'daily';
-                        });
-                        _loadCreditDebitData(period: 'daily');
-                      },
-                      child: Container(
-                        width: 95,
-                        height: _selectedPeriod == 'daily' ? 50 : 31,
-                        decoration: BoxDecoration(
-                          color: _selectedPeriod == 'daily'
-                              ? const Color(0xFF00D09E)
-                              : const Color(0xFFDFF7E2),
-                          borderRadius: BorderRadius.circular(_selectedPeriod == 'daily' ? 19 : 10),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Daily',
-                          style: TextStyle(
-                            color: const Color(0xFF052224),
-                            fontSize: 15,
-                            fontFamily: 'Poppins',
-                            fontWeight: _selectedPeriod == 'daily' ? FontWeight.w600 : FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Weekly
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        setState(() {
-                          _selectedPeriod = 'weekly';
-                        });
-                        _loadCreditDebitData(period: 'weekly');
-                      },
-                      child: Container(
-                        width: 95,
-                        height: _selectedPeriod == 'weekly' ? 50 : 31,
-                        decoration: BoxDecoration(
-                          color: _selectedPeriod == 'weekly'
-                              ? const Color(0xFF00D09E)
-                              : const Color(0xFFDFF7E2),
-                          borderRadius: BorderRadius.circular(_selectedPeriod == 'weekly' ? 19 : 10),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Weekly',
-                          style: TextStyle(
-                            color: const Color(0xFF052224),
-                            fontSize: 15,
-                            fontFamily: 'Poppins',
-                            fontWeight: _selectedPeriod == 'weekly' ? FontWeight.w600 : FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Monthly
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        setState(() {
-                          _selectedPeriod = 'monthly';
-                        });
-                        _loadCreditDebitData(period: 'monthly');
-                      },
-                      child: Container(
-                        width: 95,
-                        height: _selectedPeriod == 'monthly' ? 50 : 31,
-                        decoration: BoxDecoration(
-                          color: _selectedPeriod == 'monthly'
-                              ? const Color(0xFF00D09E)
-                              : const Color(0xFFDFF7E2),
-                          borderRadius: BorderRadius.circular(_selectedPeriod == 'monthly' ? 19 : 10),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Monthly',
-                          style: TextStyle(
-                            color: const Color(0xFF052224),
-                            fontSize: 15,
-                            fontFamily: 'Poppins',
-                            fontWeight: _selectedPeriod == 'monthly' ? FontWeight.w600 : FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Transaction items
-            // Salary transaction
-            const Positioned(
-              left: 110,
-              top: 591,
-              child: Text(
-                'Salary',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 321,
-              top: 609,
-              child: Text(
-                '\$4.000,00',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 237,
-              top: 613,
-              child: Text(
-                'Monthly',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 13,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 110,
-              top: 616.35,
-              child: Text(
-                '18:27 - April 30',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Separator lines for salary
-            Positioned(
-              left: 214.46,
-              top: 599.10,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees in radians
-                child: Container(
-                  width: 35.49,
-                  height: 0,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF00D09E),
-                      width: 1.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 307.88,
-              top: 599.10,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees in radians
-                child: Container(
-                  width: 35.49,
-                  height: 0,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF00D09E),
-                      width: 1.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Salary icon
-            Positioned(
-              left: 37,
-              top: 587,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6DB6FE),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Center(
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 7.5,
-                        top: 7.5,
-                        child: Container(
-                          width: 26,
-                          height: 23.48,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFFF1FFF3),
-                              width: 1.77,
-                            ),
-                            borderRadius: BorderRadius.circular(0.44),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 10,
-                        top: 10,
-                        child: Container(
-                          width: 20,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFFF1FFF3),
-                              width: 1.77,
-                            ),
-                            borderRadius: BorderRadius.circular(0.44),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 12.5,
-                        top: 12.5,
-                        child: Container(
-                          width: 14,
-                          height: 12.5,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFFF1FFF3),
-                              width: 1.77,
-                            ),
-                            borderRadius: BorderRadius.circular(0.44),
-                          ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${_formatCardNumber(_getLastFourDigits(account ?? _createDummyAccount()))}',
+                        style: const TextStyle(
+                          fontFamily: 'Courier',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          letterSpacing: 4,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-
-            // Groceries transaction
-            const Positioned(
-              left: 110,
-              top: 666,
-              child: Text(
-                'Groceries',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 331,
-              top: 684,
-              child: Text(
-                '-\$100,00',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 242,
-              top: 688,
-              child: Text(
-                'Pantry',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 13,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 110,
-              top: 691.35,
-              child: Text(
-                '17:00 - April 24',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Separator lines for groceries
-            Positioned(
-              left: 214.46,
-              top: 674.10,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees in radians
-                child: Container(
-                  width: 35.49,
-                  height: 0,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF00D09E),
-                      width: 1.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 307.88,
-              top: 674.10,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees in radians
-                child: Container(
-                  width: 35.49,
-                  height: 0,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF00D09E),
-                      width: 1.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Groceries icon (shopping bag)
-            Positioned(
-              left: 37,
-              top: 664,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF3299FF),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Center(
-                  child: Stack(
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Bottom section: Account name and balance
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      // Bag body
-                      Positioned(
-                        left: 20,
-                        top: 13,
-                        child: Container(
-                          width: 16.76,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFFF1FFF3),
-                              width: 1.70,
-                            ),
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(2),
-                              bottomRight: Radius.circular(2),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Bag handles
-                      Positioned(
-                        left: 18,
-                        top: 13,
-                        child: Container(
-                          width: 3,
-                          height: 7,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: const Color(0xFFF1FFF3),
-                                width: 1.70,
+                      // Account name
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'CARDHOLDER',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 8,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white70,
+                                letterSpacing: 1.5,
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 4),
+                            Text(
+                              account?.accountName.toUpperCase() ?? 'AMERICAN BANK',
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
-                      Positioned(
-                        left: 35,
-                        top: 13,
-                        child: Container(
-                          width: 3,
-                          height: 7,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              right: BorderSide(
-                                color: const Color(0xFFF1FFF3),
-                                width: 1.70,
-                              ),
+                      // Balance
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'BALANCE',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 8,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white70,
+                              letterSpacing: 1.5,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 4),
+                          Text(
+                            NumberFormat('#,##0.00').format(account?.balance ?? 40000.00),
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-
-            // Rent transaction
-            const Positioned(
-              left: 110,
-              top: 747,
-              child: Text(
-                'Rent',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 328,
-              top: 763,
-              child: Text(
-                '-\$674,40',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 248,
-              top: 767,
-              child: Text(
-                'Rent',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 13,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 110,
-              top: 772.35,
-              child: Text(
-                '8:30 - April 15',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Separator lines for rent
-            Positioned(
-              left: 214.46,
-              top: 755.10,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees in radians
-                child: Container(
-                  width: 35.49,
-                  height: 0,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF00D09E),
-                      width: 1.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 307.88,
-              top: 755.10,
-              child: Transform.rotate(
-                angle: 90 * 3.14159 / 180, // 90 degrees in radians
-                child: Container(
-                  width: 35.49,
-                  height: 0,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF00D09E),
-                      width: 1.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Rent icon (house/key)
-            Positioned(
-              left: 37,
-              top: 744,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0068FF),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Center(
-                  child: Stack(
-                    children: [
-                      // House shape with roof
-                      Positioned(
-                        left: 14,
-                        top: 14,
-                        child: Container(
-                          width: 28.37,
-                          height: 24.82,
-                          child: Stack(
-                            children: [
-                              // Roof (triangle)
-                              Positioned(
-                                left: 0,
-                                top: 0,
-                                child: CustomPaint(
-                                  size: const Size(28.37, 12),
-                                  painter: _HousePainter(),
-                                ),
-                              ),
-                              // House body
-                              Positioned(
-                                left: 0,
-                                top: 12,
-                                child: Container(
-                                  width: 28.37,
-                                  height: 12.82,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: const Color(0xFFF1FFF3),
-                                      width: 1.70,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Door
-                              Positioned(
-                                left: 9,
-                                top: 16,
-                                child: Container(
-                                  width: 10,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: const Color(0xFFF1FFF3),
-                                      width: 1.70,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Food icon (fork and knife)
-            Positioned(
-              left: 193,
-              top: 413,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.remove,
-                    size: 40,
-                    color: Color(0xFF052224),
-                  ),
                 ],
-              ),
-            ),
-            // Food icon (fork and knife)
-            Positioned(
-              left: 193,
-              top: 357,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.add, // Use 'remove' as the standard 'minus' icon to represent a negative sign
-                    size: 40,
-                    color: Color(0xFF052224),
-                  ),
-                ],
-              ),
-            ),
-
-
-            // Divider between Revenue and Food last week
-            Positioned(
-              left: 210,
-              top: 403,
-              child: SizedBox(
-                width: 120,
-                height: 2,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFFFFF),
-                    borderRadius: BorderRadius.circular(1),
-                  ),
-                ),
-              ),
-            ),
-
-            // Salary icon (stack of money)
-            Positioned(
-              left: 197,
-              top: 355,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      width: 31,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 2,
-                    top: 2,
-                    child: Container(
-                      width: 27,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 4,
-                    top: 4,
-                    child: Container(
-                      width: 23,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Divider between Revenue and Food last week
-            Positioned(
-              left: 186,
-              top: 350,
-              child: SizedBox(
-                width: 2,
-                height: 100,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFFFFF),
-                    borderRadius: BorderRadius.circular(1),
-                  ),
-                ),
-              ),
-            ),
-
-            // Circular Progress Bar for Savings Goal with Car Icon
-            Positioned(
-              left: 73,
-              top: 348,
-              child: SizedBox(
-                width: 71,
-                height: 71,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Outer circle background
-                    SizedBox(
-                      width: 68.344,
-                      height: 68.344,
-                      child: CircularProgressIndicator(
-                        value: 1.0,
-                        backgroundColor: const Color(0xFFF1FFF3),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF1FFF3)),
-                        strokeWidth: 3,
-                      ),
-                    ),
-                    // Progress circle (filled portion)
-                    _isLoadingProgress
-                        ? const SizedBox(
-                            width: 68.344,
-                            height: 68.344,
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00D09E)),
-                              strokeWidth: 3,
-                            ),
-                          )
-                        : Transform.rotate(
-                            angle: -90 * math.pi / 180, // Start from top (-90 degrees)
-                            child: SizedBox(
-                              width: 68.344,
-                              height: 68.344,
-                              child: CircularProgressIndicator(
-                                value: _savingsProgress,
-                                backgroundColor: Colors.transparent,
-                                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0068FF)),
-                                strokeWidth: 3,
-                                strokeCap: StrokeCap.round,
-                              ),
-                            ),
-                          ),
-                    // Car icon for savings goal - positioned at center
-                    const Icon(
-                      Icons.directions_car,
-                      size: 14.338,
-                      color: Color(0xFF052224),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Savings on goals text
-            Positioned(
-              left: 108.5,
-              top: 422,
-              child: SizedBox(
-                width: 63,
-                child: Text(
-                  'Savings on goals',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    height: 1.496,
-                  ),
-                ),
-              ),
-            ),
-
-
-            // Notification icon (bell)
-            Positioned(
-              left: 364,
-              top: 61,
-              child: GestureDetector(
-                onTap: () {
-                  // Navigate to notifications if needed
-                },
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFDFF7E2),
-                    borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                  ),
-                  child: Center(
-                    child: Stack(
-                      children: [
-                        // Bell shape
-                        Positioned(
-                          left: 7.71,
-                          top: 5.14,
-                          child: Container(
-                            width: 14.57,
-                            height: 18.86,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFF052224),
-                                width: 1.29,
-                              ),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8),
-                                bottomLeft: Radius.circular(2),
-                                bottomRight: Radius.circular(2),
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                // Bell clapper
-                                Positioned(
-                                  left: 6,
-                                  bottom: 2,
-                                  child: Container(
-                                    width: 2.5,
-                                    height: 3,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF052224),
-                                      borderRadius: BorderRadius.circular(1),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 0),
     );
   }
+
+  /// Format card number with spaces (e.g., "1234 5678 9012 3456")
+  String _formatCardNumber(String lastFour) {
+    return '****  ****  ****  $lastFour';
+  }
+
+  /// Create dummy account for default card
+  BankAccount _createDummyAccount() {
+    return const BankAccount(
+      id: 'dummy',
+      accountName: 'Default',
+      accountType: 'checking',
+      balance: 0,
+      initialBalance: 0,
+      currency: 'USD',
+      isActive: true,
+    );
+  }
+
+  Widget _buildPeriodSwitcher() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      height: 50,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: _buildPeriodButton('Daily')),
+          Expanded(child: _buildPeriodButton('Weekly')),
+          Expanded(child: _buildPeriodButton('Monthly')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPeriodButton(String period) {
+    final isSelected = _selectedPeriod == period;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedPeriod = period;
+        });
+      },
+      child: Container(
+        height: 42,
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF00D09E) : Colors.transparent,
+          borderRadius: BorderRadius.circular(21),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          period,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            color: isSelected ? Colors.white : const Color(0xFF666666),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransactionsList() {
+    if (_recentTransactions.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(20),
+        child: Text(
+          'No recent transactions',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 15,
+            color: Color(0xFF052224),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: _recentTransactions.take(3).map((transaction) {
+        return _buildTransactionItem(transaction);
+      }).toList(),
+    );
+  }
+
+  Widget _buildTransactionItem(Transaction transaction) {
+    final isIncome = transaction.isIncome;
+    final color = isIncome ? const Color(0xFF64B5F6) : const Color(0xFFFF8A65);
+    IconData icon;
+    
+    // Determine icon based on transaction type/category
+    if (transaction.category?.toLowerCase().contains('salary') ?? false) {
+      icon = Icons.attach_money;
+    } else if (transaction.category?.toLowerCase().contains('groceries') ?? false) {
+      icon = Icons.shopping_cart_outlined;
+    } else if (transaction.category?.toLowerCase().contains('rent') ?? false) {
+      icon = Icons.home_outlined;
+    } else {
+      icon = isIncome ? Icons.trending_up : Icons.trending_down;
+    }
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: [
+          // Icon
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          
+          // Transaction Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.description,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF333333),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  DateFormat('HH:mm - MMMM dd').format(transaction.transactionDate),
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF999999),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Amount and Category
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${isIncome ? '' : '-'}\$${NumberFormat('#,##0.00').format(transaction.amount.abs())}',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: isIncome ? const Color(0xFF4CAF50) : const Color(0xFF333333),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                transaction.category ?? '',
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF999999),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Custom painter for card background pattern (subtle circles only, no lines)
+class _CardPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.03)
+      ..style = PaintingStyle.fill;
+
+    // Draw very subtle circles in background (no lines)
+    for (int i = 0; i < 3; i++) {
+      canvas.drawCircle(
+        Offset(size.width * (0.2 + i * 0.3), size.height * 0.3),
+        size.width * 0.12,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

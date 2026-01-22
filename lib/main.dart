@@ -7,6 +7,7 @@ import 'config/router.dart';
 import 'services/storage_service.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
+import 'services/session_manager.dart';
 import 'utils/theme.dart';
 
 void main() async {
@@ -23,6 +24,9 @@ void main() async {
   
   // Initialize auth service and restore user session
   await AuthService.init();
+  
+  // Initialize session manager for automatic session monitoring
+  SessionManager.init();
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(

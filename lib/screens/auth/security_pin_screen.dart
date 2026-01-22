@@ -1,26 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class SecurityPinScreen extends StatefulWidget {
+  const SecurityPinScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<SecurityPinScreen> createState() => _SecurityPinScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+class _SecurityPinScreenState extends State<SecurityPinScreen> {
+  final List<TextEditingController> _pinControllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(
+    6,
+    (index) => FocusNode(),
+  );
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    for (var controller in _pinControllers) {
+      controller.dispose();
+    }
+    for (var node in _focusNodes) {
+      node.dispose();
+    }
     super.dispose();
   }
 
-  Future<void> _handleResetPassword() async {
-    if (!_formKey.currentState!.validate()) {
+  void _onPinChanged(int index, String value) {
+    if (value.isNotEmpty && index < 5) {
+      _focusNodes[index + 1].requestFocus();
+    } else if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
+    }
+  }
+
+  String _getPin() {
+    return _pinControllers.map((controller) => controller.text).join();
+  }
+
+  Future<void> _handleAccept() async {
+    final pin = _getPin();
+    if (pin.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter all 6 digits'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -28,7 +58,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       _isLoading = true;
     });
 
-    // TODO: Implement password reset logic
+    // TODO: Implement pin verification logic
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
@@ -38,17 +68,33 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password reset email sent!'),
+          content: Text('Pin verified successfully!'),
           backgroundColor: Color(0xFF00D09E),
         ),
       );
-      // Navigate to security pin screen after a short delay
+      // Navigate to next screen or back
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
-          context.push('/security-pin');
+          context.go('/login');
         }
       });
     }
+  }
+
+  Future<void> _handleSendAgain() async {
+    // Clear all pin fields
+    for (var controller in _pinControllers) {
+      controller.clear();
+    }
+    _focusNodes[0].requestFocus();
+
+    // TODO: Implement resend pin logic
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Pin code sent again!'),
+        backgroundColor: Color(0xFF00D09E),
+      ),
+    );
   }
 
   @override
@@ -57,74 +103,76 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       canPop: false,
       onPopInvoked: (didPop) async {
         if (!didPop) {
-          // Navigate back to login instead of closing app
+          // Navigate back instead of closing app
           if (context.canPop()) {
             context.pop();
           } else {
-            context.go('/login');
+            context.go('/forgot-password');
           }
         }
       },
       child: Scaffold(
         body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: const Color(0xFF00D09E), // Main Green background
-        child: Stack(
-          children: [
-            // Back Button
-            Positioned(
-              top: 50,
-              left: 24,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF093030),
-                ),
-                onPressed: () {
-                  context.go('/login');
-                },
-              ),
-            ),
-
-            // Title
-            Positioned(
-              top: 50,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  'Forgot Password',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
-                    height: 22 / 15,
+          width: double.infinity,
+          height: double.infinity,
+          color: const Color(0xFF00D09E), // Main Green background
+          child: Stack(
+            children: [
+              // Back Button
+              Positioned(
+                top: 50,
+                left: 24,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
                     color: Color(0xFF093030),
                   ),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/forgot-password');
+                    }
+                  },
                 ),
               ),
-            ),
 
-            // Main Content Card (Base Shape)
-            Positioned(
-              top: 117,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3), // Background Green White and Letters
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
+              // Title
+              Positioned(
+                top: 50,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Text(
+                    'Security Pin',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 30,
+                      fontWeight: FontWeight.w500,
+                      height: 22 / 15,
+                      color: Color(0xFF093030),
+                    ),
                   ),
                 ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                  child: Form(
-                    key: _formKey,
+              ),
+
+              // Main Content Card (Base Shape)
+              Positioned(
+                top: 117,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF1FFF3), // Background Green White and Letters
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(60),
+                      topRight: Radius.circular(60),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -132,7 +180,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         // Description text
                         const Text(
-                          'Enter your email address and we\'ll send you a link to reset your password.',
+                          'Enter the 6-digit security pin sent to your email',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'League Spartan',
@@ -145,77 +193,60 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         const SizedBox(height: 50),
 
-                        // Email label
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          margin: const EdgeInsets.only(left: 29, bottom: 8),
-                          child: const Text(
-                            'Enter email address',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              height: 22 / 15,
-                              color: Color(0xFF093030), // Letters and Icons
-                            ),
-                          ),
-                        ),
-
-                        // Email Input Field
-                        Container(
-                          width: 356,
-                          height: 41,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2), // Light Green
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF1a1a1a),
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFFDFF7E2),
-                              hintText: 'example@example.com',
-                              hintStyle: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                height: 14 / 16,
-                                color: Color(0xFF093030).withOpacity(0.45),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              border: OutlineInputBorder(
+                        // Pin Input Fields
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            6,
+                            (index) => Container(
+                              width: 45,
+                              height: 45,
+                              margin: const EdgeInsets.symmetric(horizontal: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDFF7E2), // Light Green
                                 borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
+                              child: TextField(
+                                controller: _pinControllers[index],
+                                focusNode: _focusNodes[index],
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                maxLength: 1,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF093030),
+                                ),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: const Color(0xFFDFF7E2),
+                                  counterText: '',
+                                  contentPadding: EdgeInsets.zero,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                    borderSide: BorderSide(
+                                      color: const Color(0xFF00D09E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                                onChanged: (value) => _onPinChanged(index, value),
                               ),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email address';
-                              }
-                              if (!value.contains('@')) {
-                                return 'Please enter a valid email address';
-                              }
-                              return null;
-                            },
                           ),
                         ),
 
                         const SizedBox(height: 50),
 
-                        // Reset Password Button
+                        // Accept Button
                         if (_isLoading)
                           const CircularProgressIndicator(
                             color: Color(0xFF00D09E),
@@ -229,9 +260,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(
-                              onPressed: _handleResetPassword,
+                              onPressed: _handleAccept,
                               child: const Text(
-                                'Next Step',
+                                'Accept',
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: 20,
@@ -243,9 +274,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                           ),
 
-                        const SizedBox(height: 130),
+                        const SizedBox(height: 20),
 
-                        // Sign Up Button
+                        // Send Again Button
                         Container(
                           width: 207,
                           height: 45,
@@ -254,11 +285,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: TextButton(
-                            onPressed: () {
-                              context.go('/register');
-                            },
+                            onPressed: _handleSendAgain,
                             child: const Text(
-                              'Sign Up',
+                              'Send Again',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 20,
@@ -270,7 +299,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 50),
 
                         // or sign up with
                         const Text(
@@ -378,11 +407,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
 }
+

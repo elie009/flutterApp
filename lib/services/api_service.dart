@@ -141,8 +141,22 @@ class ApiService {
   Exception _handleError(DioException error) {
     if (error.response != null) {
       final statusCode = error.response!.statusCode;
-      final message = error.response!.data['message'] as String? ?? 
-          'An error occurred';
+      
+      // Safely extract error message from response data
+      String message = 'An error occurred';
+      try {
+        final data = error.response!.data;
+        if (data is Map<String, dynamic>) {
+          message = data['message'] as String? ?? 
+                   data['error'] as String? ?? 
+                   'An error occurred';
+        } else if (data is String) {
+          message = data;
+        }
+      } catch (e) {
+        // If parsing fails, use default message
+        message = 'An error occurred';
+      }
       
       switch (statusCode) {
         case 400:
@@ -182,27 +196,57 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
+      print('🔒 API Interceptor: Got 401 error on ${err.requestOptions.path}');
+      
+      // Don't try to refresh if this IS the refresh endpoint (prevent infinite loop)
+      if (err.requestOptions.path.contains('/Auth/refresh')) {
+        print('🔒 API Interceptor: Refresh token endpoint failed, session expired');
+        // Refresh token is invalid, logout user
+        await AuthService.logout();
+        handler.next(err);
+        return;
+      }
+      
+      // Don't try to refresh if user is not authenticated
+      if (!AuthService.isAuthenticated()) {
+        print('🔒 API Interceptor: User not authenticated, skipping refresh');
+        handler.next(err);
+        return;
+      }
+      
+      print('🔒 API Interceptor: Attempting token refresh...');
       // Token expired, try to refresh
-      final refreshed = await AuthService.refreshToken();
-      if (refreshed) {
-        // Retry the original request
-        final opts = err.requestOptions;
-        final token = await StorageService.getToken();
-        opts.headers['Authorization'] = 'Bearer $token';
-        
-        try {
-          final response = await ApiService().dio.fetch(opts);
-          handler.resolve(response);
-          return;
-        } catch (e) {
+      try {
+        final refreshed = await AuthService.refreshToken();
+        if (refreshed) {
+          print('🔒 API Interceptor: Token refreshed successfully, retrying request');
+          // Retry the original request
+          final opts = err.requestOptions;
+          final token = await StorageService.getToken();
+          opts.headers['Authorization'] = 'Bearer $token';
+          
+          try {
+            final response = await ApiService().dio.fetch(opts);
+            handler.resolve(response);
+            return;
+          } catch (e) {
+            print('🔒 API Interceptor: Retry failed: $e');
+            handler.reject(err);
+            return;
+          }
+        } else {
+          print('🔒 API Interceptor: Token refresh failed, session expired');
           // Refresh failed, logout user
           await AuthService.logout();
-          handler.reject(err);
+          handler.next(err);
           return;
         }
-      } else {
-        // Refresh failed, logout user
+      } catch (e) {
+        print('🔒 API Interceptor: Token refresh exception: $e');
+        // Refresh threw exception, logout user
         await AuthService.logout();
+        handler.next(err);
+        return;
       }
     }
     handler.next(err);

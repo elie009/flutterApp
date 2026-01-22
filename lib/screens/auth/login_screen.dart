@@ -65,80 +65,57 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
+          // Navigate to landing or auth-selection instead of closing app
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/auth-selection');
+          }
+        }
+      },
+      child: Scaffold(
+        body: Container(
         width: double.infinity,
         height: double.infinity,
         color: const Color(0xFF00D09E), // Main Green background
         child: Stack(
           children: [
-            // Status Bar Mockup (Top)
+                 
+
+
+            // The SizedBox and Center are currently just in the Stack's children,
+            // so if later widgets (like the Positioned container) cover the whole area, 
+            // they will overlap or obscure this welcome text. 
+            // To ensure it stays visible, you might want to give it a higher position in the Stack,
+            // or place it *inside* the top Card (not outside it).
+            // Here's a suggestion to make it more visible by using Positioned:
+
             Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 32,
-              child: Container(
-                color: const Color(0xFF00D09E),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Time
-                    const Text(
-                      '16:04',
-                      style: TextStyle(
-                        fontFamily: 'League Spartan',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                        height: 12 / 13,
-                      ),
-                    ),
-                    // Status Icons
-                    Row(
-                      children: [
-                        // WiFi/Network
-                        Container(
-                          width: 13,
-                          height: 11,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 4),
-                        // Battery
-                        Container(
-                          width: 15,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(58),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        // Signal Bars
-                        Container(
-                          width: 17,
-                          height: 9,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 1),
-                            borderRadius: BorderRadius.circular(1),
-                          ),
-                          child: Container(
-                            width: 12,
-                            height: 7,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+              top: 50,
+              left: 0, right: 0,
+              child: Center(
+                child: Text(
+                  'Welcome',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                    height: 22 / 15,
+                    color: Color(0xFF093030),
+                  ),
                 ),
               ),
             ),
 
+
             // Main Content Card (Base Shape)
             Positioned(
-              top: 187,
+              top: 150,
               left: 0,
               right: 0,
               bottom: 0,
@@ -146,8 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const BoxDecoration(
                   color: Color(0xFFF1FFF3), // Background Green White and Letters
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(60),
+                    topRight: Radius.circular(60),
                   ),
                 ),
                 child: SingleChildScrollView(
@@ -157,20 +134,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 76), // Space for Welcome title positioning
+                        
 
-                        // Welcome Title
-                        const Text(
-                          'Welcome',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
-                            height: 22 / 30, // 73% line height
-                            color: Color(0xFF093030), // Letters and Icons
-                          ),
-                        ),
+
 
                         const SizedBox(height: 60),
 
@@ -206,16 +172,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Color(0xFF1a1a1a),
                             ),
                             decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xFFDFF7E2),
                               hintText: 'example@example.com',
                               hintStyle: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
-                                height: 14 / 16, // 88% line height
-                                color: Color(0xFF093030).withOpacity(0.45), // Letters and Icons
+                                height: 14 / 16,
+                                color: Color(0xFF093030).withOpacity(0.45),
                               ),
-                              border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -229,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 50),
+                        const SizedBox(height: 20),
 
                         // Password label
                         Container(
@@ -243,7 +222,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w500,
                               height: 22 / 15,
                               color: Color(0xFF093030), // Letters and Icons
+                              
                             ),
+                            
                           ),
                         ),
 
@@ -263,6 +244,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Color(0xFF1a1a1a),
                             ),
                             decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xFFDFF7E2),
                               hintText: '••••••••',
                               hintStyle: TextStyle(
                                 fontFamily: 'Poppins',
@@ -286,8 +269,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                   });
                                 },
                               ),
-                              border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -301,24 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 60),
-
-                        // Forgot Password Link
-                        GestureDetector(
-                          onTap: () {
-                            context.go('/forgot-password');
-                          },
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontFamily: 'League Spartan',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              height: 13 / 14,
-                              color: Color(0xFF093030), // Letters and Icons
-                            ),
-                          ),
-                        ),
+                        
 
                         const SizedBox(height: 50),
 
@@ -350,9 +327,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
 
-                        const SizedBox(height: 50),
+                        const SizedBox(height: 10),
+                        // Forgot Password Link
+                        GestureDetector(
+                          onTap: () {
+                            context.push('/forgot-password');
+                          },
+                          child: const Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              fontFamily: 'League Spartan',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              height: 13 / 14,
+                              color: Color(0xFF093030), // Letters and Icons
+                            ),
+                          ),
+                        ),
 
-                        // Alternative Login Button
+                        const SizedBox(height: 20),
+                        // Sign Up Button
                         Container(
                           width: 207,
                           height: 45,
@@ -362,16 +356,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              // TODO: Implement biometric login
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Biometric login coming soon!'),
-                                  backgroundColor: Color(0xFF00D09E),
-                                ),
-                              );
+                              context.go('/register');
                             },
                             child: const Text(
-                              'Log In',
+                              'Sign Up',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 20,
@@ -383,17 +371,61 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
+
+                        
+
                         const SizedBox(height: 30),
 
+                        // Login with PIN button
+                        GestureDetector(
+                          onTap: () {
+                            context.push('/pin-login');
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                height: 22 / 14,
+                                color: Color(0xFF0E3E3E),
+                              ),
+                              children: const [
+                                TextSpan(text: 'Use '),
+                                TextSpan(
+                                  text: 'PIN',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                TextSpan(text: ' to login'),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
                         // Use fingerprint to access
-                        const Text(
-                          'Use fingerprint to access',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            height: 22 / 14, // 157% line height
-                            color: Color(0xFF0E3E3E), // Dark Mode Green bar
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              height: 22 / 14, // 157% line height
+                              color: Color(0xFF0E3E3E), // Default color
+                            ),
+                            children: const [
+                              TextSpan(text: 'Use '),
+                              TextSpan(
+                                text: 'fingerprint',
+                                style: TextStyle(
+                                  color: Colors.blue, // Change 'fingerprint' to blue
+                                ),
+                              ),
+                              TextSpan(text: ' to access'),
+                            ],
                           ),
                         ),
 
@@ -467,21 +499,34 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 140),
+                        const SizedBox(height: 50),
 
                         // Don't have an account? Sign Up
                         GestureDetector(
                           onTap: () {
                             context.go('/register');
                           },
-                          child: const Text(
-                            "Don't have an account? Sign Up",
-                            style: TextStyle(
-                              fontFamily: 'League Spartan',
-                              fontSize: 13,
-                              fontWeight: FontWeight.w300,
-                              height: 15 / 13, // 115% line height
-                              color: Color(0xFF093030), // Letters and Icons
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'League Spartan',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w300,
+                                height: 15 / 13,
+                                color: Color(0xFF093030), // Default color for normal text
+                              ),
+                              children: const [
+                                TextSpan(
+                                  text: "Don't have an account? ",
+                                ),
+                                TextSpan(
+                                  text: "Sign Up",
+                                  style: TextStyle(
+                                    color: Colors.blue, // Blue color for "Sign Up"
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -495,6 +540,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -134,7 +134,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${account.accountType} • ${account.accountNumber}',
+                                          '${account.accountType}${account.accountNumber != null ? ' • ${account.accountNumber}' : ''}',
                                         ),
                                         if (account.financialInstitution != null)
                                           Text(account.financialInstitution!),
