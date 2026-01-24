@@ -51,7 +51,7 @@ class DataService {
       List<Transaction> transactions = [];
       try {
         final transactionsResponse = await ApiService().get(
-          '/Transactions',
+          '/bankaccounts/transactions/recent',
           queryParameters: {'limit': 5},
         );
         final transactionsData = transactionsResponse.data['data'] as List<dynamic>? ?? [];
@@ -124,12 +124,12 @@ class DataService {
         'limit': limit,
         if (transactionType != null) 'transactionType': transactionType,
         if (category != null) 'category': category,
-        if (dateFrom != null) 'dateFrom': dateFrom,
-        if (dateTo != null) 'dateTo': dateTo,
+        if (dateFrom != null) 'startDate': dateFrom,
+        if (dateTo != null) 'endDate': dateTo,
       };
 
       final response = await ApiService().get(
-        '/Transactions',
+        '/bankaccounts/transactions',
         queryParameters: queryParams,
       );
 

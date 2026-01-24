@@ -1,13 +1,13 @@
 class AppConfig {
   // API Configuration
   // For Android Emulator: Use 10.0.2.2 (maps to host's localhost)
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  // static const String baseUrl = 'http://10.0.2.2:5000/api';
   
   // For Web/Chrome: Use localhost
   // static const String baseUrl = 'http://localhost:5000/api';
   
   // Production API
-  // static const String baseUrl = 'https://api.utilityhub360.com/api';
+  static const String baseUrl = 'https://api.utilityhub360.com/api';
   
   // For Physical device: use your computer's IP address (e.g., 'http://192.168.5.165:5000/api')
   // To find your IP: Windows: ipconfig | Mac/Linux: ifconfig

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
+import '../../widgets/triangle_painter.dart';
 import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -9,24 +10,34 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         width: 430,
         height: 932,
-        decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
+        decoration: BoxDecoration(
+          color: const Color(0xFF00D09E),
         ),
         child: Stack(
           children: [
-            // White bottom section
+            // Small top-right triangle
+            Positioned.fill(
+              child: Transform.rotate(
+                angle: 0.4,
+                child: CustomPaint(
+                  painter: TrianglePainter(),
+                ),
+              ),
+            ),
+
+            // White bottom section (now redundant, but keep the padding/styling)
             Positioned(
               left: 0,
               top: 176,
-              width: 430,
+              width: 412,
               height: 756,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3),
+                  color: Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(70),
                     topRight: Radius.circular(70),
@@ -177,108 +188,20 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Status bar
+          
+            // Title "Profile"
             Positioned(
               left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  const Positioned(
-                    left: 37,
-                    top: 9,
-                    child: Text(
-                      '16:04',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'League Spartan',
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-
-                  // Status icons
-                  Positioned(
-                    left: 338,
-                    top: 9,
-                    child: Container(
-                      width: 13,
-                      height: 11,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    left: 356,
-                    top: 11,
-                    child: Container(
-                      width: 15,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(58),
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 377,
-                    top: 12,
-                    child: Container(
-                      width: 12,
-                      height: 7,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    left: 376,
-                    top: 11,
-                    child: Container(
-                      width: 17,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 1),
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Back button
-            Positioned(
-              left: 38,
-              top: 69,
-              child: Container(
-                width: 19,
-                height: 16,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFF1FFF3),
-                    width: 2,
-                  ),
-                ),
-              ),
-            ),
-
-            // Title
-            const Positioned(
-              left: 153,
-              top: 64,
-              child: SizedBox(
-                width: 125,
+              right: 0,
+              top: 50,
+              child: Center(
                 child: Text(
                   'Profile',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 20,
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: 32,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -304,11 +227,10 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             // Notification icon
             Positioned(
               left: 364,
-              top: 61,
+              top: 51,
               child: Container(
                 width: 30,
                 height: 30,
@@ -316,16 +238,11 @@ class ProfileScreen extends StatelessWidget {
                   color: Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.all(Radius.circular(25.71)),
                 ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
-                      ),
-                    ),
+                child: const Center(
+                  child: Icon(
+                    Icons.notifications,
+                    color: Color(0xFF093030),
+                    size: 21,
                   ),
                 ),
               ),
@@ -360,8 +277,12 @@ class ProfileScreen extends StatelessWidget {
       width: 57,
       height: 53,
       decoration: BoxDecoration(
-        color: const Color(0xFF6DB6FE),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Color(0xFF00D09E), // Green border
+          width: 2,
+        ),
       ),
       child: const Center(
         child: SizedBox(
@@ -369,7 +290,7 @@ class ProfileScreen extends StatelessWidget {
           height: 28.12,
           child: Icon(
             Icons.edit,
-            color: Color(0xFFF1FFF3),
+            color: Color(0xFF00D09E), // Green icon
             size: 20,
           ),
         ),
@@ -382,8 +303,12 @@ class ProfileScreen extends StatelessWidget {
       width: 57,
       height: 53,
       decoration: BoxDecoration(
-        color: const Color(0xFF3299FF),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Color(0xFF00D09E), // Green border
+          width: 2,
+        ),
       ),
       child: const Center(
         child: SizedBox(
@@ -391,7 +316,7 @@ class ProfileScreen extends StatelessWidget {
           height: 28.54,
           child: Icon(
             Icons.security,
-            color: Color(0xFFF1FFF3),
+            color: Color(0xFF00D09E), // Green icon
             size: 20,
           ),
         ),
@@ -404,8 +329,12 @@ class ProfileScreen extends StatelessWidget {
       width: 57,
       height: 53,
       decoration: BoxDecoration(
-        color: const Color(0xFF0068FF),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Color(0xFF00D09E), // Green border
+          width: 2,
+        ),
       ),
       child: const Center(
         child: SizedBox(
@@ -413,7 +342,7 @@ class ProfileScreen extends StatelessWidget {
           height: 28.34,
           child: Icon(
             Icons.settings,
-            color: Color(0xFFF1FFF3),
+            color: Color(0xFF00D09E), // Green icon
             size: 20,
           ),
         ),
@@ -426,8 +355,12 @@ class ProfileScreen extends StatelessWidget {
       width: 57,
       height: 53,
       decoration: BoxDecoration(
-        color: const Color(0xFF6DB6FE),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Color(0xFF00D09E), // Green border
+          width: 2,
+        ),
       ),
       child: const Center(
         child: Stack(
@@ -437,7 +370,7 @@ class ProfileScreen extends StatelessWidget {
               height: 28.93,
               child: Icon(
                 Icons.help,
-                color: Color(0xFFF1FFF3),
+                color: Color(0xFF00D09E), // Green icon
                 size: 20,
               ),
             ),
@@ -466,8 +399,12 @@ class ProfileScreen extends StatelessWidget {
       width: 57,
       height: 53,
       decoration: BoxDecoration(
-        color: const Color(0xFF3299FF),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Color(0xFF00D09E), // Green border
+          width: 2,
+        ),
       ),
       child: const Center(
         child: SizedBox(
@@ -475,7 +412,7 @@ class ProfileScreen extends StatelessWidget {
           height: 26.98,
           child: Icon(
             Icons.logout,
-            color: Color(0xFFF1FFF3),
+            color: Color(0xFF00D09E), // Green icon
             size: 18,
           ),
         ),

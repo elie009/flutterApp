@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
-
+import '../../widgets/triangle_painter.dart';
 class ChangePinScreen extends StatefulWidget {
   const ChangePinScreen({super.key});
 
@@ -68,53 +68,36 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
+      backgroundColor: const Color(0xFFFFFFFF),
       body: Container(
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
           color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
           children: [
-            // Status bar
-            Positioned(
-              left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 37,
-                    top: 9,
-                    child: SizedBox(
-                      width: 30,
-                      height: 14,
-                      child: Text(
-                        '16:04',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'League Spartan',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+         
+            // Small top-right triangle
+            Positioned.fill(
+              child: Transform.rotate(
+                angle: 0.4,
+                child: CustomPaint(
+                  painter: TrianglePainter(),
+                ),
               ),
             ),
 
+         
             // White bottom section
             Positioned(
               left: 0,
-              top: 132,
-              width: 430,
+              top: 176,
+              width: 413,
               height: 800,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3),
+                  color: Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(70),
                     topRight: Radius.circular(70),
@@ -143,21 +126,19 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
               ),
             ),
 
-            // Title
+            // Title "Profile"
             Positioned(
-              left: 153,
-              top: 64,
-              child: SizedBox(
-                width: 125,
+              left: 0,
+              right: 0,
+              top: 50,
+              child: Center(
                 child: Text(
                   'Change Pin',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color(0xFF093030),
-                    fontSize: 20,
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: 32,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -166,7 +147,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
             // Current PIN field background
             Positioned(
               left: 37,
-              top: 227,
+              top: 287,
               child: Container(
                 width: 356,
                 height: 41,
@@ -250,7 +231,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
             // New PIN field background
             Positioned(
               left: 37,
-              top: 341,
+              top: 401,
               child: Container(
                 width: 356,
                 height: 41,
@@ -334,7 +315,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
             // Confirm PIN field background
             Positioned(
               left: 37,
-              top: 457,
+              top: 517,
               child: Container(
                 width: 356,
                 height: 41,
@@ -418,7 +399,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
             // Field labels
             Positioned(
               left: 37,
-              top: 207.5,
+              top: 267.5,
               child: Transform.translate(
                 offset: const Offset(0, -10),
                 child: const Text(
@@ -435,7 +416,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
             Positioned(
               left: 37,
-              top: 321.5,
+              top: 381.5,
               child: Transform.translate(
                 offset: const Offset(0, -10),
                 child: const Text(
@@ -452,7 +433,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
             Positioned(
               left: 38,
-              top: 437.5,
+              top: 497.5,
               child: Transform.translate(
                 offset: const Offset(0, -10),
                 child: const Text(
@@ -470,7 +451,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
             // Change PIN button
             Positioned(
               left: 106,
-              top: 563,
+              top: 593,
               child: GestureDetector(
                 onTap: _isLoading ? null : _changePin,
                 child: Container(
@@ -505,8 +486,8 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
             // Notification icon
             Positioned(
-              right: 36,
-              top: 61,
+              left: 364,
+              top: 51,
               child: Container(
                 width: 30,
                 height: 30,
@@ -516,9 +497,9 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
                 ),
                 child: const Center(
                   child: Icon(
-                    Icons.notifications_outlined,
+                    Icons.notifications,
                     color: Color(0xFF093030),
-                    size: 18,
+                    size: 21,
                   ),
                 ),
               ),

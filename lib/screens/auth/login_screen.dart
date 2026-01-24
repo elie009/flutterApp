@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               bottom: 0,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3), // Background Green White and Letters
+                  color: Color(0xFFFFFFFF), // Background Green White and Letters
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(60),
                     topRight: Radius.circular(60),
@@ -134,9 +134,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        
-
-
 
                         const SizedBox(height: 60),
 
@@ -295,8 +292,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
-                        
-
                         const SizedBox(height: 50),
 
                         // Login Button
@@ -370,9 +365,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-
-
-                        
 
                         const SizedBox(height: 30),
 

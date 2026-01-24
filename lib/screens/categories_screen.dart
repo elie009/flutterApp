@@ -1,31 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/bottom_nav_bar_figma.dart';
+import '../widgets/triangle_painter.dart';
+import 'package:intl/intl.dart';
+import '../services/data_service.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // "Categories" title added at the top of the screen.
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         width: 430,
         height: 932,
-        decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
+        decoration: BoxDecoration(
+          color: const Color(0xFF00D09E),
+          // Add geometric decorations using CustomPaint and positioned circles+shapes
         ),
         child: Stack(
           children: [
+            
+            // Small top-right triangle
+            Positioned.fill(
+              child: Transform.rotate(
+                angle: 0.4,
+                child: CustomPaint(
+                  painter: TrianglePainter(),
+                ),
+              ),
+            ),
+           
+          
             // White bottom section
             Positioned(
               left: 0,
-              top: 281,
-              width: 430,
-              height: 651,
+              top: 191,
+              width: 413,
+              height: 751,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3),
+                  color: Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(70),
                     topRight: Radius.circular(70),
@@ -34,504 +51,38 @@ class CategoriesScreen extends StatelessWidget {
               ),
             ),
 
-            // Status bar
+            // Title "Categories"
             Positioned(
               left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  // Time
-                  const Positioned(
-                    left: 37,
-                    top: 9,
-                    child: Text(
-                      '16:04',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'League Spartan',
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-
-                  // Status icons
-                  Positioned(
-                    left: 338,
-                    top: 9,
-                    child: Container(
-                      width: 13,
-                      height: 11,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    left: 356,
-                    top: 11,
-                    child: Container(
-                      width: 15,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(58),
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 377,
-                    top: 12,
-                    child: Container(
-                      width: 12,
-                      height: 7,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    left: 376,
-                    top: 11,
-                    child: Container(
-                      width: 17,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 1),
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Categories title
-            const Positioned(
-              left: 153,
-              top: 64,
-              child: SizedBox(
-                width: 125,
+              right: 0,
+              top: 50,
+              child: Center(
                 child: Text(
                   'Categories',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 20,
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: 32,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
 
-            // Category icons - Row 1
-            _buildCategoryIcon(
-              left: 37,
-              top: 314,
-              color: const Color(0xFF0068FF),
-              icon: _buildFoodIcon(),
-              onTap: () => _navigateToCategory(context, 'Food'),
-            ),
-            _buildCategoryIcon(
-              left: 163,
-              top: 314,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildTransportIcon(),
-              onTap: () => _navigateToCategory(context, 'Transport'),
-            ),
-            _buildCategoryIcon(
-              left: 289,
-              top: 314,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildMedicineIcon(),
-              onTap: () => _navigateToCategory(context, 'Medicine'),
-            ),
-
-            // Category icons - Row 2
-            _buildCategoryIcon(
-              left: 37,
-              top: 483,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildGroceriesIcon(),
-              onTap: () => _navigateToCategory(context, 'Groceries'),
-            ),
-            _buildCategoryIcon(
-              left: 163,
-              top: 484,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildRentIcon(),
-              onTap: () => _navigateToCategory(context, 'Rent'),
-            ),
-            _buildCategoryIcon(
-              left: 289,
-              top: 483,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildGiftsIcon(),
-              onTap: () => _navigateToCategory(context, 'Gifts'),
-            ),
-
-            // Category icons - Row 3
-            _buildCategoryIcon(
-              left: 37,
-              top: 645,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildSavingsIcon(),
-              onTap: () => _navigateToCategory(context, 'Savings'),
-            ),
-            _buildCategoryIcon(
-              left: 166,
-              top: 645,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildEntertainmentIcon(),
-              onTap: () => _navigateToCategory(context, 'Entertainment'),
-            ),
-            _buildCategoryIcon(
-              left: 289,
-              top: 645,
-              color: const Color(0xFF6DB6FE),
-              icon: _buildMoreIcon(),
-              onTap: () => _navigateToCategory(context, 'More'),
-            ),
-
-            // Category labels
-            const Positioned(
-              left: 65,
-              top: 414,
-              child: Text(
-                'Food',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 179,
-              top: 414,
-              child: Text(
-                'Transport',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 307,
-              top: 414,
-              child: Text(
-                'Medicine',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 53,
-              top: 583,
-              child: Text(
-                'Groceries',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 198,
-              top: 583,
-              child: Text(
-                'Rent',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 324,
-              top: 583,
-              child: Text(
-                'Gifts',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 59,
-              top: 748,
-              child: Text(
-                'Savings',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 164,
-              top: 748,
-              child: Text(
-                'Entertainment',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 323,
-              top: 748,
-              child: Text(
-                'More',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            // Balance display section
-            const Positioned(
-              left: 78,
-              top: 136,
-              child: Text(
-                'Total Balance',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 60,
-              top: 152,
-              child: Text(
-                '\$7,783.00',
-                style: TextStyle(
-                  color: Color(0xFFF1FFF3),
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 268,
-              top: 137,
-              child: Text(
-                'Total Expense',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 249,
-              top: 152,
-              child: Text(
-                '-\$1.187.40',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Progress bar
+            // Circular Total Balance Icon centered below the title "Categories"
             Positioned(
-              left: 50,
-              top: 200,
-              child: Container(
-                width: 330,
-                height: 27,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF052224),
-                  borderRadius: BorderRadius.circular(13.50),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 99, // 30% of 330
-                      height: 27,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1FFF3),
-                        borderRadius: BorderRadius.circular(13.50),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '30%',
-                        style: TextStyle(
-                          color: Color(0xFF052224),
-                          fontSize: 12,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              left: 0,
+              right: 0,
+              top: 110,
+              child: Center(
+                child: _buildCircularBalance(),
               ),
             ),
-
-            // Progress bar filled part
-            Positioned(
-              left: 119,
-              top: 200,
-              child: Container(
-                width: 261,
-                height: 27,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1FFF3),
-                  borderRadius: BorderRadius.circular(13.50),
-                ),
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 19),
-                child: const Text(
-                  '\$20,000.00',
-                  style: TextStyle(
-                    color: Color(0xFF052224),
-                    fontSize: 13,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-            ),
-
-            const Positioned(
-              left: 81,
-              top: 237,
-              child: Text(
-                '30% of your expenses, looks good.',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            // Vertical separator line
-            Positioned(
-              left: 216,
-              top: 150,
-              child: Container(
-                width: 0,
-                height: 42,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFDFF7E2),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-
-            // Progress indicators
-            Positioned(
-              left: 60,
-              top: 139,
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 249,
-              top: 139,
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 60,
-              top: 243,
-              child: Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                ),
-                child: Container(
-                  margin: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF052224),
-                      width: 1,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
 
             // Notification icon
             Positioned(
               left: 364,
-              top: 61,
+              top: 51,
               child: Container(
                 width: 30,
                 height: 30,
@@ -539,17 +90,119 @@ class CategoriesScreen extends StatelessWidget {
                   color: Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.all(Radius.circular(25.71)),
                 ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
+                child: const Center(
+                  child: Icon(
+                    Icons.notifications,
+                    color: Color(0xFF093030),
+                    size: 21,
+                  ),
+                ),
+              ),
+            ),
+
+            // Use a column to center everything
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                margin: const EdgeInsets.only(top: 210),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 24),
+
+                    // Grid of categories
+                    Container(
+                      width: 350,
+                      // Ensures labels don't get squeezed
+                      child: Column(
+                        children: [
+                          // Row 1
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _categoryItem(
+                                context,
+                                icon: _buildFoodIcon(),
+                                label: "Food",
+                                color: const Color(0xFF0068FF),
+                                onTap: () => _navigateToCategory(context, 'Food'),
+                              ),
+                              _categoryItem(
+                                context,
+                                icon: _buildTransportIcon(),
+                                label: "Transport",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Transport'),
+                              ),
+                              _categoryItem(
+                                context,
+                                icon: _buildMedicineIcon(),
+                                label: "Medicine",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Medicine'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 28),
+                          // Row 2
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _categoryItem(
+                                context,
+                                icon: _buildGroceriesIcon(),
+                                label: "Groceries",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Groceries'),
+                              ),
+                              _categoryItem(
+                                context,
+                                icon: _buildRentIcon(),
+                                label: "Rent",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Rent'),
+                              ),
+                              _categoryItem(
+                                context,
+                                icon: _buildGiftsIcon(),
+                                label: "Gifts",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Gifts'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 28),
+                          // Row 3
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _categoryItem(
+                                context,
+                                icon: _buildSavingsIcon(),
+                                label: "Savings",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Savings'),
+                              ),
+                              _categoryItem(
+                                context,
+                                icon: _buildEntertainmentIcon(),
+                                label: "Entertainment",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'Entertainment'),
+                              ),
+                              _categoryItem(
+                                context,
+                                icon: _buildMoreIcon(),
+                                label: "More",
+                                color: const Color(0xFF6DB6FE),
+                                onTap: () => _navigateToCategory(context, 'More'),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -559,6 +212,38 @@ class CategoriesScreen extends StatelessWidget {
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 3),
     );
   }
+
+  // Helper for category + label
+  Widget _categoryItem(BuildContext context,
+      {required Widget icon,
+      required String label,
+      required Color color,
+      required VoidCallback onTap}) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 80,
+            height: 80,
+            child: icon,
+          ),
+        ),
+        const SizedBox(height: 7),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF093030),
+            fontSize: 15,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+
 
   Widget _buildCategoryIcon({
     required double left,
@@ -575,141 +260,293 @@ class CategoriesScreen extends StatelessWidget {
         child: Container(
           width: 105,
           height: 97.63,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(25.79),
-          ),
+         
           child: Center(child: icon),
         ),
       ),
     );
   }
 
+  
+  static const Color _iconGreen = Color(0xFF00D09E);
+
   Widget _buildFoodIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: Center(
         child: Icon(
           Icons.restaurant,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildTransportIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.directions_car,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildMedicineIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.local_hospital,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildGroceriesIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.shopping_cart,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildRentIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.home,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildGiftsIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.card_giftcard,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildSavingsIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.savings,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildEntertainmentIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.movie,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
 
   Widget _buildMoreIcon() {
-    return const SizedBox(
-      width: 69,
-      height: 69,
-      child: Center(
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: _iconGreen,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Center(
         child: Icon(
           Icons.more_horiz,
-          color: Color(0xFFF1FFF3),
-          size: 70,
+          color: _iconGreen,
+          size: 45,
         ),
       ),
     );
   }
+
+
+  Widget _buildCircularBalance() {
+    return FutureBuilder<double>(
+      future: DataService().getTotalBalance(),
+      builder: (context, snapshot) {
+        double? balance = snapshot.data;
+        bool loading = snapshot.connectionState == ConnectionState.waiting;
+
+        return Container(
+          width: 170,
+          height: 170,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF00D09E).withOpacity(0.28),
+                spreadRadius: 2,
+                blurRadius: 16,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.account_balance_wallet_outlined,
+                    size: 16,
+                    color: Color(0xFF666666),
+                  ),
+                  SizedBox(width: 5),
+                  Text(
+                    'Total Balance',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              loading
+                  ? const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00D09E)),
+                    )
+                  : Text(
+                      balance == null
+                          ? 'N/A'
+                          : NumberFormat('#,##0.00').format(balance),
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF00D09E),
+                      ),
+                    ),
+              const SizedBox(height: 4),
+              const Text(
+                'Total Across All Accounts',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF999999),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   void _navigateToCategory(BuildContext context, String categoryName) {
     // For now, just show a snackbar. In a real app, this would navigate to category details

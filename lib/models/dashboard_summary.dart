@@ -40,6 +40,18 @@ class DashboardSummary extends Equatable {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'totalBalance': totalBalance,
+      'monthlyIncome': monthlyIncome,
+      'pendingBillsCount': pendingBillsCount,
+      'pendingBillsAmount': pendingBillsAmount,
+      'upcomingPayments': upcomingPayments.map((e) => e.toJson()).toList(),
+      'recentTransactions': recentTransactions.map((e) => e.toJson()).toList(),
+      'spendingByCategory': spendingByCategory,
+    };
+  }
+
   @override
   List<Object?> get props => [
         totalBalance,

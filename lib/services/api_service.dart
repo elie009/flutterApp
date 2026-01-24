@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../config/app_config.dart';
 import 'storage_service.dart';
@@ -187,8 +188,11 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await StorageService.getToken();
-    if (token != null) {
+    if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
+      debugPrint('🔑 Auth Interceptor: Added token to request ${options.path}');
+    } else {
+      debugPrint('⚠️ Auth Interceptor: No token found for request ${options.path}');
     }
     handler.next(options);
   }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
+import '../../services/storage_service.dart';
+import '../../config/app_config.dart';
 import '../../models/transaction.dart';
 import '../../models/bank_account.dart';
+import '../../models/dashboard_summary.dart';
+import '../../widgets/triangle_painter.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -29,52 +34,197 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadData();
   }
 
-  Future<void> _loadData({bool showLoading = true}) async {
+  // Session storage key for dashboard data
+  static const String _sessionStorageKey = 'dashboard_session_data';
+
+  // Load data: restore from session first, then fetch fresh data
+  Future<void> _loadData({bool showLoading = true, bool forceRefresh = false}) async {
+    // Try to restore from session storage first (unless force refresh)
+    if (!forceRefresh) {
+      final sessionData = _restoreFromSession();
+      if (sessionData != null) {
+        debugPrint('📊 Dashboard: Restored data from session storage');
+        setState(() {
+          _totalBalance = sessionData['totalBalance'] ?? 0.0;
+          _totalExpense = sessionData['totalExpense'] ?? 0.0;
+          _recentTransactions = sessionData['transactions'] ?? [];
+          _bankAccounts = sessionData['bankAccounts'] ?? [];
+          _isLoading = false;
+        });
+        // Fetch fresh data in the background and update session
+        _fetchAndStoreData(showLoading: false);
+        return;
+      }
+    }
+
+    // No session data or force refresh - fetch from API
+    await _fetchAndStoreData(showLoading: showLoading);
+  }
+
+  // Restore dashboard data from session storage
+  Map<String, dynamic>? _restoreFromSession() {
+    try {
+      final sessionJson = StorageService.getCache(_sessionStorageKey);
+      if (sessionJson == null) {
+        debugPrint('📊 Dashboard: No session data found');
+        return null;
+      }
+
+      final sessionData = jsonDecode(sessionJson) as Map<String, dynamic>;
+      
+      // Parse dashboard summary
+      DashboardSummary? summary;
+      if (sessionData['summary'] != null) {
+        summary = DashboardSummary.fromJson(sessionData['summary'] as Map<String, dynamic>);
+      }
+
+      // Parse bank accounts
+      List<BankAccount> accounts = [];
+      if (sessionData['bankAccounts'] != null) {
+        final accountsJson = sessionData['bankAccounts'] as List<dynamic>;
+        accounts = accountsJson
+            .map((e) => BankAccount.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+
+      // Parse transactions
+      List<Transaction> transactions = [];
+      if (sessionData['transactions'] != null) {
+        final transactionsJson = sessionData['transactions'] as List<dynamic>;
+        transactions = transactionsJson
+            .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else if (summary != null && summary.recentTransactions.isNotEmpty) {
+        // Fallback to transactions from summary
+        transactions = summary.recentTransactions;
+      }
+
+      final totalBalance = summary?.totalBalance ?? sessionData['totalBalance'] as double? ?? 0.0;
+
+      debugPrint('📊 Dashboard: Restored - Balance: $totalBalance, Accounts: ${accounts.length}, Transactions: ${transactions.length}');
+      
+      return {
+        'totalBalance': totalBalance,
+        'totalExpense': _calculateExpense(transactions),
+        'transactions': transactions,
+        'bankAccounts': accounts,
+      };
+    } catch (e) {
+      debugPrint('⚠️ Dashboard: Error restoring session data: $e');
+      return null;
+    }
+  }
+
+  // Store dashboard data in session storage
+  Future<void> _storeInSession({
+    required DashboardSummary summary,
+    required List<BankAccount> accounts,
+    required List<Transaction> transactions,
+  }) async {
+    try {
+      final sessionData = {
+        'summary': summary.toJson(),
+        'bankAccounts': accounts.map((e) => e.toJson()).toList(),
+        'transactions': transactions.map((e) => e.toJson()).toList(),
+        'totalBalance': summary.totalBalance,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+
+      await StorageService.saveCache(
+        _sessionStorageKey,
+        jsonEncode(sessionData),
+      );
+      debugPrint('✅ Dashboard: Stored data in session storage');
+    } catch (e) {
+      debugPrint('⚠️ Dashboard: Error storing session data: $e');
+    }
+  }
+
+  // Fetch fresh data from API and store in session
+  Future<void> _fetchAndStoreData({bool showLoading = true}) async {
     if (showLoading) {
       setState(() => _isLoading = true);
     }
     try {
-      // Load dashboard data
-      debugPrint('📊 Dashboard: Loading data...');
+      debugPrint('📊 Dashboard: Fetching fresh data from API...');
+      
+      // Fetch dashboard summary
       final summary = await DataService().getDashboardSummary();
       debugPrint('📊 Dashboard: Got summary with totalBalance: ${summary.totalBalance}');
       
-      // Load accounts (handle errors gracefully) - fetch only active accounts
+      // Fetch bank accounts (handle errors gracefully)
       List<BankAccount> accounts = [];
       try {
         accounts = await DataService().getBankAccounts(isActive: true);
         debugPrint('📊 Dashboard: Loaded ${accounts.length} active bank accounts');
       } catch (e) {
-        debugPrint('⚠️ Dashboard: Error loading bank accounts (ignoring): $e');
-        // Continue without accounts
+        debugPrint('⚠️ Dashboard: Error loading bank accounts: $e');
+        // Try to restore from session if API fails
+        final sessionData = _restoreFromSession();
+        if (sessionData != null && sessionData['bankAccounts'] != null) {
+          accounts = sessionData['bankAccounts'] as List<BankAccount>;
+          debugPrint('📊 Dashboard: Using bank accounts from session');
+        }
       }
       
-      // Load transactions (handle errors gracefully)
+      // Fetch transactions (handle errors gracefully)
       List<Transaction> transactions = [];
       try {
         transactions = await DataService().getTransactions(limit: 5);
         debugPrint('📊 Dashboard: Loaded ${transactions.length} transactions');
       } catch (e) {
-        debugPrint('⚠️ Dashboard: Error loading transactions (ignoring): $e');
-        // Continue without transactions
+        debugPrint('⚠️ Dashboard: Error loading transactions: $e');
+        // Try to use transactions from summary or session
+        if (summary.recentTransactions.isNotEmpty) {
+          transactions = summary.recentTransactions;
+          debugPrint('📊 Dashboard: Using transactions from summary');
+        } else {
+          final sessionData = _restoreFromSession();
+          if (sessionData != null && sessionData['transactions'] != null) {
+            transactions = sessionData['transactions'] as List<Transaction>;
+            debugPrint('📊 Dashboard: Using transactions from session');
+          }
+        }
       }
 
+      // Store in session storage
+      await _storeInSession(
+        summary: summary,
+        accounts: accounts,
+        transactions: transactions,
+      );
+
+      // Update UI
       setState(() {
-        _totalBalance = summary.totalBalance; // Use API value
+        _totalBalance = summary.totalBalance;
         _totalExpense = _calculateExpense(transactions);
         _recentTransactions = transactions;
-        _bankAccounts = accounts; // Store all accounts for carousel
+        _bankAccounts = accounts;
         _isLoading = false;
       });
       debugPrint('✅ Dashboard: State updated with _totalBalance: $_totalBalance');
     } catch (e, stackTrace) {
       debugPrint('❌ Dashboard: Error loading data: $e');
       debugPrint('❌ Dashboard: Stack trace: $stackTrace');
-      setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
-        );
+      
+      // If API fails completely, try to restore from session
+      final sessionData = _restoreFromSession();
+      if (sessionData != null) {
+        debugPrint('📊 Dashboard: Restoring from session after API error');
+        setState(() {
+          _totalBalance = sessionData['totalBalance'] ?? 0.0;
+          _totalExpense = sessionData['totalExpense'] ?? 0.0;
+          _recentTransactions = sessionData['transactions'] ?? [];
+          _bankAccounts = sessionData['bankAccounts'] ?? [];
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error loading data: $e')),
+          );
+        }
       }
     }
   }
@@ -108,74 +258,128 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : RefreshIndicator(
-                onRefresh: () async {
-                  debugPrint('🔄 Dashboard: Pull to refresh triggered');
-                  await _loadData(showLoading: false);
-                },
-                color: const Color(0xFF00D09E),
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling even when content is small
-                  child: Column(
+      backgroundColor: Colors.white,
+      // Move SafeArea inside the Stack, so the colored background reaches the topmost edge
+      body: Stack(
+        children: [
+          // The colored background area - goes edge to edge (including behind status bar)
+          Container(
+            width: 430,
+            height: 932,
+            decoration: const BoxDecoration(
+              color: Color(0xFF00D09E),
+              // You can add other decorations here if necessary
+            ),
+            child: Stack(
+              children: [
+                // Small top-right triangle, similar to CategoriesScreen
+                Positioned.fill(
+                  child: Transform.rotate(
+                    angle: 0.4,
+                    child: CustomPaint(
+                      painter: TrianglePainter(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // The UI is wrapped in SafeArea so its content respects system UI (not the background)
+          SafeArea(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Stack(
                     children: [
-                      const SizedBox(height: 15),
-                      
-                      // Notification Icon
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE8E8E8),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.notifications_outlined,
-                                size: 20,
-                                color: Color(0xFF333333),
-                              ),
+                      // The white dashboard "card" area
+                      Positioned(
+                        top: 140, // Adjust as needed for visual design
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(70),
+                              topRight: Radius.circular(70),
                             ),
-                          ],
+                          ),
+                       
                         ),
                       ),
 
+ 
+           
 
-                      // Circular Total Balance
-                      _buildCircularBalance(),
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          debugPrint('🔄 Dashboard: Pull to refresh triggered');
+                          await _loadData(showLoading: false, forceRefresh: true);
+                        },
+                        color: const Color(0xFF00D09E),
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 15),
+                              // Notification Icon
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFDFF7E2),
+                                        borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.notifications,
+                                          color: Color(0xFF093030),
+                                          size: 21,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
-                      const SizedBox(height: 20),
+                              // Circular Total Balance
+                              _buildCircularBalance(),
 
-                      // Action Buttons
-                      _buildActionButtons(),
+                              const SizedBox(height: 20),
 
-                      const SizedBox(height: 15),
+                              // Action Buttons
+                              _buildActionButtons(),
 
-                      // Bank Cards Carousel
-                      _buildBankCardsCarousel(),
+                              const SizedBox(height: 15),
 
-                      const SizedBox(height: 15),
+                              // Bank Cards Carousel
+                              _buildBankCardsCarousel(),
 
-                      // Period Switcher
-                      _buildPeriodSwitcher(),
+                              const SizedBox(height: 15),
 
-                      const SizedBox(height: 15),
+                              // Period Switcher
+                              _buildPeriodSwitcher(),
 
-                      // Transactions List
-                      _buildTransactionsList(),
+                              const SizedBox(height: 15),
 
-                      const SizedBox(height: 100), // Space for bottom nav
+                              // Transactions List
+                              _buildTransactionsList(),
+
+                              const SizedBox(height: 100), // Space for bottom nav
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ),
+          ),
+        ],
       ),
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 0),
     );

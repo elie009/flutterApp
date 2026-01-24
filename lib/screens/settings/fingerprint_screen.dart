@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
-
+import '../../widgets/triangle_painter.dart';
 class FingerprintScreen extends StatefulWidget {
   const FingerprintScreen({super.key});
 
@@ -54,74 +54,55 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
     );
   }
 
-  Future<void> _removeFingerprint(String fingerprintId) async {
-    final fingerprint = _fingerprints.firstWhere((fp) => fp['id'] == fingerprintId);
+  void _removeFingerprint(String fingerprintId) {
+    final fingerprint = _fingerprints.firstWhere(
+      (fp) => fp['id'] == fingerprintId,
+      orElse: () => {},
+    );
     final fingerprintName = fingerprint['name'] ?? 'Unknown Fingerprint';
 
-    final result = await Navigator.of(context).pushNamed(
+    Navigator.of(context).pushNamed(
       'fingerprint-delete',
-      arguments: {'name': fingerprintName, 'id': fingerprintId},
+      arguments: {
+        'fingerprintName': fingerprintName,
+        'fingerprintId': fingerprintId,
+      },
     );
-
-    // If deletion was successful (came back from success screen), remove from list
-    if (result == true) {
-      setState(() {
-        _fingerprints.removeWhere((fp) => fp['id'] == fingerprintId);
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
       body: Container(
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
           color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
           children: [
-            // Status bar
-            Positioned(
-              left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 37,
-                    top: 9,
-                    child: SizedBox(
-                      width: 30,
-                      height: 14,
-                      child: Text(
-                        '16:04',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'League Spartan',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+      
+            // Small top-right triangle
+            Positioned.fill(
+              child: Transform.rotate(
+                angle: 0.4,
+                child: CustomPaint(
+                  painter: TrianglePainter(),
+                ),
               ),
             ),
 
             // White bottom section
             Positioned(
               left: 0,
-              top: 132,
-              width: 430,
+              top: 176,
+              width: 413,
               height: 800,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3),
+                  color: Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(70),
                     topRight: Radius.circular(70),
@@ -150,21 +131,19 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
               ),
             ),
 
-            // Title
+            // Title "Profile"
             Positioned(
-              left: 95,
-              top: 64,
-              child: SizedBox(
-                width: 241,
+              left: 0,
+              right: 0,
+              top: 50,
+              child: Center(
                 child: Text(
                   'Fingerprint',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color(0xFF093030),
-                    fontSize: 20,
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: 32,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -174,7 +153,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
             ..._fingerprints.asMap().entries.map((entry) {
               final index = entry.key;
               final fingerprint = entry.value;
-              final topPosition = 194.0 + (index * 81); // Space fingerprints vertically
+              final topPosition = 234.0 + (index * 81); // Space fingerprints vertically
 
               return Positioned(
                 left: 37,
@@ -182,7 +161,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => _removeFingerprint(fingerprint['id']!),
+                    onTap: () => context.go('/fingerprint-delete', extra: fingerprint),
                     borderRadius: BorderRadius.circular(22),
                     child: Container(
                       width: 356, // Match the width of other items
@@ -194,12 +173,16 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                             width: 57,
                             height: 53,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF6DB6FE),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(22),
+                              border: Border.all(
+                                color: Color(0xFF00D09E), // Green border
+                                width: 2,
+                              ),
                             ),
                             child: const Icon(
                               Icons.fingerprint,
-                              color: Colors.white,
+                              color: Color(0xFF00D09E), // Green icon
                               size: 24,
                             ),
                           ),
@@ -233,7 +216,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
             // Add fingerprint option
             Positioned(
               left: 37,
-              top: 275.0, // Fixed position matching Figma design
+              top: 325.0, // Fixed position matching Figma design
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -249,12 +232,16 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                           width: 57,
                           height: 53,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF3299FF),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: Color(0xFF00D09E), // Green border
+                              width: 2,
+                            ),
                           ),
                           child: const Icon(
                             Icons.add,
-                            color: Colors.white,
+                            color: Color(0xFF00D09E), // Green icon
                             size: 24,
                           ),
                         ),
@@ -286,8 +273,8 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
 
             // Notification icon
             Positioned(
-              right: 36,
-              top: 61,
+              left: 364,
+              top: 51,
               child: Container(
                 width: 30,
                 height: 30,
@@ -297,9 +284,9 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                 ),
                 child: const Center(
                   child: Icon(
-                    Icons.notifications_outlined,
+                    Icons.notifications,
                     color: Color(0xFF093030),
-                    size: 18,
+                    size: 21,
                   ),
                 ),
               ),
