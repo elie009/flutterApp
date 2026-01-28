@@ -109,27 +109,27 @@ class DataService {
     }
   }
 
-  // Transactions
+  // Transactions - GET api/BankAccounts/transactions
   Future<List<Transaction>> getTransactions({
     int page = 1,
     int limit = 50,
-    String? transactionType,
-    String? category,
-    String? dateFrom,
-    String? dateTo,
+    String? bankAccountId,
+    String? accountType,
+    String? startDate,
+    String? endDate,
   }) async {
     try {
       final queryParams = <String, dynamic>{
         'page': page,
         'limit': limit,
-        if (transactionType != null) 'transactionType': transactionType,
-        if (category != null) 'category': category,
-        if (dateFrom != null) 'startDate': dateFrom,
-        if (dateTo != null) 'endDate': dateTo,
+        if (bankAccountId != null && bankAccountId.isNotEmpty) 'bankAccountId': bankAccountId,
+        if (accountType != null && accountType.isNotEmpty) 'accountType': accountType,
+        if (startDate != null) 'startDate': startDate,
+        if (endDate != null) 'endDate': endDate,
       };
 
       final response = await ApiService().get(
-        '/bankaccounts/transactions',
+        '/BankAccounts/transactions',
         queryParameters: queryParams,
       );
 
@@ -137,6 +137,68 @@ class DataService {
       return data
           .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
           .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Create Transaction - POST api/BankAccounts/transactions
+  Future<Transaction> createTransaction({
+    required String bankAccountId,
+    required double amount,
+    required String transactionType, // 'CREDIT' or 'DEBIT'
+    required String description,
+    String? category,
+    String? referenceNumber,
+    String? externalTransactionId,
+    DateTime? transactionDate,
+    String? notes,
+    String? merchant,
+    String? location,
+    bool isRecurring = false,
+    String? recurringFrequency,
+    String currency = 'USD',
+    String? billId,
+    String? savingsAccountId,
+    String? loanId,
+    String? investmentId,
+    String? transactionPurpose,
+    String? toBankAccountId, // For transfers
+  }) async {
+    try {
+      final requestBody = <String, dynamic>{
+        'bankAccountId': bankAccountId,
+        'amount': amount,
+        'transactionType': transactionType.toUpperCase(),
+        'description': description,
+        'currency': currency,
+        'transactionDate': (transactionDate ?? DateTime.now()).toIso8601String(),
+        'isRecurring': isRecurring,
+        if (category != null && category.isNotEmpty) 'category': category,
+        if (referenceNumber != null && referenceNumber.isNotEmpty) 'referenceNumber': referenceNumber,
+        if (externalTransactionId != null && externalTransactionId.isNotEmpty) 'externalTransactionId': externalTransactionId,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+        if (merchant != null && merchant.isNotEmpty) 'merchant': merchant,
+        if (location != null && location.isNotEmpty) 'location': location,
+        if (recurringFrequency != null && recurringFrequency.isNotEmpty) 'recurringFrequency': recurringFrequency,
+        if (billId != null && billId.isNotEmpty) 'billId': billId,
+        if (savingsAccountId != null && savingsAccountId.isNotEmpty) 'savingsAccountId': savingsAccountId,
+        if (loanId != null && loanId.isNotEmpty) 'loanId': loanId,
+        if (investmentId != null && investmentId.isNotEmpty) 'investmentId': investmentId,
+        if (transactionPurpose != null && transactionPurpose.isNotEmpty) 'transactionPurpose': transactionPurpose,
+        if (toBankAccountId != null && toBankAccountId.isNotEmpty) 'toBankAccountId': toBankAccountId,
+      };
+
+      final response = await ApiService().post(
+        '/BankAccounts/transactions',
+        data: requestBody,
+      );
+
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return Transaction.fromJson(response.data['data'] as Map<String, dynamic>);
+      } else {
+        throw Exception(response.data['message'] ?? 'Failed to create transaction');
+      }
     } catch (e) {
       rethrow;
     }
@@ -233,6 +295,8 @@ class DataService {
   }) async {
     try {
       final userId = AuthService.getCurrentUser()?.id ?? '';
+      if (userId.isEmpty) return [];
+
       final queryParams = <String, dynamic>{
         'page': page,
         'limit': limit,
@@ -242,10 +306,30 @@ class DataService {
       final response = await ApiService().get(
         '/Loans/user/$userId',
         queryParameters: queryParams,
+        timeout: const Duration(seconds: 15),
       );
 
-      final data = response.data['data'] as List<dynamic>? ?? [];
-      return data.map((e) => Loan.fromJson(e as Map<String, dynamic>)).toList();
+      final rawData = response.data;
+      if (rawData is! Map<String, dynamic>) return [];
+
+      final data = rawData['data'];
+      List<dynamic> list;
+      if (data is List<dynamic>) {
+        list = data;
+      } else if (data is Map<String, dynamic> && data['data'] is List<dynamic>) {
+        list = data['data'] as List<dynamic>;
+      } else {
+        list = [];
+      }
+
+      return list.map((e) {
+        if (e is! Map<String, dynamic>) return null;
+        try {
+          return Loan.fromJson(e);
+        } catch (_) {
+          return null;
+        }
+      }).whereType<Loan>().toList();
     } catch (e) {
       rethrow;
     }

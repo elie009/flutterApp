@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../models/loan.dart';
+import '../../services/data_service.dart';
+import '../../utils/formatters.dart';
 import '../../utils/navigation_helper.dart';
-
+import '../../widgets/bottom_nav_bar_figma.dart';
+import '../../widgets/empty_state.dart';
+import '../../widgets/error_widget.dart' as app_error;
+import '../../widgets/loading_indicator.dart';
+import '../../widgets/triangle_painter.dart';
 class LoansScreen extends StatefulWidget {
   const LoansScreen({super.key});
 
@@ -9,585 +16,133 @@ class LoansScreen extends StatefulWidget {
 }
 
 class _LoansScreenState extends State<LoansScreen> {
+  List<Loan> _loans = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLoans();
+  }
+
+  Future<void> _loadLoans() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      final loans = await DataService().getUserLoans(page: 1, limit: 50);
+      if (mounted) {
+        setState(() {
+          _loans = loans;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  static const _iconColors = [
+    Color(0xFF6CB5FD),
+    Color(0xFF3299FF),
+    Color(0xFF00D09E),
+  ];
+
+  Color _loanIconColor(int index) =>
+      _iconColors[index % _iconColors.length];
+
+  String _getMonthLabel(DateTime date) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[date.month - 1];
+  }
+
+  String _formatLoanDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 3),
+      backgroundColor: const Color(0xFFFFFFFF),
       body: Container(
-        width: 430,
-        height: 932,
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
           children: [
-            // Status bar
-            Positioned(
-              left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 37,
-                    top: 9,
-                    child: SizedBox(
-                      width: 30,
-                      height: 14,
-                      child: Text(
-                        '16:04',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'League Spartan',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+
+            // Small top-right triangle
+            Positioned.fill(
+              child: Transform.rotate(
+                angle: 0.4,
+                child: CustomPaint(
+                  painter: TrianglePainter(),
+                ),
               ),
             ),
 
-            // Back button
+            // Back button with icon
             Positioned(
               left: 38,
               top: 69,
-              child: Container(
-                width: 19,
-                height: 16,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFF1FFF3),
-                    width: 2,
+              child: GestureDetector(
+                onTap: () => NavigationHelper.navigateBack(context),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFFF1FFF3),
+                      size: 19,
+                    ),
                   ),
                 ),
               ),
             ),
 
-            // Title
-            const Positioned(
-              left: 189,
-              top: 64,
-              child: SizedBox(
-                width: 52,
+            // Title "Loans"
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 50,
+              child: Center(
                 child: Text(
                   'Loans',
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 20,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: 32,
+                    fontFamily: 'Loans',
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-
-            // Balance section
-            const Positioned(
-              left: 60,
-              top: 152,
-              child: Text(
-                '\$15,230.00',
-                style: TextStyle(
-                  color: Color(0xFFF1FFF3),
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 249,
-              top: 152,
-              child: Text(
-                '-\$2,450.80',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 78,
-              top: 136,
-              child: Text(
-                'Total Loans',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Positioned(
-              left: 216,
-              top: 178,
-              child: Transform.rotate(
-                angle: -90 * 3.14159 / 180,
-                child: Container(
-                  width: 42,
-                  height: 0,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Color(0xFFDFF7E2),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 268,
-              top: 137,
-              child: Text(
-                'Monthly Payments',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-
-            // Expense arrows
-            Positioned(
-              left: 249,
-              top: 139,
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 60,
-              top: 139,
-              child: Transform.rotate(
-                angle: -90 * 3.14159 / 180,
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF052224),
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-            ),
-
-            // Progress bar section
-            const Positioned(
-              left: 81,
-              top: 237,
-              child: Text(
-                '65% of your loan capacity used.',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Positioned(
-              left: 50,
-              top: 200,
-              child: Container(
-                width: 330,
-                height: 27,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF052224),
-                  borderRadius: BorderRadius.circular(13.50),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 71,
-              top: 205,
-              child: Text(
-                '65%',
-                style: TextStyle(
-                  color: Color(0xFFF1FFF3),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Positioned(
-              left: 119,
-              top: 200,
-              child: Container(
-                width: 261,
-                height: 27,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1FFF3),
-                  borderRadius: BorderRadius.circular(13.50),
-                ),
-                alignment: Alignment.center,
-                child: const Text(
-                  '\$8,450.00',
-                  style: TextStyle(
-                    color: Color(0xFF052224),
-                    fontSize: 13,
-                    fontStyle: FontStyle.italic,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-
-            // Check mark
-            Positioned(
-              left: 60,
-              top: 243,
-              child: Container(
-                width: 11,
-                height: 11,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF052224),
-                    width: 1,
-                  ),
-                ),
-                child: const Stack(
-                  children: [
-                    Positioned(
-                      left: 3,
-                      top: 3,
-                      child: SizedBox(
-                        width: 6,
-                        height: 5,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                color: Color(0xFF052224),
-                                width: 1,
-                              ),
-                              right: BorderSide(
-                                color: Color(0xFF052224),
-                                width: 1,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // April section
-            const Positioned(
-              left: 37,
-              top: 309,
-              child: Text(
-                'April',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            // Calendar button
-            Positioned(
-              left: 362,
-              top: 308,
-              child: Container(
-                width: 32.26,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00D09E),
-                  borderRadius: BorderRadius.circular(12.45),
-                ),
-              ),
-            ),
-
-            // Date circles and loan items for April
-            // April 30 - Car Loan Payment
-            Positioned(
-              left: 37,
-              top: 349,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6CB5FD),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 110,
-              top: 351,
-              child: Text(
-                'Car Loan Payment',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 337,
-              top: 368,
-              child: Text(
-                '-\$450.00',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 110,
-              top: 376.35,
-              child: Text(
-                '18:27 - April 30',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // April 24 - Home Loan Payment
-            Positioned(
-              left: 37,
-              top: 426,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF3299FF),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 110,
-              top: 426,
-              child: Text(
-                'Home Mortgage',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 338,
-              top: 436,
-              child: Text(
-                '-\$1,200.00',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 110,
-              top: 451.35,
-              child: Text(
-                '15:00 - April 24',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // April 15 - Student Loan Payment
-            Positioned(
-              left: 37,
-              top: 503,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6CB5FD),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 110,
-              top: 508,
-              child: Text(
-                'Student Loan',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 336,
-              top: 524,
-              child: Text(
-                '-\$320.50',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 110,
-              top: 533.35,
-              child: Text(
-                '12:30 - April 15',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // March section
-            const Positioned(
-              left: 38,
-              top: 652,
-              child: Text(
-                'March',
-                style: TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            // March 31 - Personal Loan Payment
-            Positioned(
-              left: 38,
-              top: 695,
-              child: Container(
-                width: 57,
-                height: 53,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6CB5FD),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 111,
-              top: 694,
-              child: Text(
-                'Personal Loan',
-                style: TextStyle(
-                  color: Color(0xFF052224),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 334,
-              top: 710,
-              child: Text(
-                '-\$180.25',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 111,
-              top: 720.35,
-              child: Text(
-                '20:50 - March 31',
-                style: TextStyle(
-                  color: Color(0xFF0068FF),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Add Loan button
-            Positioned(
-              left: 123,
-              top: 769,
-              child: GestureDetector(
-                onTap: () {
-                  NavigationHelper.navigateTo(context, 'add-loan');
-                },
-                child: Container(
-                  width: 169,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00D09E),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Add Loan',
-                    style: TextStyle(
-                      color: Color(0xFF093030),
-                      fontSize: 15,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
+         
             // Notification icon
             Positioned(
               left: 364,
-              top: 61,
+              top: 51,
               child: Container(
                 width: 30,
                 height: 30,
@@ -595,118 +150,235 @@ class _LoansScreenState extends State<LoansScreen> {
                   color: Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.all(Radius.circular(25.71)),
                 ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
-                      ),
-                    ),
+                child: const Center(
+                  child: Icon(
+                    Icons.notifications,
+                    color: Color(0xFF093030),
+                    size: 21,
                   ),
                 ),
               ),
             ),
 
-            // Bottom Navigation
+            // White bottom section with dynamic content
             Positioned(
               left: 0,
-              top: 824,
-              width: 430,
-              height: 108,
+              right: 0,
+              top: 176,
+              bottom: 0,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
+                  color: Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(70),
                     topRight: Radius.circular(70),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Home icon
-                    Container(
-                      width: 25,
-                      height: 31,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Analysis icon
-                    Container(
-                      width: 31,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Transactions icon
-                    Container(
-                      width: 33,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Loans icon (active)
-                    Stack(
-                      children: [
-                        Positioned(
-                          left: -15,
-                          top: -15,
-                          child: Container(
-                            width: 57,
-                            height: 53,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E),
-                              borderRadius: BorderRadius.circular(22),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 27,
-                          height: 23,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF052224),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Profile icon
-                    Container(
-                      width: 22,
-                      height: 27,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(70),
+                    topRight: Radius.circular(70),
+                  ),
+                  child: _isLoading
+                      ? const LoadingIndicator(message: 'Loading loans...')
+                      : _errorMessage != null
+                          ? app_error.ErrorDisplay(
+                              message: _errorMessage!,
+                              onRetry: _loadLoans,
+                            )
+                          : _loans.isEmpty
+                              ? EmptyState(
+                                  icon: Icons.account_balance_wallet_outlined,
+                                  title: 'No loans yet',
+                                  message:
+                                      'Your loans will appear here. Tap + to apply for a loan.',
+                                  actionLabel: 'Refresh',
+                                  onAction: _loadLoans,
+                                )
+                              : RefreshIndicator(
+                                  onRefresh: _loadLoans,
+                                  color: const Color(0xFF00D09E),
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.only(
+                                      left: 24,
+                                      right: 24,
+                                      top: 24,
+                                      bottom: 100,
+                                    ),
+                                    itemCount: _loans.length,
+                                    itemBuilder: (context, index) {
+                                      final loan = _loans[index];
+                                      final displayDate = loan.nextDueDate ??
+                                          loan.appliedAt;
+                                      final monthLabel = _getMonthLabel(
+                                          displayDate);
+                                      final showMonthHeader = index == 0 ||
+                                          _getMonthLabel(_loans[index - 1]
+                                                  .nextDueDate ??
+                                              _loans[index - 1].appliedAt) !=
+                                              monthLabel;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (showMonthHeader) ...[
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 8),
+                                              child: Text(
+                                                monthLabel,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF093030),
+                                                  fontSize: 15,
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 16),
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  NavigationHelper.navigateTo(
+                                                context,
+                                                'loan-detail',
+                                                params: {'id': loan.id},
+                                              ),
+                                              behavior:
+                                                  HitTestBehavior.opaque,
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 57,
+                                                    height: 53,
+                                                    decoration: BoxDecoration(
+                                                      color: _loanIconColor(
+                                                          index),
+                                                      borderRadius:
+                                                          BorderRadius
+                                                              .circular(22),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons
+                                                            .account_balance_wallet_outlined,
+                                                        color: Colors.white,
+                                                        size: 26,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          loan.purpose
+                                                                  ?.isNotEmpty ==
+                                                                  true
+                                                              ? loan.purpose!
+                                                              : 'Loan',
+                                                          style: const TextStyle(
+                                                            color: Color(
+                                                                0xFF052224),
+                                                            fontSize: 15,
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 4),
+                                                        Text(
+                                                          _formatLoanDate(
+                                                              displayDate),
+                                                          style: const TextStyle(
+                                                            color: Color(
+                                                                0xFF0068FF),
+                                                            fontSize: 12,
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '-${Formatters.formatCurrency(loan.monthlyPayment, symbol: '\$')}',
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF0068FF),
+                                                      fontSize: 15,
+                                                      fontFamily: 'Poppins',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
                 ),
               ),
             ),
+
+            // Floating Add Loan button (bottom right)
+            Positioned(
+              right: 28,
+              bottom: 16,
+              child: GestureDetector(
+                onTap: () async {
+                  await NavigationHelper.navigateToWithResult<bool>(
+                    context,
+                    'add-loan',
+                  );
+                  if (mounted) _loadLoans();
+                },
+                child: Container(
+                  width: 65,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: const Color(0xFF00D09E), // green border
+                      width: 2.5,
+                    ),
+                    borderRadius: BorderRadius.circular(12), // square with rounded corners
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x2900D09E),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.add,
+                      color: const Color(0xFF00D09E),
+                      size: 36,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            
+
+           
           ],
         ),
       ),

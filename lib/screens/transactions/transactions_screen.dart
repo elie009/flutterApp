@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
 import '../../models/transaction.dart';
+import '../../models/bank_account.dart';
 import '../../widgets/triangle_painter.dart';
 
 
@@ -22,36 +23,63 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Transaction> _transactions = [];
   final DataService _dataService = DataService();
 
+  // Filter state for API (GET api/BankAccounts/transactions)
+  DateTime? _filterDateFrom;
+  DateTime? _filterDateTo;
+  int _filterLimit = 50;
+  String? _filterBankAccountId;
+  String? _filterAccountType;
+  List<BankAccount> _bankAccounts = [];
+
   @override
   void initState() {
     super.initState();
+    // Default to current month
+    final now = DateTime.now();
+    _filterDateFrom = DateTime(now.year, now.month, 1);
+    _filterDateTo = DateTime(now.year, now.month + 1, 0); // last day of current month
+    _loadBankAccounts();
     _loadData();
+  }
+
+  Future<void> _loadBankAccounts() async {
+    try {
+      final accounts = await _dataService.getBankAccounts(isActive: true);
+      if (mounted) setState(() => _bankAccounts = accounts);
+    } catch (_) {}
   }
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     try {
-      // Load total balance
       final summary = await _dataService.getDashboardSummary();
-      
-      // Load all transactions
-      final transactions = await _dataService.getTransactions(limit: 100);
-      
-      // Calculate totals based on transaction type
+
+      final startDateStr = _filterDateFrom != null
+          ? "${_filterDateFrom!.year.toString().padLeft(4, '0')}-${_filterDateFrom!.month.toString().padLeft(2, '0')}-${_filterDateFrom!.day.toString().padLeft(2, '0')}"
+          : null;
+      final endDateStr = _filterDateTo != null
+          ? "${_filterDateTo!.year.toString().padLeft(4, '0')}-${_filterDateTo!.month.toString().padLeft(2, '0')}-${_filterDateTo!.day.toString().padLeft(2, '0')}"
+          : null;
+
+      final transactions = await _dataService.getTransactions(
+        page: 1,
+        limit: _filterLimit,
+        bankAccountId: _filterBankAccountId,
+        accountType: _filterAccountType,
+        startDate: startDateStr,
+        endDate: endDateStr,
+      );
+
       double income = 0.0;
       double expense = 0.0;
       for (var transaction in transactions) {
-        // Calculate Total Income from all CREDIT transactions
         if (transaction.transactionType.toLowerCase() == 'credit') {
           income += transaction.amount;
-        }
-        // Calculate Total Expense from all DEBIT transactions
-        else if (transaction.transactionType.toLowerCase() == 'debit') {
+        } else if (transaction.transactionType.toLowerCase() == 'debit') {
           expense += transaction.amount;
         }
-        // Note: 'transfer' transactions are excluded from income/expense calculations
       }
-      
+
       debugPrint('📊 Transactions: Total CREDIT (Income): $income, Total DEBIT (Expense): $expense');
 
       setState(() {
@@ -234,38 +262,52 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
             ),
 
-          // Floating action button at lower right corner
-          Positioned(
-            right: 28,
-            bottom: 16,
-            child: GestureDetector(
-              onTap: () {
-                _showAddTransactionModal(context);
-              },
-              child: Container(
-                width: 65,
-                height: 65,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF00D09E),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x2900D09E),
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 36,
+                // Floating action button at lower right corner (square, white background, green border)
+                Positioned(
+                  right: 28,
+                  bottom: 16,
+                  child: StatefulBuilder(
+                    builder: (context, setState) {
+                      bool isHovered = false;
+                      return MouseRegion(
+                        onEnter: (_) => setState(() => isHovered = true),
+                        onExit: (_) => setState(() => isHovered = false),
+                        child: GestureDetector(
+                          onTap: () {
+                            _showAddTransactionModal(context);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 65,
+                            height: 65,
+                            decoration: BoxDecoration(
+                              color: isHovered ? const Color(0xFF00D09E) : Colors.white,
+                              border: Border.all(
+                                color: const Color(0xFF00D09E), // green border
+                                width: 2.5,
+                              ),
+                              borderRadius: BorderRadius.circular(12), // square with slightly rounded corners
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x2900D09E),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                )
+                              ],
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.add,
+                                color: isHovered ? Colors.white : const Color(0xFF00D09E),
+                                size: 36,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ),
-          ),
               ],
             ),
           ),
@@ -275,209 +317,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
-  Widget _buildStatusBar() {
-    final now = DateTime.now();
-    final timeString = DateFormat('HH:mm').format(now);
-    
-    return Positioned(
-      left: 0,
-      top: 0,
-      width: 430,
-      height: 32,
-      child: Stack(
-        children: [
-          // Time display (left: 37, top: 9)
-          Positioned(
-            left: 37,
-            top: 9,
-            child: Text(
-              timeString,
-              style: const TextStyle(
-                fontSize: 13,
-                fontFamily: 'League Spartan',
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          
-          // Status icons
-          // Signal icon (left: 338, top: 9)
-          Positioned(
-            left: 338,
-            top: 9,
-            child: Container(
-              width: 13,
-              height: 11,
-              color: Colors.white,
-            ),
-          ),
-          // WiFi icon (left: 356, top: 11)
-          Positioned(
-            left: 356,
-            top: 11,
-            child: Container(
-              width: 15,
-              height: 8,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(58),
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-            ),
-          ),
-          // Battery icon (left: 377, top: 12)
-          Positioned(
-            left: 377,
-            top: 12,
-            child: Container(
-              width: 12,
-              height: 7,
-              color: Colors.white,
-            ),
-          ),
-          // Battery frame (left: 376, top: 11)
-          Positioned(
-            left: 376,
-            top: 11,
-            child: Container(
-              width: 17,
-              height: 9,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 1),
-                borderRadius: BorderRadius.circular(1),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildSummaryCardPositioned({
-    required String label,
-    required double amount,
-    required IconData icon,
-    required Color iconColor,
-    required Color textColor,
-    required double iconTop,
-    required double iconLeft,
-    required double labelTop,
-    required double labelLeft,
-    required double amountTop,
-    required double amountLeft,
-  }) {
-    return Container(
-      width: 171,
-      height: 101,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1FFF3),
-        borderRadius: BorderRadius.circular(14.89),
-      ),
-      child: Stack(
-        children: [
-          // Icon
-          Positioned(
-            left: iconLeft,
-            top: iconTop,
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 25,
-            ),
-          ),
-          // Label
-          Positioned(
-            left: labelLeft,
-            top: labelTop,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Color(0xFF093030),
-                fontSize: 15,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          // Amount
-          Positioned(
-            left: amountLeft,
-            top: amountTop,
-            child: Text(
-              _formatCurrency(amount),
-              style: TextStyle(
-                color: textColor,
-                fontSize: 20,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildSummaryCard({
-    required String label,
-    required double amount,
-    required IconData icon,
-    required Color iconColor,
-    required Color textColor,
-  }) {
-    return Container(
-      height: 101,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1FFF3),
-        borderRadius: BorderRadius.circular(14.89),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Icon at top center
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 25,
-              ),
-            ],
-          ),
-          // Label and amount at bottom
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Color(0xFF093030),
-                  fontSize: 15,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _formatCurrency(amount),
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 20,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+ 
 
   Widget _buildTransactionsList() {
     if (_transactions.isEmpty) {
@@ -760,308 +600,271 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   void _showSummaryModal(BuildContext context, Color iconColor) {
-    // Modal local state holders
-    DateTime? _dateFrom;
-    DateTime? _dateTo;
-    int? _limit;
-    String? _selectedTransactionType;
-    String? _selectedCategory;
-    String? _selectedBankAccount;
+    DateTime? dateFrom = _filterDateFrom;
+    DateTime? dateTo = _filterDateTo;
+    String? bankAccountId = _filterBankAccountId;
+    String? accountType = _filterAccountType;
+    final limitController = TextEditingController(text: _filterLimit.toString());
 
-    // Dummy dropdown lists (replace with your data)
-    final List<String> transactionTypes = ['All', 'Income', 'Expense'];
-    final List<String> categories = ['All', 'Food', 'Transport', 'Shopping'];
-    final List<String> bankAccounts = ['All', 'Main', 'Savings', 'Credit Card'];
-
-    // Controllers for Limit field
-    final TextEditingController _limitController = TextEditingController();
-
-    // To adjust the modal height, change the `height` of the Container below (or make it dynamic based on content).
-    // Here are examples for: 
-    // 1. Fixed height: set a specific fraction of screen height (e.g., 0.6 as before, or 0.8 for 80%).
-    // 2. Dynamic height: let modal size itself to content, up to a max height.
+    // Account type options: display label -> API value (null = All)
+    const accountTypeOptions = [
+      ('All', null),
+      ('Checking', 'checking'),
+      ('Savings', 'savings'),
+      ('Credit Card', 'credit_card'),
+    ];
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
+      builder: (BuildContext modalContext) {
         return DraggableScrollableSheet(
-          // Reduced sizes by 10% (0.4 -> 0.3, 0.6 -> 0.5, 0.8 -> 0.7)
-          minChildSize: 0.3, // Minimum height as fraction of screen
-          initialChildSize: 0.5, // Initial height as fraction of screen
-          maxChildSize: 0.7, // Maximum height as fraction of screen
+          minChildSize: 0.3,
+          initialChildSize: 0.5,
+          maxChildSize: 0.7,
           expand: false,
           builder: (context, scrollController) {
-            Future<void> _pickDate(BuildContext ctx, bool isFrom) async {
-              final now = DateTime.now();
-              final picked = await showDatePicker(
-                context: ctx,
-                initialDate: isFrom
-                    ? (_dateFrom ?? now)
-                    : (_dateTo ?? now),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (picked != null) {
-                // ignore: invalid_use_of_visible_for_testing_member
-                (context as Element).markNeedsBuild();
-                // update state as needed (you can refactor to hold a local state if necessary)
-                if (isFrom) {
-                  _dateFrom = picked;
-                  if (_dateTo != null && _dateTo!.isBefore(_dateFrom!)) {
-                    _dateTo = _dateFrom;
-                  }
-                } else {
-                  _dateTo = picked;
-                  if (_dateFrom != null && _dateTo!.isBefore(_dateFrom!)) {
-                    _dateFrom = _dateTo;
+            return StatefulBuilder(
+              builder: (context, setModalState) {
+                Future<void> pickDate(bool isFrom) async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: modalContext,
+                    initialDate: isFrom ? (dateFrom ?? now) : (dateTo ?? now),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (picked != null) {
+                    if (isFrom) {
+                      dateFrom = picked;
+                      if (dateTo != null && dateTo!.isBefore(dateFrom!)) dateTo = dateFrom;
+                    } else {
+                      dateTo = picked;
+                      if (dateFrom != null && dateTo!.isBefore(dateFrom!)) dateFrom = dateTo;
+                    }
+                    setModalState(() {});
                   }
                 }
-              }
-            }
 
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
-              child: SingleChildScrollView(
-                controller: scrollController,
-                physics: const ClampingScrollPhysics(),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Drag handle
-                      Center(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 12, bottom: 20),
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
                       ),
-                      // Header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Row(
-                          children: [
-                            Container(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 12, bottom: 20),
                               width: 40,
-                              height: 40,
+                              height: 4,
                               decoration: BoxDecoration(
-                                color: iconColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Icon(
-                                Icons.search,
-                                color: iconColor,
-                                size: 24,
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                "Filter Summary",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF052224),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: iconColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(Icons.search, color: iconColor, size: 24),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Text(
+                                    "Filter Summary",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF052224),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () => Navigator.of(modalContext).pop(),
+                                  icon: const Icon(Icons.close, color: Color(0xFF052224)),
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: const Icon(Icons.close, color: Color(0xFF052224)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Date From, Date To, Limit (in a row)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _pickDate(context, true),
-                                child: AbsorbPointer(
+                          ),
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => pickDate(true),
+                                    child: AbsorbPointer(
+                                      child: TextFormField(
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          labelText: 'From',
+                                          labelStyle: const TextStyle(fontFamily: 'Poppins'),
+                                          suffixIcon: const Icon(Icons.calendar_today, size: 18),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                        ),
+                                        controller: TextEditingController(
+                                          text: dateFrom != null
+                                              ? "${dateFrom!.year.toString().padLeft(4, '0')}-${dateFrom!.month.toString().padLeft(2, '0')}-${dateFrom!.day.toString().padLeft(2, '0')}"
+                                              : "",
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => pickDate(false),
+                                    child: AbsorbPointer(
+                                      child: TextFormField(
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          labelText: 'To',
+                                          labelStyle: const TextStyle(fontFamily: 'Poppins'),
+                                          suffixIcon: const Icon(Icons.calendar_today, size: 18),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                        ),
+                                        controller: TextEditingController(
+                                          text: dateTo != null
+                                              ? "${dateTo!.year.toString().padLeft(4, '0')}-${dateTo!.month.toString().padLeft(2, '0')}-${dateTo!.day.toString().padLeft(2, '0')}"
+                                              : "",
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 80,
                                   child: TextFormField(
-                                    readOnly: true,
+                                    style: const TextStyle(fontFamily: 'Poppins'),
+                                    controller: limitController,
+                                    keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
-                                      labelText: 'From',
-                                      labelStyle: const TextStyle(fontFamily: 'Poppins'),
-                                      suffixIcon: const Icon(Icons.calendar_today, size: 18),
+                                      labelText: 'Limit',
                                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
-                                    controller: TextEditingController(
-                                      text: _dateFrom != null
-                                          ? "${_dateFrom!.year.toString().padLeft(4, '0')}-${_dateFrom!.month.toString().padLeft(2, '0')}-${_dateFrom!.day.toString().padLeft(2, '0')}"
-                                          : "",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: DropdownButtonFormField<String?>(
+                                    value: accountType,
+                                    items: accountTypeOptions
+                                        .map((e) => DropdownMenuItem<String?>(
+                                              value: e.$2,
+                                              child: Text(e.$1, style: const TextStyle(fontFamily: 'Poppins')),
+                                            ))
+                                        .toList(),
+                                    onChanged: (val) {
+                                      accountType = val;
+                                      setModalState(() {});
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Account Type',
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: DropdownButtonFormField<String?>(
+                                    value: bankAccountId,
+                                    items: [
+                                      const DropdownMenuItem<String?>(value: null, child: Text('All', style: TextStyle(fontFamily: 'Poppins'))),
+                                      ..._bankAccounts.map((a) => DropdownMenuItem<String?>(
+                                            value: a.id,
+                                            child: Text(a.accountName, style: const TextStyle(fontFamily: 'Poppins'), overflow: TextOverflow.ellipsis),
+                                          )),
+                                    ],
+                                    onChanged: (val) {
+                                      bankAccountId = val;
+                                      setModalState(() {});
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Bank Account',
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: const Icon(Icons.search, color: Colors.white),
+                                onPressed: () {
+                                  final limit = int.tryParse(limitController.text) ?? _filterLimit;
+                                  setState(() {
+                                    _filterDateFrom = dateFrom;
+                                    _filterDateTo = dateTo;
+                                    _filterLimit = limit.clamp(1, 500);
+                                    _filterBankAccountId = bankAccountId;
+                                    _filterAccountType = accountType;
+                                  });
+                                  Navigator.of(modalContext).pop();
+                                  _loadData();
+                                },
+                                label: const Text(
+                                  'Search',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF00D09E),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _pickDate(context, false),
-                                child: AbsorbPointer(
-                                  child: TextFormField(
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: 'To',
-                                      labelStyle: const TextStyle(fontFamily: 'Poppins'),
-                                      suffixIcon: const Icon(Icons.calendar_today, size: 18),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                                    ),
-                                    controller: TextEditingController(
-                                      text: _dateTo != null
-                                          ? "${_dateTo!.year.toString().padLeft(4, '0')}-${_dateTo!.month.toString().padLeft(2, '0')}-${_dateTo!.day.toString().padLeft(2, '0')}"
-                                          : "",
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: 80,
-                              child: TextFormField(
-                                style: const TextStyle(fontFamily: 'Poppins'),
-                                controller: _limitController,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: 'Limit',
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                onChanged: (val) {
-                                  // Not stateful here -- if you want the limit stored, refactor this function or use a callback.
-                                  _limit = int.tryParse(val);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Transaction Type, Category
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: _selectedTransactionType ?? transactionTypes[0],
-                                items: transactionTypes
-                                    .map((type) => DropdownMenuItem(
-                                          value: type,
-                                          child: Text(type, style: const TextStyle(fontFamily: 'Poppins')),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) {
-                                  _selectedTransactionType = val;
-                                  (context as Element).markNeedsBuild();
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Transaction Type',
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: _selectedCategory ?? categories[0],
-                                items: categories
-                                    .map((cat) => DropdownMenuItem(
-                                          value: cat,
-                                          child: Text(cat, style: const TextStyle(fontFamily: 'Poppins')),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) {
-                                  _selectedCategory = val;
-                                  (context as Element).markNeedsBuild();
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Category',
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Bank Accounts
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedBankAccount ?? bankAccounts[0],
-                          items: bankAccounts
-                              .map((acc) => DropdownMenuItem(
-                                    value: acc,
-                                    child: Text(acc, style: const TextStyle(fontFamily: 'Poppins')),
-                                  ))
-                              .toList(),
-                          onChanged: (val) {
-                            _selectedBankAccount = val;
-                            (context as Element).markNeedsBuild();
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Bank Accounts',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 28),
-                      // Search Button
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.search, color: Colors.white),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            label: const Text(
-                              'Search',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF00D09E),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );

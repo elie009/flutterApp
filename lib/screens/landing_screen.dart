@@ -110,7 +110,7 @@ class _LandingScreenState extends State<LandingScreen>
               ),
             ),
 
-            // FinWise title
+            // Utility Hub 360 title
             Positioned(
               left: 0,
               right: 0,
@@ -125,7 +125,7 @@ class _LandingScreenState extends State<LandingScreen>
                       child: ScaleTransition(
                         scale: _scaleAnimation,
                         child: const Text(
-                          'FinWise',
+                          'Utility Hub 360',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Poppins',

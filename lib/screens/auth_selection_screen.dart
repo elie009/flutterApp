@@ -42,15 +42,23 @@ class AuthSelectionScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.account_balance_wallet,
-                        color: Color(0xFF1a1a1a),
-                        size: 40,
+                      clipBehavior: Clip.antiAlias,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Image.asset(
+                          'logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.account_balance_wallet,
+                            color: Color(0xFF1a1a1a),
+                            size: 40,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Welcome to FinWise',
+                      'Welcome to Utility Hub 360',
                       style: Theme.of(context).textTheme.displayMedium?.copyWith(
                         color: AppTheme.primaryColor,
                         fontWeight: FontWeight.bold,
@@ -79,22 +87,8 @@ class AuthSelectionScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 56,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppTheme.primaryColor,
-                          AppTheme.primaryDark,
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
+                      color: AppTheme.primaryColor, // Changed to green
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryColor.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: ElevatedButton(
                       onPressed: () {
@@ -107,6 +101,7 @@ class AuthSelectionScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: EdgeInsets.zero,
+                        elevation: 0,
                       ),
                       child: Text(
                         'Sign In',
@@ -125,6 +120,7 @@ class AuthSelectionScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 56,
                     decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withOpacity(0.12), // subtle green bg
                       border: Border.all(
                         color: AppTheme.primaryColor,
                         width: 2,
@@ -142,6 +138,7 @@ class AuthSelectionScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: EdgeInsets.zero,
+                        elevation: 0,
                       ),
                       child: Text(
                         'Create Account',

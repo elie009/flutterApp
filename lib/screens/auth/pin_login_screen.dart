@@ -206,7 +206,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                 bottom: 0,
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFFF1FFF3), // Background Green White
+                    color: Color(0xFFFFFFFF), // Background Green White
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(60),
                       topRight: Radius.circular(60),
@@ -217,7 +217,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 60),
+                        const SizedBox(height: 30),
 
                         // Lock Icon
                         Container(
@@ -249,7 +249,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 50),
+                        const SizedBox(height: 10),
 
                         // PIN Input Fields
                         Row(
@@ -257,8 +257,8 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                           children: List.generate(
                             6,
                             (index) => Container(
-                              width: 50,
-                              height: 50,
+                              width: 45,
+                              height: 45,
                               margin: const EdgeInsets.symmetric(horizontal: 6),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFDFF7E2), // Light Green
@@ -335,7 +335,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 50),
+                        const SizedBox(height: 20),
 
                         // Login Button
                         if (_isLoading)

@@ -12,23 +12,27 @@ class BottomNavBarFigma extends StatelessWidget {
   void _navigateTo(BuildContext context, int index) {
     if (index == currentIndex) return; // Already on this page
 
+    final String location;
     switch (index) {
       case 0:
-        context.go('/'); // Home page
+        location = '/';
         break;
       case 1:
-        context.go('/analysis');
+        location = '/analysis';
         break;
       case 2:
-        context.go('/transactions');
+        location = '/transactions';
         break;
       case 3:
-        context.go('/category');
+        location = '/category';
         break;
       case 4:
-        context.go('/profile');
+        location = '/profile';
         break;
+      default:
+        return;
     }
+    GoRouter.of(context).go(location);
   }
 
   @override
@@ -103,6 +107,7 @@ class BottomNavBarFigma extends StatelessWidget {
     final isActive = currentIndex == index;
     
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => _navigateTo(context, index),
       child: Container(
         width: 60,

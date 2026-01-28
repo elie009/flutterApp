@@ -10,7 +10,7 @@ import '../../widgets/error_widget.dart';
 import '../../widgets/shimmer_loading.dart';
 import '../../widgets/empty_state.dart';
 import '../../utils/theme.dart';
-
+import '../../widgets/bottom_nav_bar_figma.dart';
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
 
@@ -137,6 +137,7 @@ class _BillsScreenState extends State<BillsScreen> {
       appBar: AppBar(
         title: const Text('Bills & Utilities'),
       ),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 3),
       body: Column(
         children: [
           // Filter Chips
@@ -294,7 +295,6 @@ class _BillsScreenState extends State<BillsScreen> {
         backgroundColor: AppTheme.primaryColor,
         child: const Icon(Icons.add, color: Colors.white),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

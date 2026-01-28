@@ -10,6 +10,8 @@ import '../../models/transaction.dart';
 import '../../models/bank_account.dart';
 import '../../models/dashboard_summary.dart';
 import '../../widgets/triangle_painter.dart';
+import '../bills/bills_screen.dart';
+import '../loans/loans_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -386,65 +388,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildCircularBalance() {
-    return Container(
-      width: 170,
-      height: 170,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-      
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00D09E).withOpacity(0.28),
-            spreadRadius: 2,
-            blurRadius: 16
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.account_balance_wallet_outlined,
-                size: 16,
-                color: Color(0xFF666666),
-              ),
-              SizedBox(width: 5),
-              Text(
-                'Total Balance',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
+    return GestureDetector(
+      onTap: () {
+        _showAddTransactionModal(context);
+      },
+      child: Container(
+        width: 170,
+        height: 170,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF00D09E).withOpacity(0.28),
+              spreadRadius: 2,
+              blurRadius: 16,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.account_balance_wallet_outlined,
+                  size: 16,
                   color: Color(0xFF666666),
                 ),
+                SizedBox(width: 5),
+                Text(
+                  'Total Balance',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF666666),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              NumberFormat('#,##0.00').format(_totalBalance),
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF00D09E),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            NumberFormat('#,##0.00').format(_totalBalance),
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF00D09E),
             ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Total Across All Accounts',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 10,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF999999),
+            const SizedBox(height: 4),
+            const Text(
+              'Total Across All Accounts',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF999999),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -456,34 +462,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildActionButton('SAVINGS', const Color(0xFF00D09E)),
-          _buildActionButton('LOANS', const Color(0xFF00D09E)),
-          _buildActionButton('BILLS', const Color(0xFF00D09E)),
+          _buildActionButton(
+            'LOANS',
+            const Color(0xFF00D09E),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoansScreen()),
+              );
+            },
+          ),
+          _buildActionButton(
+            'BILLS',
+            const Color(0xFF00D09E),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BillsScreen()),
+              );
+            },
+          ),
           _buildActionButton('REPORTS', const Color(0xFF00D09E)),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton(String label, Color primaryColor) {
-    return Container(
-      width: 80,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: primaryColor, // Use the primary color for the border
-          width: 1,
+  Widget _buildActionButton(String label, Color primaryColor, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 80,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: primaryColor, // Use the primary color for the border
+            width: 1,
+          ),
         ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: primaryColor, // Use primary color for the text
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: primaryColor, // Use primary color for the text
+          ),
         ),
       ),
     );
@@ -983,6 +1010,726 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+   void _showAddTransactionModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Title
+              const Text(
+                'Add Transaction',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF052224),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // 2x2 Grid of options
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 1.1,
+                children: [
+                  _buildModalOption(
+                    icon: Icons.description_outlined,
+                    title: 'Full Form',
+                    description: 'Complete Transaction Form With All Fields And Options',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showFullFormModal(context);
+                    },
+                  ),
+                  _buildModalOption(
+                    icon: Icons.rocket_launch_outlined,
+                    title: 'Quick Add',
+                    description: 'Fast Entry With Essential Fields Only',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showQuickAddModal(context);
+                    },
+                  ),
+                  _buildModalOption(
+                    icon: Icons.auto_awesome_outlined,
+                    title: 'Transaction Analyzer',
+                    description: 'AI-Powered Text Analysis To Extract Transaction Details',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // TODO: Navigate to transaction analyzer
+                    },
+                  ),
+                  _buildModalOption(
+                    icon: Icons.cloud_upload_outlined,
+                    title: 'Upload Receipt',
+                    description: 'AI-Powered Text Analysis To Extract Transaction Details',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // TODO: Navigate to upload receipt
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildModalOption({
+    required IconData icon,
+    required String title,
+    required String description,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFF00D09E).withOpacity(0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFF00D09E).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFF00D09E),
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF052224),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 10,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[600],
+                height: 1.3,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullFormModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return _FullFormModalContent(
+              scrollController: scrollController,
+              bankAccounts: _bankAccounts,
+              onTransactionCreated: () {
+                // Refresh dashboard data after transaction is created
+                _loadData(showLoading: false, forceRefresh: true);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showQuickAddModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.8,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return _QuickAddModalContent(
+              scrollController: scrollController,
+              bankAccounts: _bankAccounts,
+              onTransactionCreated: () {
+                // Refresh dashboard data after transaction is created
+                _loadData(showLoading: false, forceRefresh: true);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+}
+
+// Quick Add Modal Content - Simplified form with essential fields only
+class _QuickAddModalContent extends StatefulWidget {
+  final ScrollController scrollController;
+  final List<BankAccount> bankAccounts;
+  final VoidCallback onTransactionCreated;
+
+  const _QuickAddModalContent({
+    required this.scrollController,
+    required this.bankAccounts,
+    required this.onTransactionCreated,
+  });
+
+  @override
+  State<_QuickAddModalContent> createState() => _QuickAddModalContentState();
+}
+
+class _QuickAddModalContentState extends State<_QuickAddModalContent> {
+  final DataService _dataService = DataService();
+  bool _isSubmitting = false;
+
+  // Form state - only essential fields
+  String? selectedBankAccountId;
+  String selectedTransactionType = 'DEBIT';
+  String? selectedCategory;
+  DateTime selectedDate = DateTime.now();
+
+  // Controllers
+  late final TextEditingController amountController;
+  late final TextEditingController descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default bank account if available
+    if (widget.bankAccounts.isNotEmpty) {
+      selectedBankAccountId = widget.bankAccounts.first.id;
+    }
+    amountController = TextEditingController();
+    descriptionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSubmit() async {
+    // Validation
+    if (selectedBankAccountId == null || selectedBankAccountId!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a bank account')),
+      );
+      return;
+    }
+
+    final amountText = amountController.text.trim();
+    if (amountText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an amount')),
+      );
+      return;
+    }
+
+    final amount = double.tryParse(amountText);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount greater than 0')),
+      );
+      return;
+    }
+
+    final description = descriptionController.text.trim();
+    if (description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a description')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await _dataService.createTransaction(
+        bankAccountId: selectedBankAccountId!,
+        amount: amount,
+        transactionType: selectedTransactionType,
+        description: description,
+        category: selectedCategory,
+        transactionDate: selectedDate,
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        widget.onTransactionCreated();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Transaction created successfully'),
+            backgroundColor: Color(0xFF00D09E),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create transaction: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildBankAccountDropdown() {
+    if (widget.bankAccounts.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Bank Account *',
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF666666),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 56,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.red.withOpacity(0.5)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: const Center(
+              child: Text(
+                'No bank accounts available',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return _buildDropdownField(
+      label: 'Bank Account *',
+      value: selectedBankAccountId,
+      items: widget.bankAccounts.map((acc) => acc.id).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedBankAccountId = value;
+        });
+      },
+      displayText: (value) {
+        if (value == null) return 'Select Bank Account';
+        final account = widget.bankAccounts.firstWhere((acc) => acc.id == value);
+        return account.accountName;
+      },
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required String? value,
+    required List<String?> items,
+    required Function(String?) onChanged,
+    String Function(String?)? displayText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 56,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFF00D09E).withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String?>(
+              value: value,
+              isExpanded: true,
+              items: items.map((String? item) {
+                return DropdownMenuItem<String?>(
+                  value: item,
+                  child: Text(
+                    displayText != null
+                        ? displayText(item)
+                        : (item ?? 'None'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF052224),
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: onChanged,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xFF00D09E),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFF00D09E).withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF052224),
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateField({
+    required String label,
+    required DateTime date,
+    required VoidCallback onTap,
+  }) {
+    final dateFormat = DateFormat('MM / dd / yyyy');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFF00D09E).withOpacity(0.3),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    dateFormat.format(date),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF052224),
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.calendar_today,
+                  color: Color(0xFF00D09E),
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Drag handle
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12, bottom: 20),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Title
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Quick Add Transaction',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF052224),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Form content
+          Expanded(
+            child: SingleChildScrollView(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Bank Account
+                  _buildBankAccountDropdown(),
+                  const SizedBox(height: 16),
+                  // Transaction Type and Category
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDropdownField(
+                          label: 'Type *',
+                          value: selectedTransactionType,
+                          items: ['CREDIT', 'DEBIT'],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedTransactionType = value ?? 'DEBIT';
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildDropdownField(
+                          label: 'Category (Optional)',
+                          value: selectedCategory,
+                          items: [
+                            null,
+                            'Food',
+                            'Transport',
+                            'Shopping',
+                            'Bills',
+                            'Entertainment',
+                            'Healthcare',
+                            'Education',
+                            'Other',
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedCategory = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Amount and Date
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'Amount *',
+                          controller: amountController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildDateField(
+                          label: 'Date',
+                          date: selectedDate,
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate,
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                selectedDate = picked;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Description
+                  _buildTextField(
+                    label: 'Description *',
+                    controller: descriptionController,
+                  ),
+                  const SizedBox(height: 32),
+                  // Create Transaction Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _isSubmitting ? null : _handleSubmit,
+                      icon: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Icon(Icons.send, color: Colors.white),
+                      label: Text(
+                        _isSubmitting ? 'Creating...' : 'Create Transaction',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00D09E),
+                        disabledBackgroundColor: const Color(0xFF00D09E).withOpacity(0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Custom painter for card background pattern (subtle circles only, no lines)
@@ -1005,4 +1752,647 @@ class _CardPatternPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// StatefulWidget for the full form modal content
+class _FullFormModalContent extends StatefulWidget {
+  final ScrollController scrollController;
+  final List<BankAccount> bankAccounts;
+  final VoidCallback onTransactionCreated;
+
+  const _FullFormModalContent({
+    required this.scrollController,
+    required this.bankAccounts,
+    required this.onTransactionCreated,
+  });
+
+  @override
+  State<_FullFormModalContent> createState() => _FullFormModalContentState();
+}
+
+class _FullFormModalContentState extends State<_FullFormModalContent> {
+  final DataService _dataService = DataService();
+  bool _isSubmitting = false;
+
+  // Form state variables
+  String? selectedBankAccountId;
+  bool isRecurring = false;
+  String? selectedTransactionType = 'DEBIT';
+  String? selectedCategory;
+  String? selectedTransactionPurpose;
+  String? selectedRecurringFrequency;
+  DateTime selectedDate = DateTime.now();
+  
+  // Controllers
+  late final TextEditingController amountController;
+  late final TextEditingController referenceNumberController;
+  late final TextEditingController merchantController;
+  late final TextEditingController locationController;
+  late final TextEditingController descriptionController;
+  late final TextEditingController notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default bank account if available
+    if (widget.bankAccounts.isNotEmpty) {
+      selectedBankAccountId = widget.bankAccounts.first.id;
+    }
+    amountController = TextEditingController();
+    referenceNumberController = TextEditingController();
+    merchantController = TextEditingController();
+    locationController = TextEditingController();
+    descriptionController = TextEditingController();
+    notesController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    referenceNumberController.dispose();
+    merchantController.dispose();
+    locationController.dispose();
+    descriptionController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Drag handle
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12, bottom: 20),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Title
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Add Transaction',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF052224),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Form content
+          Expanded(
+            child: SingleChildScrollView(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Row 1: Bank Account and Recurring Transaction
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildBankAccountDropdown(),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Recurring Transaction',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF666666),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Switch(
+                              value: isRecurring,
+                              onChanged: (value) {
+                                setState(() {
+                                  isRecurring = value;
+                                });
+                              },
+                              activeColor: const Color(0xFF00D09E),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Row 2: Transaction Type and Categories
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDropdownField(
+                          label: 'Transaction Type',
+                          value: selectedTransactionType,
+                          items: ['CREDIT', 'DEBIT'],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedTransactionType = value;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildDropdownField(
+                          label: 'Category (Optional)',
+                          value: selectedCategory,
+                          items: [
+                            null,
+                            'Food',
+                            'Transport',
+                            'Shopping',
+                            'Bills',
+                            'Entertainment',
+                            'Healthcare',
+                            'Education',
+                            'Other',
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedCategory = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Row 3: Transaction Purpose and Amount
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDropdownField(
+                          label: 'Transaction Purpose (Optional)',
+                          value: selectedTransactionPurpose,
+                          items: [
+                            null,
+                            'BILL',
+                            'UTILITY',
+                            'SAVINGS',
+                            'LOAN',
+                            'OTHER',
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedTransactionPurpose = value;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'Amount *',
+                          controller: amountController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Row 4: Reference Number and Merchant
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'Reference Number',
+                          controller: referenceNumberController,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'Merchant',
+                          controller: merchantController,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Location (full width)
+                  _buildTextField(
+                    label: 'Location',
+                    controller: locationController,
+                  ),
+                  const SizedBox(height: 16),
+                  // Description (full width)
+                  _buildTextField(
+                    label: 'Description *',
+                    controller: descriptionController,
+                  ),
+                  const SizedBox(height: 16),
+                  // Notes (full width)
+                  _buildTextField(
+                    label: 'Notes',
+                    controller: notesController,
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  // Recurring Frequency (if recurring is enabled)
+                  if (isRecurring) ...[
+                    const SizedBox(height: 16),
+                    _buildDropdownField(
+                      label: 'Recurring Frequency',
+                      value: selectedRecurringFrequency,
+                      items: [
+                        null,
+                        'DAILY',
+                        'WEEKLY',
+                        'MONTHLY',
+                        'YEARLY',
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedRecurringFrequency = value;
+                        });
+                      },
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  // Transaction Date
+                  _buildDateField(
+                    label: 'Transaction Date',
+                    date: selectedDate,
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          selectedDate = picked;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 32),
+                  // Create Transaction Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _isSubmitting ? null : _handleSubmit,
+                      icon: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Icon(Icons.send, color: Colors.white),
+                      label: Text(
+                        _isSubmitting ? 'Creating...' : 'Create Transaction',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00D09E),
+                        disabledBackgroundColor: const Color(0xFF00D09E).withOpacity(0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleSubmit() async {
+    // Validation
+    if (selectedBankAccountId == null || selectedBankAccountId!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a bank account')),
+      );
+      return;
+    }
+
+    final amountText = amountController.text.trim();
+    if (amountText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an amount')),
+      );
+      return;
+    }
+
+    final amount = double.tryParse(amountText);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount greater than 0')),
+      );
+      return;
+    }
+
+    final description = descriptionController.text.trim();
+    if (description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a description')),
+      );
+      return;
+    }
+
+    if (isRecurring && (selectedRecurringFrequency == null || selectedRecurringFrequency!.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a recurring frequency')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await _dataService.createTransaction(
+        bankAccountId: selectedBankAccountId!,
+        amount: amount,
+        transactionType: selectedTransactionType ?? 'DEBIT',
+        description: description,
+        category: selectedCategory,
+        referenceNumber: referenceNumberController.text.trim().isEmpty
+            ? null
+            : referenceNumberController.text.trim(),
+        merchant: merchantController.text.trim().isEmpty ? null : merchantController.text.trim(),
+        location: locationController.text.trim().isEmpty ? null : locationController.text.trim(),
+        notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+        transactionDate: selectedDate,
+        isRecurring: isRecurring,
+        recurringFrequency: selectedRecurringFrequency,
+        transactionPurpose: selectedTransactionPurpose,
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        widget.onTransactionCreated();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Transaction created successfully'),
+            backgroundColor: Color(0xFF00D09E),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create transaction: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildBankAccountDropdown() {
+    if (widget.bankAccounts.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Bank Account *',
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF666666),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 56,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.red.withOpacity(0.5),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: const Center(
+              child: Text(
+                'No bank accounts available',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return _buildDropdownField(
+      label: 'Bank Account *',
+      value: selectedBankAccountId,
+      items: widget.bankAccounts.map((acc) => acc.id).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedBankAccountId = value;
+        });
+      },
+      displayText: (value) {
+        if (value == null) return 'Select Bank Account';
+        final account = widget.bankAccounts.firstWhere((acc) => acc.id == value);
+        return account.accountName;
+      },
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required String? value,
+    required List<String?> items,
+    required Function(String?) onChanged,
+    String Function(String?)? displayText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 56,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFF00D09E).withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String?>(
+              value: value,
+              isExpanded: true,
+              items: items.map((String? item) {
+                return DropdownMenuItem<String?>(
+                  value: item,
+                  child: Text(
+                    displayText != null
+                        ? displayText(item)
+                        : (item ?? 'None'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF052224),
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: onChanged,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xFF00D09E),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFF00D09E).withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF052224),
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateField({
+    required String label,
+    required DateTime date,
+    required VoidCallback onTap,
+  }) {
+    final dateFormat = DateFormat('MM / dd / yyyy');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFF00D09E).withOpacity(0.3),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    dateFormat.format(date),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF052224),
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.calendar_today,
+                  color: Color(0xFF00D09E),
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
