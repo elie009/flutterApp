@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../utils/navigation_helper.dart';
+import '../../services/data_service.dart';
+import '../../models/bill.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 
 class AddBillScreen extends StatefulWidget {
   const AddBillScreen({super.key});
@@ -13,8 +17,14 @@ class _AddBillScreenState extends State<AddBillScreen> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _providerController = TextEditingController();
   String? _selectedCategory;
+  String _selectedFrequency = 'MONTHLY';
   DateTime _selectedDate = DateTime.now();
+  bool _isSubmitting = false;
+  String? _errorMessage;
+
+  final DataService _dataService = DataService();
 
   final List<String> _billCategories = [
     'Electricity',
@@ -29,11 +39,19 @@ class _AddBillScreenState extends State<AddBillScreen> {
     'Other'
   ];
 
+  static const List<String> _frequencyOptions = [
+    'MONTHLY',
+    'WEEKLY',
+    'BIWEEKLY',
+    'YEARLY',
+  ];
+
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
+    _providerController.dispose();
     super.dispose();
   }
 
@@ -51,10 +69,57 @@ class _AddBillScreenState extends State<AddBillScreen> {
     }
   }
 
-  void _saveBill() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement save bill logic
-      NavigationHelper.navigateTo(context, 'bills');
+  Future<void> _saveBill() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedCategory == null || _selectedCategory!.isEmpty) {
+      setState(() => _errorMessage = 'Please select a category');
+      return;
+    }
+
+    final amountText = _amountController.text.trim();
+    final amount = double.tryParse(amountText);
+    if (amount == null || amount <= 0) {
+      setState(() => _errorMessage = 'Please enter a valid amount greater than 0');
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await _dataService.createBill(
+        billName: _titleController.text.trim(),
+        billType: _selectedCategory!,
+        amount: amount,
+        dueDate: _selectedDate,
+        frequency: _selectedFrequency,
+        notes: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+        provider: _providerController.text.trim().isEmpty
+            ? null
+            : _providerController.text.trim(),
+      );
+
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Bill created successfully'),
+          backgroundColor: Color(0xFF00D09E),
+        ),
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.go('/bills');
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isSubmitting = false;
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
     }
   }
 
@@ -68,6 +133,8 @@ class _AddBillScreenState extends State<AddBillScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
+      bottomNavigationBar: BottomNavBarFigma(currentIndex: 3),
       body: Form(
         key: _formKey,
         child: Container(
@@ -75,17 +142,103 @@ class _AddBillScreenState extends State<AddBillScreen> {
         height: 932,
         decoration: const BoxDecoration(
           color: Color(0xFF00D09E),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
           children: [
-            // Form fields background containers
+
+               // Title "Add bills" (centered)
             Positioned(
-              left: 55,
-              top: 198,
+              left: 0,
+              right: 0,
+              top: 64,
+              child: Center(
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: const TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Add Bills',
+                        style: TextStyle(
+                          color: Color(0xFFFFFFFF),
+                          fontSize: 20,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w700, // Changed to bold
+                          height: 1.10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Notification icon
+            Positioned(
+              left: 364,
+              top: 51,
               child: Container(
-                width: 320,
-                height: 41,
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFDFF7E2),
+                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.notifications,
+                    color: Color(0xFF093030),
+                    size: 21,
+                  ),
+                ),
+              ),
+            ),
+            // Back button (use go to avoid "nothing to pop" when opened via go/goNamed)
+            Positioned(
+              left: 38,
+              top: 69,
+              child: GestureDetector(
+                onTap: () {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) context.go('/bills');
+                  });
+                },
+                child: Container(
+                  width: 19,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFF1FFF3),
+                      width: 2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // White bottom section
+            Positioned(
+              left: 0,
+              top: 176,
+              width: 430,
+              height: 800,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(70),
+                    topRight: Radius.circular(70),
+                  ),
+                ),
+              ),
+            ),
+       
+
+            // Date field
+            Positioned(
+              left: 37,
+              top: 198 , // moved down by 12px to account for the gap
+              child: Container(
+                width: 356,
+                height: 48,
                 decoration: BoxDecoration(
                   color: const Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.circular(18),
@@ -129,10 +282,10 @@ class _AddBillScreenState extends State<AddBillScreen> {
             // Category dropdown
             Positioned(
               left: 37,
-              top: 301,
+              top: 278,
               child: Container(
                 width: 356,
-                height: 41,
+                height: 48,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: const Color(0xFFDFF7E2),
@@ -180,36 +333,88 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
 
+            // Frequency dropdown (required by API)
+            Positioned(
+              left: 37,
+              top: 358,
+              child: Container(
+                width: 356,
+                height: 48,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDFF7E2),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedFrequency,
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF093030)),
+                    style: const TextStyle(
+                      color: Color(0xFF0E3E3E),
+                      fontSize: 15.68,
+                      fontFamily: 'League Spartan',
+                      fontWeight: FontWeight.w400,
+                    ),
+                    onChanged: _isSubmitting
+                        ? null
+                        : (String? newValue) {
+                            setState(() => _selectedFrequency = newValue ?? 'MONTHLY');
+                          },
+                    items: _frequencyOptions.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+
             // Amount field
             Positioned(
-              left: 56,
-              top: 392,
+              left: 37,
+              top: 449,
               child: Container(
-                width: 320,
-                height: 41,
+                width: 356,
+                height: 48,
                 decoration: BoxDecoration(
                   color: const Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: TextFormField(
                   controller: _amountController,
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   style: const TextStyle(
                     color: Color(0xFF093030),
                     fontSize: 15,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
-                    hintText: '\$3.53',
-                    hintStyle: TextStyle(
+                  decoration: InputDecoration(
+                    hintText: '0.00',
+                    hintStyle: const TextStyle(
                       color: Color(0xFF093030),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    filled: true,
+                    fillColor: const Color(0xFFDFF7E2),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide(
+                        color: const Color(0xFFDFF7E2),
+                        width: 2,
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -221,13 +426,13 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
 
-            // Title field
+            // Bill name field
             Positioned(
-              left: 55,
-              top: 487,
+              left: 37,
+              top: 533,
               child: Container(
-                width: 320,
-                height: 41,
+                width: 356,
+                height: 48,
                 decoration: BoxDecoration(
                   color: const Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.circular(18),
@@ -240,20 +445,33 @@ class _AddBillScreenState extends State<AddBillScreen> {
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
-                    hintText: 'Fuel',
-                    hintStyle: TextStyle(
+                  decoration: InputDecoration(
+                    hintText: 'e.g. Electricity, Rent',
+                    hintStyle: const TextStyle(
                       color: Color(0xFF093030),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    filled: true,
+                    fillColor: const Color(0xFFDFF7E2),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide(
+                        color: const Color(0xFFDFF7E2),
+                        width: 2,
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter an expense title';
+                      return 'Please enter a bill name';
                     }
                     return null;
                   },
@@ -261,112 +479,130 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
 
-            // Description field
+            // Notes / Description field
             Positioned(
-              left: 56,
-              top: 567,
+              left: 37,
+              top: 617,
               child: Container(
-                width: 320,
-                height: 166,
+                width: 356,
+                height: 100,
                 decoration: BoxDecoration(
                   color: const Color(0xFFDFF7E2),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: TextFormField(
                   controller: _descriptionController,
-                  maxLines: 6,
+                  maxLines: 4,
                   style: const TextStyle(
                     color: Color(0xFF093030),
                     fontSize: 15,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
-                    hintText: 'Enter Message',
-                    hintStyle: TextStyle(
-                      color: Color(0xFF00D09E),
-                      fontSize: 15,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16),
-                  ),
-                ),
-              ),
-            ),
-
-            // Title
-            const Positioned(
-              left: 145,
-              top: 64,
-              child: SizedBox(
-                width: 141,
-                child: Text(
-                  'Add Expenses',
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 20,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    height: 1.10,
-                  ),
-                ),
-              ),
-            ),
-
-            // Back button
-            Positioned(
-              left: 38,
-              top: 69,
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 19,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFFF1FFF3),
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Save button
-            Positioned(
-              left: 123,
-              top: 769,
-              child: GestureDetector(
-                onTap: _saveBill,
-                child: Container(
-                  width: 169,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00D09E),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
+                  decoration: InputDecoration(
+                    hintText: 'Notes (optional)',
+                    hintStyle: const TextStyle(
                       color: Color(0xFF093030),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
                     ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(16),
+                    filled: true,
+                    fillColor: const Color(0xFFDFF7E2),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide(
+                        color: const Color(0xFFDFF7E2),
+                        width: 2,
+                      ),
+                    ),
                   ),
+                ),
+              ),
+            ),
+
+            // Error message
+            if (_errorMessage != null)
+              Positioned(
+                left: 37,
+                top: 728,
+                right: 37,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'Poppins',
+                            color: Colors.red.shade800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // Save button
+            Positioned(
+              left: 123,
+              top: 800,
+              child: GestureDetector(
+                onTap: _isSubmitting ? null : _saveBill,
+                child: Container(
+                  width: 169,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: _isSubmitting
+                        ? const Color(0xFF00D09E).withOpacity(0.6)
+                        : const Color(0xFF00D09E),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  alignment: Alignment.center,
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFF093030),
+                          ),
+                        )
+                      : const Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Color(0xFF093030),
+                            fontSize: 15,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                 ),
               ),
             ),
 
             // Field labels
             const Positioned(
-              left: 64,
+              left: 37,
               top: 175,
               child: Text(
-                'Date',
+                'Due date',
                 style: TextStyle(
                   color: Color(0xFF093030),
                   fontSize: 15,
@@ -376,8 +612,8 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
             const Positioned(
-              left: 64,
-              top: 273,
+              left: 37,
+              top: 255,
               child: Text(
                 'Category',
                 style: TextStyle(
@@ -389,8 +625,21 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
             const Positioned(
-              left: 64,
-              top: 368,
+              left: 37,
+              top: 335,
+              child: Text(
+                'Frequency',
+                style: TextStyle(
+                  color: Color(0xFF093030),
+                  fontSize: 15,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const Positioned(
+              left: 37,
+              top: 426,
               child: Text(
                 'Amount',
                 style: TextStyle(
@@ -402,10 +651,10 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
             const Positioned(
-              left: 64,
-              top: 463,
+              left: 37,
+              top: 510,
               child: Text(
-                'Expense Title',
+                'Bill name',
                 style: TextStyle(
                   color: Color(0xFF093030),
                   fontSize: 15,
@@ -415,154 +664,8 @@ class _AddBillScreenState extends State<AddBillScreen> {
               ),
             ),
 
-            // Status bar
-            Positioned(
-              left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  const Positioned(
-                    left: 37,
-                    top: 9,
-                    child: Text(
-                      '16:04',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontFamily: 'League Spartan',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+           
 
-            // Notification icon
-            Positioned(
-              left: 364,
-              top: 61,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Bottom Navigation
-            Positioned(
-              left: 0,
-              top: 824,
-              width: 430,
-              height: 108,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(60, 36, 60, 41),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Home icon
-                    Container(
-                      width: 25,
-                      height: 31,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Analysis icon
-                    Container(
-                      width: 31,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Transactions icon
-                    Container(
-                      width: 33,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-
-                    // Bills icon (active)
-                    Stack(
-                      children: [
-                        Positioned(
-                          left: -15,
-                          top: -15,
-                          child: Container(
-                            width: 57,
-                            height: 53,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E),
-                              borderRadius: BorderRadius.circular(22),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 27,
-                          height: 23,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF052224),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Profile icon
-                    Container(
-                      width: 22,
-                      height: 27,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF052224),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),

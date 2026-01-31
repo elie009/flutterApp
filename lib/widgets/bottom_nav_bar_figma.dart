@@ -38,18 +38,25 @@ class BottomNavBarFigma extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 28), // Increased bottom margin for more "floating" effect
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10), // More padding for bigger look
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
+        color: Colors.white.withOpacity(0.90), // More opaque for increased visibility
+        borderRadius: BorderRadius.circular(38),
         boxShadow: [
+          // Stronger shadow for elevation
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.18),
+            blurRadius: 40,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
+        
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

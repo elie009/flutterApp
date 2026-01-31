@@ -11,7 +11,6 @@ import '../screens/bills/bill_detail_screen.dart';
 import '../screens/bills/add_bill_screen.dart';
 import '../screens/loans/loans_screen.dart';
 import '../screens/loans/loan_detail_screen.dart';
-import '../screens/loans/add_loan_screen.dart';
 import '../screens/income/income_sources_screen.dart';
 import '../screens/income/add_edit_income_source_screen.dart';
 import '../screens/bank/bank_accounts_screen.dart';
@@ -145,11 +144,6 @@ class AppRouter {
         path: '/loans',
         name: 'loans',
         builder: (context, state) => const AuthGuard(child: LoansScreen()),
-      ),
-      GoRoute(
-        path: '/add-loan',
-        name: 'add-loan',
-        builder: (context, state) => const AuthGuard(child: AddLoanScreen()),
       ),
       GoRoute(
         path: '/loans/:id',

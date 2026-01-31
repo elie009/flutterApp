@@ -204,6 +204,54 @@ class DataService {
     }
   }
 
+  /// Analyze transaction text (e.g. SMS/notification) and create a bank transaction.
+  /// Calls POST /api/BankAccounts/transactions/analyze-text
+  Future<Transaction> analyzeTransactionText({
+    required String transactionText,
+    String? bankAccountId,
+    String? billId,
+    String? loanId,
+    String? savingsAccountId,
+  }) async {
+    try {
+      final requestBody = <String, dynamic>{
+        'transactionText': transactionText.trim(),
+        if (bankAccountId != null && bankAccountId.isNotEmpty)
+          'bankAccountId': bankAccountId,
+        if (billId != null && billId.isNotEmpty) 'billId': billId,
+        if (loanId != null && loanId.isNotEmpty) 'loanId': loanId,
+        if (savingsAccountId != null && savingsAccountId.isNotEmpty)
+          'savingsAccountId': savingsAccountId,
+      };
+
+      final response = await ApiService().post(
+        '/BankAccounts/transactions/analyze-text',
+        data: requestBody,
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw Exception('Invalid response from server');
+      }
+      final success = data['success'] as bool? ?? false;
+      final message = data['message'] as String? ?? 'Unknown error';
+      final transactionData = data['data'];
+
+      if (!success) {
+        throw Exception(message);
+      }
+      if (transactionData == null) {
+        throw Exception('No transaction data in response');
+      }
+      final map = transactionData is Map<String, dynamic>
+          ? transactionData
+          : Map<String, dynamic>.from(transactionData as Map);
+      return Transaction.fromJson(map);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Bills
   Future<Map<String, dynamic>> getBills({
     String? status,
@@ -244,6 +292,69 @@ class DataService {
     try {
       final response = await ApiService().get('/Bills/$billId');
       return Bill.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Create a bill. POST /api/Bills. Request body: CreateBillDto.
+  Future<Bill> createBill({
+    required String billName,
+    required String billType,
+    required double amount,
+    required DateTime dueDate,
+    required String frequency,
+    DateTime? statementDate,
+    String? notes,
+    String? provider,
+    String? referenceNumber,
+    bool autoGenerateNext = false,
+    bool isScheduledPayment = false,
+    String? scheduledPaymentBankAccountId,
+    int? scheduledPaymentDaysBeforeDue,
+  }) async {
+    try {
+      final requestBody = <String, dynamic>{
+        'billName': billName.trim(),
+        'billType': billType.trim(),
+        'amount': amount,
+        'dueDate': dueDate.toIso8601String(),
+        'frequency': frequency,
+        if (statementDate != null)
+          'statementDate': statementDate.toIso8601String(),
+        if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
+        if (provider != null && provider.trim().isNotEmpty) 'provider': provider.trim(),
+        if (referenceNumber != null && referenceNumber.trim().isNotEmpty)
+          'referenceNumber': referenceNumber.trim(),
+        'autoGenerateNext': autoGenerateNext,
+        'isScheduledPayment': isScheduledPayment,
+        if (scheduledPaymentBankAccountId != null &&
+            scheduledPaymentBankAccountId.trim().isNotEmpty)
+          'scheduledPaymentBankAccountId': scheduledPaymentBankAccountId.trim(),
+        if (scheduledPaymentDaysBeforeDue != null)
+          'scheduledPaymentDaysBeforeDue': scheduledPaymentDaysBeforeDue,
+      };
+
+      final response = await ApiService().post('/Bills', data: requestBody);
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw Exception('Invalid response from server');
+      }
+      final success = data['success'] as bool? ?? false;
+      final message = data['message'] as String? ?? 'Unknown error';
+      final billData = data['data'];
+
+      if (!success) {
+        throw Exception(message);
+      }
+      if (billData == null) {
+        throw Exception('No bill data in response');
+      }
+      final map = billData is Map<String, dynamic>
+          ? billData
+          : Map<String, dynamic>.from(billData as Map);
+      return Bill.fromJson(map);
     } catch (e) {
       rethrow;
     }
@@ -335,13 +446,91 @@ class DataService {
     }
   }
 
+  /// Get a single loan by id. Uses GET /Loans/{loanId} (NOT /Loans/user/...).
   Future<Loan> getLoan(String loanId) async {
     try {
-      final response = await ApiService().get('/Loans/user/$loanId');
+      // Build path without "user" - single loan endpoint is /Loans/{loanId} only.
+      const prefix = '/Loans/';
+      final path = prefix + loanId;
+      if (path.contains('user')) {
+        debugPrint('ERROR getLoan: path must not contain "user". Got: $path');
+        throw StateError('getLoan must call GET /Loans/{id}, not /Loans/user/...');
+      }
+      if (kDebugMode) debugPrint('getLoan: GET $path');
+      final response = await ApiService().get(path);
       return Loan.fromJson(response.data['data'] as Map<String, dynamic>);
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// Update loan (PUT /Loans/{loanId}). Returns updated loan or throws.
+  Future<Loan> updateLoan(
+    String loanId, {
+    String? purpose,
+    String? additionalInfo,
+    String? status,
+    double? principal,
+    double? interestRate,
+    double? monthlyPayment,
+    double? remainingBalance,
+  }) async {
+    final response = await ApiService().put(
+      '/Loans/$loanId',
+      data: {
+        if (purpose != null) 'purpose': purpose,
+        if (additionalInfo != null) 'additionalInfo': additionalInfo,
+        if (status != null) 'status': status,
+        if (principal != null) 'principal': principal,
+        if (interestRate != null) 'interestRate': interestRate,
+        if (monthlyPayment != null) 'monthlyPayment': monthlyPayment,
+        if (remainingBalance != null) 'remainingBalance': remainingBalance,
+      },
+    );
+    final raw = response.data;
+    if (raw is! Map<String, dynamic>) throw Exception('Invalid response');
+    final success = raw['success'] == true;
+    final data = raw['data'];
+    if (!success || data == null) {
+      final msg = raw['message'] as String? ?? 'Failed to update loan';
+      throw Exception(msg);
+    }
+    return Loan.fromJson(data as Map<String, dynamic>);
+  }
+
+  /// Apply for a loan (POST /Loans/apply). Returns the created loan or throws.
+  Future<Loan> applyForLoan({
+    required double principal,
+    required String purpose,
+    required int termMonths,
+    double interestRate = 0,
+    String loanType = 'PERSONAL',
+    String? additionalInfo,
+    double? monthlyIncome,
+    String? employmentStatus,
+  }) async {
+    final response = await ApiService().post(
+      '/Loans/apply',
+      data: {
+        'principal': principal,
+        'interestRate': interestRate,
+        'purpose': purpose,
+        'term': termMonths,
+        'loanType': loanType,
+        if (additionalInfo != null && additionalInfo.isNotEmpty) 'additionalInfo': additionalInfo,
+        if (monthlyIncome != null) 'monthlyIncome': monthlyIncome,
+        if (employmentStatus != null) 'employmentStatus': employmentStatus,
+      },
+    );
+    final raw = response.data;
+    if (raw is! Map<String, dynamic>) throw Exception('Invalid response');
+    final success = raw['success'] == true;
+    final data = raw['data'];
+    if (!success || data == null) {
+      final msg = raw['message'] as String? ?? 'Failed to apply for loan';
+      throw Exception(msg);
+    }
+    return Loan.fromJson(data as Map<String, dynamic>);
   }
 
   Future<bool> makeLoanPayment({

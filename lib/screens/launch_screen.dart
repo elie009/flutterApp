@@ -37,19 +37,19 @@ class _LaunchScreenState extends State<LaunchScreen> {
         ),
         child: const Stack(
           children: [
-            // App title
-            Positioned(
-              left: 113,
-              top: 401,
-              child: Text(
-                'finWise',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFF00D09E),
-                  fontSize: 52.14,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                  height: 1.10,
+            // App title (centered on screen)
+            Positioned.fill(
+              child: Center(
+                child: Text(
+                  'UtilityHub360',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF00D09E),
+                    fontSize: 52.14,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    height: 1.10,
+                  ),
                 ),
               ),
             ),

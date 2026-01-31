@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/loan.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
@@ -20,12 +21,30 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   Loan? _loan;
   bool _isLoading = true;
   String? _errorMessage;
+  bool _isEditing = false;
+  bool _isSaving = false;
   final _paymentAmountController = TextEditingController();
+  final _purposeController = TextEditingController();
+  final _additionalInfoController = TextEditingController();
+  String? _editStatus;
 
   @override
   void initState() {
     super.initState();
     _loadLoan();
+  }
+
+  /// Safe read of additionalInfo via JSON (avoids lookup error if old Loan model has no additionalInfo getter).
+  static String? _getAdditionalInfo(Loan loan) {
+    return loan.toJson()['additionalInfo'] as String?;
+  }
+
+  void _syncEditFieldsFromLoan() {
+    if (_loan != null) {
+      _purposeController.text = _loan!.purpose ?? '';
+      _additionalInfoController.text = _getAdditionalInfo(_loan!) ?? '';
+      _editStatus = _loan!.status;
+    }
   }
 
   Future<void> _loadLoan() async {
@@ -41,12 +60,54 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         _isLoading = false;
         _paymentAmountController.text =
             loan.monthlyPayment.toStringAsFixed(2);
+        _syncEditFieldsFromLoan();
       });
     } catch (e) {
+      final msg = e.toString();
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = msg.toLowerCase().contains('forbidden')
+            ? 'You don\'t have access to this loan. Make sure you\'re on the latest app version, then pull to refresh or tap Retry.'
+            : msg;
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _saveEdits() async {
+    if (_loan == null) return;
+    setState(() => _isSaving = true);
+    try {
+      final updated = await DataService().updateLoan(
+        widget.loanId,
+        purpose: _purposeController.text.trim().isEmpty
+            ? null
+            : _purposeController.text.trim(),
+        additionalInfo: _additionalInfoController.text.trim().isEmpty
+            ? null
+            : _additionalInfoController.text.trim(),
+        status: _editStatus,
+      );
+      if (mounted) {
+        setState(() {
+          _loan = updated;
+          _isEditing = false;
+          _isSaving = false;
+        });
+        NavigationHelper.showSnackBar(
+          context,
+          'Loan updated',
+          backgroundColor: AppTheme.successColor,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        NavigationHelper.showSnackBar(
+          context,
+          e.toString().replaceFirst('Exception: ', ''),
+          backgroundColor: AppTheme.errorColor,
+        );
+      }
     }
   }
 
@@ -105,11 +166,48 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
     }
   }
 
+  static const _statusOptions = ['PENDING', 'APPROVED', 'ACTIVE', 'COMPLETED'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Loan Details'),
+        backgroundColor: Colors.white,
+        foregroundColor: AppTheme.primaryDark,
+        elevation: 0,
+        leadingWidth: 56,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _isSaving
+              ? null
+              : () {
+                  if (_isEditing && _loan != null && !_isLoading && _errorMessage == null) {
+                    setState(() => _isEditing = false);
+                  } else {
+                    // Navigate to loans list (loan-detail was opened with goNamed, so pop would fail)
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) context.go('/loans');
+                    });
+                  }
+                },
+          tooltip: 'Back',
+        ),
+        actions: [
+          if (_loan != null && !_isLoading && _errorMessage == null)
+            _isEditing
+                ? IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: _isSaving
+                        ? null
+                        : () => setState(() => _isEditing = false),
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () => setState(() => _isEditing = true),
+                  ),
+        ],
       ),
       body: _isLoading
           ? const LoadingIndicator(message: 'Loading loan details...')
@@ -128,47 +226,169 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Card(
+                            color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    _loan!.purpose ?? 'Loan',
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        'Remaining Balance',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                        ),
+                                  if (_isEditing) ...[
+                                    const Text(
+                                      'Purpose',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 12,
                                       ),
-                                      Text(
-                                        Formatters.formatCurrency(
-                                          _loan!.remainingBalance,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    TextField(
+                                      controller: _purposeController,
+                                      enabled: !_isSaving,
+                                      style: const TextStyle(color: Colors.black),
+                                      decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        hintText: 'Loan purpose/title',
+                                        border: OutlineInputBorder(),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 10),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      'Additional Info',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    TextField(
+                                      controller: _additionalInfoController,
+                                      enabled: !_isSaving,
+                                      maxLines: 3,
+                                      style: const TextStyle(color: Colors.black),
+                                      decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        hintText: 'Notes or description',
+                                        border: OutlineInputBorder(),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 10),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      'Status',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    DropdownButtonFormField<String>(
+                                      value: _editStatus,
+                                      dropdownColor: Colors.white,
+                                      style: const TextStyle(color: Colors.black),
+                                      decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 8),
+                                      ),
+                                      items: _statusOptions
+                                          .map((s) => DropdownMenuItem(
+                                                value: s,
+                                                child: Text(s, style: const TextStyle(color: Colors.black)),
+                                              ))
+                                          .toList(),
+                                      onChanged: _isSaving
+                                          ? null
+                                          : (v) {
+                                              if (v != null) {
+                                                setState(() => _editStatus = v);
+                                              }
+                                            },
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextButton(
+                                          onPressed: _isSaving
+                                              ? null
+                                              : () =>
+                                                  setState(() => _isEditing = false),
+                                          child: const Text('Cancel'),
                                         ),
+                                        const SizedBox(width: 8),
+                                        ElevatedButton(
+                                          onPressed: _isSaving ? null : _saveEdits,
+                                          child: _isSaving
+                                              ? const SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Text('Save'),
+                                        ),
+                                      ],
+                                    ),
+                                  ] else ...[
+                                    Text(
+                                      _loan!.purpose ?? 'Loan',
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    if (_getAdditionalInfo(_loan!) != null &&
+                                        _getAdditionalInfo(_loan!)!.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        _getAdditionalInfo(_loan!)!,
                                         style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTheme.primaryColor,
+                                          fontSize: 14,
+                                          color: Colors.black87,
                                         ),
                                       ),
                                     ],
-                                  ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Remaining Balance',
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        Text(
+                                          Formatters.formatCurrency(
+                                            _loan!.remainingBalance,
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
                           Card(
+                            color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
@@ -213,6 +433,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                           if (_loan!.isActive) ...[
                             const SizedBox(height: 16),
                             Card(
+                              color: Colors.white,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
@@ -223,6 +444,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.black,
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -232,9 +454,14 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                           const TextInputType.numberWithOptions(
                                         decimal: true,
                                       ),
+                                      style: const TextStyle(color: Colors.black),
                                       decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
                                         labelText: 'Payment Amount',
+                                        labelStyle: TextStyle(color: Colors.black87),
                                         prefixText: '₱',
+                                        prefixStyle: TextStyle(color: Colors.black),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -253,6 +480,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
@@ -275,7 +503,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         Text(
           label,
           style: const TextStyle(
-            color: Colors.grey,
+            color: Colors.black87,
             fontSize: 14,
           ),
         ),
@@ -284,6 +512,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
+            color: Colors.black,
           ),
         ),
       ],
@@ -293,6 +522,8 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   @override
   void dispose() {
     _paymentAmountController.dispose();
+    _purposeController.dispose();
+    _additionalInfoController.dispose();
     super.dispose();
   }
 }

@@ -249,6 +249,7 @@ class AuthService {
       if (response.data['success'] == true) {
         final userData = response.data['data'] as Map<String, dynamic>;
         _currentUser = User.fromJson(userData);
+        await StorageService.saveString(AppConfig.userKey, jsonEncode(userData));
         return _currentUser;
       }
       return null;
@@ -282,6 +283,7 @@ class AuthService {
       if (response.data['success'] == true) {
         final userData = response.data['data'] as Map<String, dynamic>;
         _currentUser = User.fromJson(userData);
+        await StorageService.saveString(AppConfig.userKey, jsonEncode(userData));
         return {
           'success': true,
           'user': _currentUser,
