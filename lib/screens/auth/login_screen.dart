@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
@@ -40,26 +41,52 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final result = await AuthService.login(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+    try {
+      // Timeout after 35s so loading never spins forever (API timeout is 30s)
+      final result = await AuthService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ).timeout(
+        const Duration(seconds: 35),
+        onTimeout: () {
+          return {
+            'success': false,
+            'message': 'Request timed out. Check your connection and try again.',
+          };
+        },
+      );
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (result['success'] == true) {
-      if (mounted) {
-        context.go('/');
+      if (result['success'] == true) {
+        if (mounted) {
+          context.go('/');
+        }
+      } else {
+        if (mounted) {
+          final message = result['message'];
+          final displayMessage = message is String ? message : 'Login failed';
+          debugPrint('🔐 Login failed: $displayMessage');
+          NavigationHelper.showSnackBar(
+            context,
+            displayMessage,
+            backgroundColor: Colors.red,
+          );
+        }
       }
-    } else {
+    } catch (e, stackTrace) {
+      debugPrint('🔐 Login error: $e');
+      debugPrint('$stackTrace');
       if (mounted) {
         NavigationHelper.showSnackBar(
           context,
-          result['message'] as String,
+          'Login failed. ${e.toString().replaceFirst('Exception: ', '')}',
           backgroundColor: Colors.red,
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }

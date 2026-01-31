@@ -134,8 +134,15 @@ class _BillsScreenState extends State<BillsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Bills & Utilities'),
+        title: const Text(
+          'Bills & Utilities',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
       ),
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 3),
       body: Column(
@@ -146,27 +153,65 @@ class _BillsScreenState extends State<BillsScreen> {
             child: Row(
               children: [
                 FilterChip(
-                  label: const Text('All'),
+                  label: const Text('All', style: TextStyle(color: Colors.black)),
                   selected: _selectedStatus == null,
                   onSelected: (_) => _filterByStatus(null),
+                  backgroundColor: Colors.white,
+                  selectedColor: Colors.white,
+                  side: const BorderSide(
+                    color: Colors.green,
+                    width: 2,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
-                  label: const Text('Pending'),
+                  label: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFC107),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const Text('Pending', style: TextStyle(color: Colors.black)),
+                    ],
+                  ),
                   selected: _selectedStatus == 'PENDING',
                   onSelected: (_) => _filterByStatus('PENDING'),
+                  backgroundColor: Colors.white,
+                  selectedColor: Colors.white,
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
-                  label: const Text('Paid'),
+                  label: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4CAF50),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const Text('Paid', style: TextStyle(color: Colors.black)),
+                    ],
+                  ),
+                  backgroundColor: Colors.white,
+                  selectedColor: Colors.white,
                   selected: _selectedStatus == 'PAID',
                   onSelected: (_) => _filterByStatus('PAID'),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
-                  label: const Text('Overdue'),
+                  label: const Text('Overdue', style: TextStyle(color: Colors.black)),
                   selected: _selectedStatus == 'OVERDUE',
                   onSelected: (_) => _filterByStatus('OVERDUE'),
+                  backgroundColor: Colors.white,
+                  selectedColor: Colors.white,
                 ),
               ],
             ),
@@ -206,7 +251,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                     ),
                                     color: bill.isOverdue
                                         ? Colors.red.shade50
-                                        : null,
+                                        : Colors.white,
                                     child: ListTile(
                                       leading: Icon(
                                         Icons.receipt,
@@ -216,19 +261,25 @@ class _BillsScreenState extends State<BillsScreen> {
                                                 ? AppTheme.successColor
                                                 : AppTheme.warningColor,
                                       ),
-                                      title: Text(bill.billName),
+                                      title: Text(
+                                        bill.billName,
+                                        style: const TextStyle(color: Colors.black),
+                                      ),
                                       subtitle: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           if (bill.provider != null)
-                                            Text(bill.provider!),
+                                            Text(
+                                              bill.provider!,
+                                              style: const TextStyle(color: Colors.black87),
+                                            ),
                                           Text(
                                             'Due: ${Formatters.formatDate(bill.dueDate)}',
                                             style: TextStyle(
                                               color: bill.isOverdue
                                                   ? AppTheme.errorColor
-                                                  : null,
+                                                  : Colors.black87,
                                               fontWeight: bill.isOverdue
                                                   ? FontWeight.bold
                                                   : null,
@@ -247,6 +298,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
+                                              color: Colors.black,
                                             ),
                                           ),
                                           Container(
@@ -288,12 +340,46 @@ class _BillsScreenState extends State<BillsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          NavigationHelper.navigateTo(context, 'add-bill');
+      floatingActionButton: StatefulBuilder(
+        builder: (context, setState) {
+          bool isHovered = false;
+          return MouseRegion(
+            onEnter: (_) => setState(() => isHovered = true),
+            onExit: (_) => setState(() => isHovered = false),
+            child: GestureDetector(
+              onTap: () {
+                NavigationHelper.navigateTo(context, 'add-bill');
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 65,
+                height: 65,
+                decoration: BoxDecoration(
+                  color: isHovered ? const Color(0xFF00D09E) : Colors.white,
+                  border: Border.all(
+                    color: const Color(0xFF00D09E),
+                    width: 2.5,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x2900D09E),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.add,
+                    color: isHovered ? Colors.white : const Color(0xFF00D09E),
+                    size: 36,
+                  ),
+                ),
+              ),
+            ),
+          );
         },
-        backgroundColor: AppTheme.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

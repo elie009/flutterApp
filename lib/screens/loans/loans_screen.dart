@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../models/loan.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
@@ -341,11 +342,16 @@ class _LoansScreenState extends State<LoansScreen> {
               bottom: 16,
               child: GestureDetector(
                 onTap: () async {
-                  await NavigationHelper.navigateToWithResult<bool>(
-                    context,
-                    'add-loan',
+                  final added = await showModalBottomSheet<bool>(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => _AddLoanModalContent(
+                      onSaved: () => Navigator.of(ctx).pop(true),
+                      onCancel: () => Navigator.of(ctx).pop(false),
+                    ),
                   );
-                  if (mounted) _loadLoans();
+                  if (mounted && added == true) _loadLoans();
                 },
                 child: Container(
                   width: 65,
@@ -384,5 +390,323 @@ class _LoansScreenState extends State<LoansScreen> {
       ),
     );
   }
+}
+
+// Add Loan modal: form shown when FAB is tapped
+class _AddLoanModalContent extends StatefulWidget {
+  final VoidCallback onSaved;
+  final VoidCallback onCancel;
+
+  const _AddLoanModalContent({
+    required this.onSaved,
+    required this.onCancel,
+  });
+
+  @override
+  State<_AddLoanModalContent> createState() => _AddLoanModalContentState();
+}
+
+class _AddLoanModalContentState extends State<_AddLoanModalContent> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _amountController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  String _selectedCategory = 'Personal Loan';
+  DateTime _selectedDate = DateTime.now();
+  bool _isSaving = false;
+  String? _errorMessage;
+
+  static const _loanCategories = [
+    'Personal Loan',
+    'Home Loan',
+    'Car Loan',
+    'Student Loan',
+    'Business Loan',
+    'Credit Card',
+    'Other',
+  ];
+
+  static String _categoryToLoanType(String category) {
+    switch (category) {
+      case 'Home Loan': return 'MORTGAGE';
+      case 'Car Loan': return 'AUTO';
+      case 'Student Loan': return 'STUDENT';
+      case 'Business Loan': return 'BUSINESS';
+      default: return 'PERSONAL';
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _amountController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && mounted) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
+  Future<void> _saveLoan() async {
+    _errorMessage = null;
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+    try {
+      final amount = double.tryParse(_amountController.text.trim());
+      if (amount == null || amount <= 0) {
+        setState(() {
+          _errorMessage = 'Please enter a valid amount';
+          _isSaving = false;
+        });
+        return;
+      }
+
+      await DataService().applyForLoan(
+        principal: amount,
+        purpose: _titleController.text.trim(),
+        termMonths: 12,
+        loanType: _categoryToLoanType(_selectedCategory),
+        additionalInfo: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Loan application submitted.'),
+            backgroundColor: Color(0xFF00D09E),
+          ),
+        );
+        widget.onSaved();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Text(
+                'Add Loan',
+                style: TextStyle(
+                  color: Color(0xFF093030),
+                  fontSize: 20,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Date', style: _labelStyle),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: _isSaving ? null : _selectDate,
+                        child: Container(
+                          height: 48,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDFF7E2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            DateFormat('MMMM d, yyyy').format(_selectedDate),
+                            style: const TextStyle(
+                              color: Color(0xFF093030),
+                              fontSize: 15,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Category', style: _labelStyle),
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 48,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDFF7E2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedCategory,
+                            isExpanded: true,
+                            icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF093030)),
+                            style: const TextStyle(
+                              color: Color(0xFF093030),
+                              fontSize: 15,
+                              fontFamily: 'Poppins',
+                            ),
+                            onChanged: _isSaving ? null : (v) {
+                              if (v != null) setState(() => _selectedCategory = v);
+                            },
+                            items: _loanCategories.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Amount', style: _labelStyle),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _amountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        readOnly: _isSaving,
+                        decoration: _inputDecoration(hint: '\$0.00'),
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return 'Please enter an amount';
+                          if (double.tryParse(v.trim()) == null || double.parse(v.trim()) <= 0) {
+                            return 'Enter a valid amount';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Loan Title', style: _labelStyle),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _titleController,
+                        readOnly: _isSaving,
+                        decoration: _inputDecoration(hint: 'Loan Title'),
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return 'Please enter a loan title';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Description', style: _labelStyle),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 3,
+                        readOnly: _isSaving,
+                        decoration: _inputDecoration(hint: 'Enter loan description'),
+                      ),
+                      if (_errorMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red, fontSize: 13),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _isSaving ? null : widget.onCancel,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF093030),
+                                side: const BorderSide(color: Color(0xFF00D09E)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: _isSaving ? null : _saveLoan,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF00D09E),
+                                foregroundColor: const Color(0xFF093030),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF093030)),
+                                    )
+                                  : const Text('Save'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+const _labelStyle = TextStyle(
+  color: Color(0xFF093030),
+  fontSize: 15,
+  fontFamily: 'Poppins',
+  fontWeight: FontWeight.w500,
+);
+
+InputDecoration _inputDecoration({required String hint}) {
+  return InputDecoration(
+    hintText: hint,
+    hintStyle: const TextStyle(color: Color(0xFF093030), fontSize: 15, fontFamily: 'Poppins'),
+    filled: true,
+    fillColor: const Color(0xFFDFF7E2),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  );
 }
 

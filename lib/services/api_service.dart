@@ -185,8 +185,18 @@ class ApiService {
 
 // Auth Interceptor to add token and handle token refresh
 class _AuthInterceptor extends Interceptor {
+  static const _publicPaths = ['/Auth/login', '/Auth/register'];
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    // Skip token lookup for login/register — avoids blocking on StorageService.getToken()
+    // which can hang on some devices and cause login to time out.
+    final isPublicAuth = _publicPaths.any((p) => options.path.contains(p));
+    if (isPublicAuth) {
+      handler.next(options);
+      return;
+    }
+
     final token = await StorageService.getToken();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';

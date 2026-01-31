@@ -12,6 +12,8 @@ import '../../models/dashboard_summary.dart';
 import '../../widgets/triangle_painter.dart';
 import '../bills/bills_screen.dart';
 import '../loans/loans_screen.dart';
+import '../../models/bill.dart';
+import '../../models/loan.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -261,6 +263,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 100),
       // Move SafeArea inside the Stack, so the colored background reaches the topmost edge
       body: Stack(
         children: [
@@ -274,15 +277,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             child: Stack(
               children: [
-                // Small top-right triangle, similar to CategoriesScreen
-                Positioned.fill(
-                  child: Transform.rotate(
-                    angle: 0.4,
-                    child: CustomPaint(
-                      painter: TrianglePainter(),
-                    ),
-                  ),
-                ),
+                  // Small top-right triangle (moved here from inside Stack)
+                              Positioned.fill(
+                                child: Transform.rotate(
+                                  angle: 0.4,
+                                  child: CustomPaint(
+                                    painter: TrianglePainter(),
+                                  ),
+                                ),
+                              ),
+                              
+
+                           // White bottom section
+                          Positioned(
+                            left: 0,
+                            top: 191,
+                            width: 413,
+                            height: 751,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFFFFFF),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(70),
+                                  topRight: Radius.circular(70),
+                                ),
+                              ),
+                            ),
+                          ),
+
               ],
             ),
           ),
@@ -292,24 +314,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : Stack(
                     children: [
-                      // The white dashboard "card" area
-                      Positioned(
-                        top: 140, // Adjust as needed for visual design
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: double.infinity,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFFFFFF),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(70),
-                              topRight: Radius.circular(70),
-                            ),
-                          ),
-                       
-                        ),
-                      ),
+                     
 
  
            
@@ -383,7 +388,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 0),
+     
     );
   }
 
@@ -1083,7 +1088,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     description: 'AI-Powered Text Analysis To Extract Transaction Details',
                     onTap: () {
                       Navigator.of(context).pop();
-                      // TODO: Navigate to transaction analyzer
+                      _showTransactionAnalyzerModal(context);
                     },
                   ),
                   _buildModalOption(
@@ -1227,6 +1232,495 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void _showTransactionAnalyzerModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return _TransactionAnalyzerModalContent(
+              scrollController: scrollController,
+              bankAccounts: _bankAccounts,
+              onAnalyzed: () {
+                _loadData(showLoading: false, forceRefresh: true);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+}
+
+// Transaction Analyzer modal: form for analyze-text API and response handling
+class _TransactionAnalyzerModalContent extends StatefulWidget {
+  final ScrollController scrollController;
+  final List<BankAccount> bankAccounts;
+  final VoidCallback onAnalyzed;
+
+  const _TransactionAnalyzerModalContent({
+    required this.scrollController,
+    required this.bankAccounts,
+    required this.onAnalyzed,
+  });
+
+  @override
+  State<_TransactionAnalyzerModalContent> createState() =>
+      _TransactionAnalyzerModalContentState();
+}
+
+class _TransactionAnalyzerModalContentState
+    extends State<_TransactionAnalyzerModalContent> {
+  final DataService _dataService = DataService();
+  final TextEditingController _transactionTextController =
+      TextEditingController();
+  final TextEditingController _savingsAccountIdController =
+      TextEditingController();
+
+  String? _selectedBankAccountId;
+  String? _selectedBillId;
+  String? _selectedLoanId;
+  bool _isAnalyzing = false;
+  String? _errorMessage;
+  String? _successMessage;
+
+  List<Bill> _bills = [];
+  List<Loan> _loans = [];
+  bool _loadingOptions = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.bankAccounts.isNotEmpty) {
+      _selectedBankAccountId = widget.bankAccounts.first.id;
+    }
+    _loadBillsAndLoans();
+  }
+
+  @override
+  void dispose() {
+    _transactionTextController.dispose();
+    _savingsAccountIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadBillsAndLoans() async {
+    try {
+      final billsResult =
+          await _dataService.getBills(status: 'PENDING', limit: 50);
+      final bills = billsResult['bills'] as List<Bill>? ?? [];
+      final loans = await _dataService.getUserLoans(status: 'ACTIVE', limit: 50);
+      if (mounted) {
+        setState(() {
+          _bills = bills;
+          _loans = loans;
+          _loadingOptions = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _loadingOptions = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleAnalyze() async {
+    final text = _transactionTextController.text.trim();
+    if (text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter transaction text (e.g. SMS or notification).';
+        _successMessage = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _isAnalyzing = true;
+      _errorMessage = null;
+      _successMessage = null;
+    });
+
+    try {
+      final transaction = await _dataService.analyzeTransactionText(
+        transactionText: text,
+        bankAccountId: _selectedBankAccountId?.isEmpty ?? true
+            ? null
+            : _selectedBankAccountId,
+        billId:
+            _selectedBillId?.isEmpty ?? true ? null : _selectedBillId,
+        loanId:
+            _selectedLoanId?.isEmpty ?? true ? null : _selectedLoanId,
+        savingsAccountId: _savingsAccountIdController.text.trim().isEmpty
+            ? null
+            : _savingsAccountIdController.text.trim(),
+      );
+
+      if (mounted) {
+        setState(() {
+          _isAnalyzing = false;
+          _successMessage =
+              'Transaction created: ${transaction.description} (\$${transaction.amount.toStringAsFixed(2)})';
+          _errorMessage = null;
+          _transactionTextController.clear();
+        });
+        Navigator.of(context).pop();
+        widget.onAnalyzed();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_successMessage!),
+            backgroundColor: const Color(0xFF00D09E),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isAnalyzing = false;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+          _successMessage = null;
+        });
+      }
+    }
+  }
+
+  Widget _buildDropdown<T>({
+    required String label,
+    required String? value,
+    required List<T> items,
+    required String Function(T) getValue,
+    required String Function(T) getDisplayText,
+    required void Function(String?) onChanged,
+    bool requiredField = false,
+  }) {
+    final effectiveItems = [if (!requiredField) null, ...items.map(getValue)];
+    String display = (requiredField ? 'Select $label' : 'None');
+    if (value != null && value.isNotEmpty) {
+      for (final x in items) {
+        if (getValue(x) == value) {
+          display = getDisplayText(x);
+          break;
+        }
+      }
+      if (display == (requiredField ? 'Select $label' : 'None')) {
+        display = value;
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label + (requiredField ? ' *' : ' (Optional)'),
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF666666),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: const Color(0xFF00D09E).withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String?>(
+              value: value?.isEmpty ?? true ? null : value,
+              isExpanded: true,
+              items: effectiveItems.map((String? id) {
+                String displayText = 'None';
+                if (id != null && id.isNotEmpty) {
+                  T? found;
+                  for (final x in items) {
+                    if (getValue(x) == id) {
+                      found = x;
+                      break;
+                    }
+                  }
+                  displayText = found != null ? getDisplayText(found) : id;
+                }
+                return DropdownMenuItem<String?>(
+                  value: id,
+                  child: Text(
+                    displayText,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF052224),
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: onChanged,
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xFF00D09E),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12, bottom: 20),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Transaction Analyzer',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF052224),
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Paste SMS or notification text to extract and create a transaction.',
+              style: TextStyle(
+                fontSize: 12,
+                fontFamily: 'Poppins',
+                color: Color(0xFF666666),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Transaction text (required)
+                  const Text(
+                    'Transaction text *',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF00D09E).withOpacity(0.3),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      controller: _transactionTextController,
+                      maxLines: 4,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF052224),
+                      ),
+                      decoration: const InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText:
+                            'e.g. You spent \$9.50 at AZDEHAR A. Balance: \$990.50',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Bank account (optional)
+                  _buildDropdown<BankAccount>(
+                    label: 'Bank account',
+                    value: _selectedBankAccountId,
+                    items: widget.bankAccounts,
+                    getValue: (a) => a.id,
+                    getDisplayText: (a) => a.accountName,
+                    onChanged: (v) =>
+                        setState(() => _selectedBankAccountId = v),
+                    requiredField: false,
+                  ),
+                  const SizedBox(height: 16),
+                  if (_loadingOptions)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    )
+                  else ...[
+                    _buildDropdown<Bill>(
+                      label: 'Link to bill',
+                      value: _selectedBillId,
+                      items: _bills,
+                      getValue: (b) => b.id,
+                      getDisplayText: (b) => b.billName,
+                      onChanged: (v) => setState(() => _selectedBillId = v),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDropdown<Loan>(
+                      label: 'Link to loan',
+                      value: _selectedLoanId,
+                      items: _loans,
+                      getValue: (l) => l.id,
+                      getDisplayText: (l) =>
+                          l.purpose ?? 'Loan #${l.id.substring(0, 8)}',
+                      onChanged: (v) => setState(() => _selectedLoanId = v),
+                    ),
+                    const SizedBox(height: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Savings account ID (Optional)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF666666),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFF00D09E).withOpacity(0.3),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: TextField(
+                            controller: _savingsAccountIdController,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF052224),
+                            ),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: 'Savings account ID',
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: Colors.red.shade700, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'Poppins',
+                                color: Colors.red.shade800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _isAnalyzing ? null : _handleAnalyze,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00D09E),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isAnalyzing
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Analyze & Create Transaction',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // Quick Add Modal Content - Simplified form with essential fields only
@@ -1494,9 +1988,11 @@ class _QuickAddModalContentState extends State<_QuickAddModalContent> {
               fontWeight: FontWeight.w400,
               color: Color(0xFF052224),
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
         ),
@@ -1656,6 +2152,7 @@ class _QuickAddModalContentState extends State<_QuickAddModalContent> {
                           label: 'Amount *',
                           controller: amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                         
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -2330,9 +2827,11 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
               fontWeight: FontWeight.w400,
               color: Color(0xFF052224),
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
         ),

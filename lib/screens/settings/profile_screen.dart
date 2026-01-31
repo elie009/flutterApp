@@ -50,11 +50,11 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       const SizedBox(height: 76), // Space for profile avatar
 
-                      // User name
-                      const Center(
+                      // User name (from session / current user)
+                      Center(
                         child: Text(
-                          'John Smith',
-                          style: TextStyle(
+                          AuthService.getCurrentUser()?.name ?? 'User',
+                          style: const TextStyle(
                             color: Color(0xFF0E3E3E),
                             fontSize: 20,
                             fontFamily: 'Poppins',
@@ -65,13 +65,13 @@ class ProfileScreen extends StatelessWidget {
 
                       const SizedBox(height: 6),
 
-                      // User ID
+                      // User email (from session / current user)
                       Center(
                         child: Text.rich(
                           TextSpan(
                             children: [
-                              TextSpan(
-                                text: 'ID: ',
+                              const TextSpan(
+                                text: 'Email: ',
                                 style: TextStyle(
                                   color: Color(0xFF093030),
                                   fontSize: 13,
@@ -80,8 +80,8 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: '25030024',
-                                style: TextStyle(
+                                text: AuthService.getCurrentUser()?.email ?? '—',
+                                style: const TextStyle(
                                   color: Color(0xFF093030),
                                   fontSize: 13,
                                   fontFamily: 'Poppins',
@@ -93,7 +93,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 72),
+                      const SizedBox(height: 62),
 
                       // Menu items
                       Column(
@@ -107,7 +107,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 34),
+                          const SizedBox(height: 24),
 
                           // Security
                           GestureDetector(
@@ -118,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 34),
+                          const SizedBox(height: 24),
 
                           // Setting
                           GestureDetector(
@@ -129,7 +129,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 34),
+                          const SizedBox(height: 24),
 
                           // Help
                           GestureDetector(
@@ -142,7 +142,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 34),
+                          const SizedBox(height: 24),
 
                           // Logout
                           GestureDetector(

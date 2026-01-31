@@ -108,6 +108,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 2),
       body: Center(
         child: SizedBox(
           width: designWidth,
@@ -128,23 +129,20 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 ),
               ),
             ),
+           
           
-            // Back button (left: 28, top: 59) - much larger, bold arrow in a thick circle background
+            // White bottom section
             Positioned(
-              left: 5,
-              top: 51,
-              child: GestureDetector(
-                onTap: () => context.pop(),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                 
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Color(0xFFF1FFF3),
-                    size: 22, // bigger arrow
-                    weight: 900, // make as bold as supported
+              left: 0,
+              top: 191,
+              width: 413,
+              height: 751,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(70),
+                    topRight: Radius.circular(70),
                   ),
                 ),
               ),
@@ -313,7 +311,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 2),
+      
     );
   }
 

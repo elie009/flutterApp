@@ -10,6 +10,7 @@ class Loan extends Equatable {
   final double remainingBalance;
   final DateTime? nextDueDate;
   final String? purpose;
+  final String? additionalInfo;
   final DateTime appliedAt;
 
   const Loan({
@@ -22,6 +23,7 @@ class Loan extends Equatable {
     required this.remainingBalance,
     this.nextDueDate,
     this.purpose,
+    this.additionalInfo,
     required this.appliedAt,
   });
 
@@ -38,6 +40,7 @@ class Loan extends Equatable {
           ? DateTime.parse(json['nextDueDate'] as String)
           : null,
       purpose: json['purpose'] as String?,
+      additionalInfo: json['additionalInfo'] as String?,
       appliedAt: DateTime.parse(json['appliedAt'] as String),
     );
   }
@@ -53,6 +56,7 @@ class Loan extends Equatable {
       'remainingBalance': remainingBalance,
       'nextDueDate': nextDueDate?.toIso8601String(),
       'purpose': purpose,
+      'additionalInfo': additionalInfo,
       'appliedAt': appliedAt.toIso8601String(),
     };
   }
@@ -72,6 +76,7 @@ class Loan extends Equatable {
         remainingBalance,
         nextDueDate,
         purpose,
+        additionalInfo,
         appliedAt,
       ];
 }
