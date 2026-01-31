@@ -90,6 +90,23 @@ class AuthService {
     }
   }
 
+  /// Restore session from stored token and user data (e.g. after PIN or biometric unlock).
+  /// Returns true if a valid session was restored.
+  static Future<bool> restoreSessionFromStorage() async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null || token.isEmpty) return false;
+      final userDataString = StorageService.getString(AppConfig.userKey);
+      if (userDataString == null || userDataString.isEmpty) return false;
+      final userData = jsonDecode(userDataString) as Map<String, dynamic>;
+      _currentUser = User.fromJson(userData);
+      await ApiService().updateAuthHeader(token);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Get current user
   static User? getCurrentUser() {
     return _currentUser;
@@ -141,6 +158,68 @@ class AuthService {
           'message': response.data['message'] as String? ?? 'Login failed',
         };
       }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  /// Login with email + PIN (server-side, mobile-only). Use when backend PIN is set.
+  static Future<Map<String, dynamic>> loginWithPin({
+    required String email,
+    required String pin,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        '/Auth/login-pin',
+        data: {'email': email, 'pin': pin},
+      );
+      if (response.data['success'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        final token = data['token'] as String;
+        final refreshToken = data['refreshToken'] as String;
+        final userData = data['user'] as Map<String, dynamic>;
+        await StorageService.saveToken(token);
+        await StorageService.saveRefreshToken(refreshToken);
+        await ApiService().updateAuthHeader(token);
+        _currentUser = User.fromJson(userData);
+        await StorageService.saveString(
+          AppConfig.userKey,
+          jsonEncode(userData),
+        );
+        return {'success': true, 'user': _currentUser};
+      }
+      return {
+        'success': false,
+        'message': response.data['message'] as String? ?? 'PIN login failed',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  /// Setup or update PIN on server (mobile-only). Requires user to be logged in.
+  static Future<Map<String, dynamic>> setupPin(String pin) async {
+    try {
+      final response = await ApiService().post(
+        '/Auth/setup-pin',
+        data: {'pin': pin},
+      );
+      if (response.data['success'] == true) {
+        return {
+          'success': true,
+          'message': response.data['message'] as String? ?? 'PIN set successfully',
+        };
+      }
+      return {
+        'success': false,
+        'message': response.data['message'] as String? ?? 'Failed to set PIN',
+      };
     } catch (e) {
       return {
         'success': false,

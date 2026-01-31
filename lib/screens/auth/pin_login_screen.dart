@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../services/auth_service.dart';
+import '../../services/biometric_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
 
@@ -112,15 +114,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
     });
 
     if (storedPin == enteredPin) {
-      if (mounted) {
-        NavigationHelper.showSnackBar(
-          context,
-          'PIN verified successfully!',
-          backgroundColor: const Color(0xFF00D09E),
-        );
-        // Navigate to dashboard
-        context.go('/');
-      }
+      await _onUnlockSuccess();
     } else {
       if (mounted) {
         NavigationHelper.showSnackBar(
@@ -137,6 +131,26 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
     setState(() {
       _obscurePin = !_obscurePin;
     });
+  }
+
+  /// Called after PIN or biometric success: restore session and navigate to dashboard.
+  Future<void> _onUnlockSuccess() async {
+    final restored = await AuthService.restoreSessionFromStorage();
+    if (!mounted) return;
+    if (restored) {
+      NavigationHelper.showSnackBar(
+        context,
+        'Welcome back!',
+        backgroundColor: const Color(0xFF00D09E),
+      );
+      context.go('/');
+    } else {
+      NavigationHelper.showSnackBar(
+        context,
+        'No saved session. Please log in with email/password.',
+        backgroundColor: Colors.orange,
+      );
+    }
   }
 
   @override
@@ -411,30 +425,48 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
                         const SizedBox(height: 40),
 
-                        // Use fingerprint to access
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              height: 22 / 14,
-                              color: Color(0xFF0E3E3E),
-                            ),
-                            children: const [
-                              TextSpan(text: 'Use '),
-                              TextSpan(
-                                text: 'fingerprint',
+                        // Mobile only: Use fingerprint/face to access
+                        if (BiometricService.isMobile) ...[
+                          GestureDetector(
+                            onTap: () async {
+                              final authenticated = await BiometricService.authenticate(
+                                reason: 'Log in to UtilityHub360',
+                              );
+                              if (!mounted) return;
+                              if (authenticated) {
+                                await _onUnlockSuccess();
+                              } else {
+                                NavigationHelper.showSnackBar(
+                                  context,
+                                  'Biometric authentication failed or was cancelled',
+                                  backgroundColor: Colors.orange,
+                                );
+                              }
+                            },
+                            child: RichText(
+                              text: const TextSpan(
                                 style: TextStyle(
-                                  color: Colors.blue,
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  height: 22 / 14,
+                                  color: Color(0xFF0E3E3E),
                                 ),
+                                children: [
+                                  TextSpan(text: 'Use '),
+                                  TextSpan(
+                                    text: 'fingerprint or face',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  TextSpan(text: ' to access'),
+                                ],
                               ),
-                              TextSpan(text: ' to access'),
-                            ],
+                            ),
                           ),
-                        ),
-
-                        const SizedBox(height: 40),
+                          const SizedBox(height: 40),
+                        ],
 
                         // or sign in with
                         const Text(

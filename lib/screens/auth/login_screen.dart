@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
+import '../../services/biometric_service.dart';
 import '../../utils/navigation_helper.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -368,60 +369,93 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 30),
 
-                        // Login with PIN button
-                        GestureDetector(
-                          onTap: () {
-                            context.push('/pin-login');
-                          },
-                          child: RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                height: 22 / 14,
-                                color: Color(0xFF0E3E3E),
-                              ),
-                              children: const [
-                                TextSpan(text: 'Use '),
-                                TextSpan(
-                                  text: 'PIN',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                                TextSpan(text: ' to login'),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        // Use fingerprint to access
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              height: 22 / 14, // 157% line height
-                              color: Color(0xFF0E3E3E), // Default color
-                            ),
-                            children: const [
-                              TextSpan(text: 'Use '),
-                              TextSpan(
-                                text: 'fingerprint',
+                        // Mobile only: PIN and biometric (fingerprint/face) login
+                        if (BiometricService.isMobile) ...[
+                          // Login with PIN button
+                          GestureDetector(
+                            onTap: () {
+                              context.push('/pin-login');
+                            },
+                            child: RichText(
+                              text: const TextSpan(
                                 style: TextStyle(
-                                  color: Colors.blue, // Change 'fingerprint' to blue
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  height: 22 / 14,
+                                  color: Color(0xFF0E3E3E),
                                 ),
+                                children: [
+                                  TextSpan(text: 'Use '),
+                                  TextSpan(
+                                    text: 'PIN',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  TextSpan(text: ' to login'),
+                                ],
                               ),
-                              TextSpan(text: ' to access'),
-                            ],
+                            ),
                           ),
-                        ),
-
-                        const SizedBox(height: 40),
+                          const SizedBox(height: 15),
+                          // Use fingerprint/face to access
+                          GestureDetector(
+                            onTap: () async {
+                              final authenticated = await BiometricService.authenticate(
+                                reason: 'Log in to UtilityHub360',
+                              );
+                              if (!mounted) return;
+                              if (!authenticated) {
+                                NavigationHelper.showSnackBar(
+                                  context,
+                                  'Biometric authentication failed or was cancelled',
+                                  backgroundColor: Colors.orange,
+                                );
+                                return;
+                              }
+                              final restored = await AuthService.restoreSessionFromStorage();
+                              if (!mounted) return;
+                              if (restored) {
+                                NavigationHelper.showSnackBar(
+                                  context,
+                                  'Welcome back!',
+                                  backgroundColor: const Color(0xFF00D09E),
+                                );
+                                context.go('/');
+                              } else {
+                                NavigationHelper.showSnackBar(
+                                  context,
+                                  'No saved session. Please log in with email/password first.',
+                                  backgroundColor: Colors.orange,
+                                );
+                              }
+                            },
+                            child: RichText(
+                              text: const TextSpan(
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  height: 22 / 14,
+                                  color: Color(0xFF0E3E3E),
+                                ),
+                                children: [
+                                  TextSpan(text: 'Use '),
+                                  TextSpan(
+                                    text: 'fingerprint or face',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  TextSpan(text: ' to access'),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                        ] else
+                          const SizedBox(height: 40),
 
                         // or sign up with
                         const Text(
