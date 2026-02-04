@@ -355,15 +355,15 @@ class _BillsScreenState extends State<BillsScreen> {
                 width: 65,
                 height: 65,
                 decoration: BoxDecoration(
-                  color: isHovered ? const Color(0xFF00D09E) : Colors.white,
+                  color: isHovered ? const Color(0xFFb3ee9a) : Colors.white,
                   border: Border.all(
-                    color: const Color(0xFF00D09E),
+                    color: const Color(0xFFb3ee9a),
                     width: 2.5,
                   ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x2900D09E),
+                      color: Color(0x29b3ee9a),
                       blurRadius: 10,
                       offset: Offset(0, 4),
                     ),
@@ -372,7 +372,7 @@ class _BillsScreenState extends State<BillsScreen> {
                 child: Center(
                   child: Icon(
                     Icons.add,
-                    color: isHovered ? Colors.white : const Color(0xFF00D09E),
+                    color: isHovered ? Colors.white : const Color(0xFFb3ee9a),
                     size: 36,
                   ),
                 ),

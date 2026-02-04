@@ -102,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         width: screenWidth,
         height: screenHeight,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -250,7 +250,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: 25,
                       height: 25,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF00D09E),
+                        color: Color(0xFFb3ee9a),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       child: const Icon(
@@ -355,7 +355,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       _darkThemeEnabled = value;
                     });
                   },
-                  activeColor: const Color(0xFF00D09E),
+                  activeColor: const Color(0xFFb3ee9a),
                   inactiveThumbColor: Colors.white,
                   inactiveTrackColor: const Color(0xFFDFF7E2),
                 ),
@@ -377,7 +377,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         _pushNotificationsEnabled = value;
                       });
                     },
-                    activeColor: const Color(0xFF00D09E),
+                    activeColor: const Color(0xFFb3ee9a),
                     inactiveThumbColor: Colors.white,
                     inactiveTrackColor: const Color(0xFFDFF7E2),
                   ),
@@ -580,7 +580,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     width: 169,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00D09E),
+                      color: const Color(0xFFb3ee9a),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     alignment: Alignment.center,

@@ -7,6 +7,8 @@ import '../models/bank_account.dart';
 import '../models/notification.dart';
 import '../models/dashboard_summary.dart';
 import '../models/transaction_category.dart';
+import '../models/savings_account.dart';
+import '../models/savings_summary.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
@@ -722,6 +724,165 @@ class DataService {
       debugPrint('Error getting savings progress: $e');
       return 0.0;
     }
+  }
+
+  // ————— Savings API —————
+
+  Future<List<SavingsAccount>> getSavingsAccounts() async {
+    try {
+      final response = await ApiService().get('/Savings/accounts');
+      if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to load savings accounts');
+      final data = response.data['data'];
+      if (data == null) return [];
+      final list = data is List ? data : (data is Map && data['data'] != null ? data['data'] as List : <dynamic>[]);
+      return list.map((e) => SavingsAccount.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      debugPrint('getSavingsAccounts: $e');
+      rethrow;
+    }
+  }
+
+  Future<SavingsAccount?> getSavingsAccount(String savingsAccountId) async {
+    try {
+      final response = await ApiService().get('/Savings/accounts/$savingsAccountId');
+      if (response.data['success'] != true) return null;
+      final data = response.data['data'];
+      if (data == null || data is! Map<String, dynamic>) return null;
+      return SavingsAccount.fromJson(data);
+    } catch (e) {
+      debugPrint('getSavingsAccount: $e');
+      rethrow;
+    }
+  }
+
+  Future<SavingsSummary> getSavingsSummary() async {
+    try {
+      final response = await ApiService().get('/Savings/summary');
+      if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to load savings summary');
+      final data = response.data['data'] as Map<String, dynamic>?;
+      if (data == null) return const SavingsSummary(totalSavingsAccounts: 0, totalSavingsBalance: 0, totalTargetAmount: 0, overallProgressPercentage: 0, activeGoals: 0, completedGoals: 0, monthlySavingsTarget: 0, thisMonthSaved: 0);
+      return SavingsSummary.fromJson(data);
+    } catch (e) {
+      debugPrint('getSavingsSummary: $e');
+      rethrow;
+    }
+  }
+
+  Future<SavingsAccount> createSavingsAccount({
+    required String accountName,
+    required String savingsType,
+    String? accountType,
+    double? interestRate,
+    String? interestCompoundingFrequency,
+    required double targetAmount,
+    String? description,
+    String? goal,
+    required DateTime targetDate,
+    DateTime? startDate,
+    String currency = 'USD',
+  }) async {
+    final body = <String, dynamic>{
+      'accountName': accountName,
+      'savingsType': savingsType,
+      'targetAmount': targetAmount,
+      'targetDate': targetDate.toIso8601String(),
+      'currency': currency,
+      if (accountType != null) 'accountType': accountType,
+      if (interestRate != null) 'interestRate': interestRate,
+      if (interestCompoundingFrequency != null) 'interestCompoundingFrequency': interestCompoundingFrequency,
+      if (description != null) 'description': description,
+      if (goal != null) 'goal': goal,
+      if (startDate != null) 'startDate': startDate.toIso8601String(),
+    };
+    final response = await ApiService().post('/Savings/accounts', data: body);
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to create savings account');
+    final data = response.data['data'] as Map<String, dynamic>?;
+    if (data == null) throw Exception('Invalid response');
+    return SavingsAccount.fromJson(data);
+  }
+
+  Future<SavingsAccount> updateSavingsAccount(String savingsAccountId, {
+    String? accountName,
+    String? savingsType,
+    String? accountType,
+    double? interestRate,
+    String? interestCompoundingFrequency,
+    double? targetAmount,
+    String? description,
+    String? goal,
+    DateTime? targetDate,
+    DateTime? startDate,
+    String? currency,
+  }) async {
+    final body = <String, dynamic>{};
+    if (accountName != null) body['accountName'] = accountName;
+    if (savingsType != null) body['savingsType'] = savingsType;
+    if (accountType != null) body['accountType'] = accountType;
+    if (interestRate != null) body['interestRate'] = interestRate;
+    if (interestCompoundingFrequency != null) body['interestCompoundingFrequency'] = interestCompoundingFrequency;
+    if (targetAmount != null) body['targetAmount'] = targetAmount;
+    if (description != null) body['description'] = description;
+    if (goal != null) body['goal'] = goal;
+    if (targetDate != null) body['targetDate'] = targetDate.toIso8601String();
+    if (startDate != null) body['startDate'] = startDate.toIso8601String();
+    if (currency != null) body['currency'] = currency;
+    final response = await ApiService().put('/Savings/accounts/$savingsAccountId', data: body);
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to update savings account');
+    final data = response.data['data'] as Map<String, dynamic>?;
+    if (data == null) throw Exception('Invalid response');
+    return SavingsAccount.fromJson(data);
+  }
+
+  Future<void> deleteSavingsAccount(String savingsAccountId) async {
+    final response = await ApiService().delete('/Savings/accounts/$savingsAccountId');
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to delete savings account');
+  }
+
+  Future<void> markSavingsAsPaid(String savingsAccountId, {required double amount, String? notes}) async {
+    final body = <String, dynamic>{'amount': amount, if (notes != null) 'notes': notes};
+    final response = await ApiService().post('/Savings/accounts/$savingsAccountId/mark-paid', data: body);
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to mark as paid');
+  }
+
+  Future<void> updateSavingsGoal(String savingsAccountId, {required double targetAmount, DateTime? targetDate}) async {
+    final body = <String, dynamic>{
+      'targetAmount': targetAmount,
+      if (targetDate != null) 'targetDate': targetDate.toIso8601String(),
+    };
+    final response = await ApiService().put('/Savings/accounts/$savingsAccountId/goal', data: body);
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Failed to update goal');
+  }
+
+  Future<void> transferBankToSavings({
+    required String bankAccountId,
+    required String savingsAccountId,
+    required double amount,
+    required String description,
+  }) async {
+    final body = {
+      'bankAccountId': bankAccountId,
+      'savingsAccountId': savingsAccountId,
+      'amount': amount,
+      'description': description,
+    };
+    final response = await ApiService().post('/Savings/transfer/bank-to-savings', data: body);
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Transfer failed');
+  }
+
+  Future<void> transferSavingsToBank({
+    required String savingsAccountId,
+    required String bankAccountId,
+    required double amount,
+    required String description,
+  }) async {
+    final body = {
+      'savingsAccountId': savingsAccountId,
+      'bankAccountId': bankAccountId,
+      'amount': amount,
+      'description': description,
+    };
+    final response = await ApiService().post('/Savings/transfer/savings-to-bank', data: body);
+    if (response.data['success'] != true) throw Exception(response.data['message'] ?? 'Transfer failed');
   }
 
   // Notifications

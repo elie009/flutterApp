@@ -50,7 +50,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -304,7 +304,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
                   width: 202,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00D09E),
+                    color: const Color(0xFFb3ee9a),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,
@@ -424,7 +424,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
                             width: 57,
                             height: 53,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E),
+                              color: const Color(0xFFb3ee9a),
                               borderRadius: BorderRadius.circular(22),
                             ),
                           ),

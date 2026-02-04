@@ -14,7 +14,7 @@ class SecurityScreen extends StatelessWidget {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
         ),
         child: Stack(
           children: [

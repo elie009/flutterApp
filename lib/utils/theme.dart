@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Color Palette - Updated to match mobile dashboard design
-  static const Color primaryColor = Color(0xFF00D09E);    // Main green (#00D09E)
+  static const Color primaryColor = Color(0xFFb3ee9a);    // Primary green (#b3ee9a)
   static const Color primaryLight = Color(0xFFF1FFF3);   // Light green white (#F1FFF3)
   static const Color primaryDark = Color(0xFF093030);    // Dark text (#093030)
   static const Color secondaryColor = Color(0xFF6DB6FE);  // Light blue buttons (#6DB6FE)

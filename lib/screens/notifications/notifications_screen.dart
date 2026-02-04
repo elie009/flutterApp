@@ -94,7 +94,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       width: 37,
       height: 37,
       decoration: BoxDecoration(
-        color: const Color(0xFF00D09E),
+        color: const Color(0xFFb3ee9a),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(
@@ -211,7 +211,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             border: Border(
               top: BorderSide(
                 width: 1.01,
-                color: Color(0xFF00D09E),
+                color: Color(0xFFb3ee9a),
               ),
             ),
           ),
@@ -227,7 +227,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -390,7 +390,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             width: 57,
                             height: 53,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E),
+                              color: const Color(0xFFb3ee9a),
                               borderRadius: BorderRadius.circular(22),
                             ),
                           ),

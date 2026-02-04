@@ -73,7 +73,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
         ),
         child: Stack(
           children: [
@@ -458,7 +458,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
                   width: 218,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00D09E),
+                    color: const Color(0xFFb3ee9a),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,

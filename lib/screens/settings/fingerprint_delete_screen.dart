@@ -57,7 +57,7 @@ class _FingerprintDeleteScreenState extends State<FingerprintDeleteScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
         ),
         child: Stack(
           children: [
@@ -138,7 +138,7 @@ class _FingerprintDeleteScreenState extends State<FingerprintDeleteScreen> {
                 width: 195,
                 height: 195,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF00D09E),
+                  color: Color(0xFFb3ee9a),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -195,7 +195,7 @@ class _FingerprintDeleteScreenState extends State<FingerprintDeleteScreen> {
                   width: 202,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00D09E),
+                    color: const Color(0xFFb3ee9a),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,

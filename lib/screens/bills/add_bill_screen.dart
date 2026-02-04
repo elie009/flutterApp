@@ -108,7 +108,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Bill created successfully'),
-          backgroundColor: Color(0xFF00D09E),
+          backgroundColor: Color(0xFFb3ee9a),
         ),
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -141,7 +141,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
         ),
         child: Stack(
           children: [
@@ -263,7 +263,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
                           width: 23.66,
                           height: 22,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00D09E),
+                            color: const Color(0xFFb3ee9a),
                             borderRadius: BorderRadius.circular(9.13),
                           ),
                           child: const Icon(
@@ -570,8 +570,8 @@ class _AddBillScreenState extends State<AddBillScreen> {
                   height: 36,
                   decoration: BoxDecoration(
                     color: _isSubmitting
-                        ? const Color(0xFF00D09E).withOpacity(0.6)
-                        : const Color(0xFF00D09E),
+                        ? const Color(0xFFb3ee9a).withOpacity(0.6)
+                        : const Color(0xFFb3ee9a),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,

@@ -20,7 +20,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -64,7 +64,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                 height: 48,
                                 decoration: BoxDecoration(
                                   color: _selectedPeriod == 'Daily'
-                                      ? const Color(0xFF00D09E)
+                                      ? const Color(0xFFb3ee9a)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -91,7 +91,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                 height: 48,
                                 decoration: BoxDecoration(
                                   color: _selectedPeriod == 'Weekly'
-                                      ? const Color(0xFF00D09E)
+                                      ? const Color(0xFFb3ee9a)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -118,7 +118,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                 height: 48,
                                 decoration: BoxDecoration(
                                   color: _selectedPeriod == 'Monthly'
-                                      ? const Color(0xFF00D09E)
+                                      ? const Color(0xFFb3ee9a)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -145,7 +145,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                 height: 48,
                                 decoration: BoxDecoration(
                                   color: _selectedPeriod == 'Year'
-                                      ? const Color(0xFF00D09E)
+                                      ? const Color(0xFFb3ee9a)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -198,12 +198,12 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    _buildBar('Mon', 60, const Color(0xFF00D09E)),
-                                    _buildBar('Tue', 80, const Color(0xFF00D09E)),
+                                    _buildBar('Mon', 60, const Color(0xFFb3ee9a)),
+                                    _buildBar('Tue', 80, const Color(0xFFb3ee9a)),
                                     _buildBar('Wed', 45, const Color(0xFF0068FF)),
-                                    _buildBar('Thu', 70, const Color(0xFF00D09E)),
+                                    _buildBar('Thu', 70, const Color(0xFFb3ee9a)),
                                     _buildBar('Fri', 55, const Color(0xFF0068FF)),
-                                    _buildBar('Sat', 90, const Color(0xFF00D09E)),
+                                    _buildBar('Sat', 90, const Color(0xFFb3ee9a)),
                                     _buildBar('Sun', 65, const Color(0xFF0068FF)),
                                   ],
                                 ),
@@ -246,7 +246,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                   Text(
                                     '\$4,120.00',
                                     style: TextStyle(
-                                      color: Color(0xFF00D09E),
+                                      color: Color(0xFFb3ee9a),
                                       fontSize: 16,
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
@@ -735,7 +735,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             child: CircularProgressIndicator(
               value: progress,
               backgroundColor: const Color(0xFFE0F7E0),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00D09E)),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFb3ee9a)),
               strokeWidth: 6,
             ),
           ),

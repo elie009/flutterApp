@@ -19,10 +19,17 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
+  // Design colors (from provided design)
+  static const _lightGreen = Color(0xFFb3ee9a); // Primary
+  static const _lightGreenBorder = Color(0xFFB8E6A8);
+  static const _textDark = Color(0xFF1a1a1a);
+  static const _textGray = Color(0xFF757575);
+  static const _borderLight = Color(0xFFE0E0E0);
+  static const _white = Color(0xFFFFFFFF);
+
   @override
   void initState() {
     super.initState();
-    // AuthService is already initialized in main.dart
   }
 
   @override
@@ -33,43 +40,30 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      // Timeout after 35s so loading never spins forever (API timeout is 30s)
       final result = await AuthService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       ).timeout(
         const Duration(seconds: 35),
-        onTimeout: () {
-          return {
-            'success': false,
-            'message': 'Request timed out. Check your connection and try again.',
-          };
+        onTimeout: () => {
+          'success': false,
+          'message': 'Request timed out. Check your connection and try again.',
         },
       );
 
       if (result['success'] == true) {
-        if (mounted) {
-          context.go('/');
-        }
+        if (mounted) context.go('/');
       } else {
         if (mounted) {
           final message = result['message'];
           final displayMessage = message is String ? message : 'Login failed';
           debugPrint('🔐 Login failed: $displayMessage');
-          NavigationHelper.showSnackBar(
-            context,
-            displayMessage,
-            backgroundColor: Colors.red,
-          );
+          NavigationHelper.showSnackBar(context, displayMessage, backgroundColor: Colors.red);
         }
       }
     } catch (e, stackTrace) {
@@ -83,11 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -97,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
       canPop: false,
       onPopInvoked: (didPop) async {
         if (!didPop) {
-          // Navigate to landing or auth-selection instead of closing app
           if (context.canPop()) {
             context.pop();
           } else {
@@ -106,496 +95,382 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       child: Scaffold(
-        body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: const Color(0xFF00D09E), // Main Green background
-        child: Stack(
-          children: [
-                 
+        backgroundColor: _white,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 24),
 
-
-            // The SizedBox and Center are currently just in the Stack's children,
-            // so if later widgets (like the Positioned container) cover the whole area, 
-            // they will overlap or obscure this welcome text. 
-            // To ensure it stays visible, you might want to give it a higher position in the Stack,
-            // or place it *inside* the top Card (not outside it).
-            // Here's a suggestion to make it more visible by using Positioned:
-
-            Positioned(
-              top: 50,
-              left: 0, right: 0,
-              child: Center(
-                child: Text(
-                  'Welcome',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
-                    height: 22 / 15,
-                    color: Color(0xFF093030),
-                  ),
-                ),
-              ),
-            ),
-
-
-            // Main Content Card (Base Shape)
-            Positioned(
-              top: 150,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFFFFF), // Background Green White and Letters
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-
-                        const SizedBox(height: 60),
-
-                        // Username or email label
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          margin: const EdgeInsets.only(left: 29, bottom: 8),
-                          child: const Text(
-                            'Username or email',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              height: 22 / 15,
-                              color: Color(0xFF093030), // Letters and Icons
-                            ),
-                          ),
+                  // App logo (square, light green fill, white outline shape in center)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: _lightGreen,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: _white, width: 2),
                         ),
-
-                        // Email Input Field
-                        Container(
-                          width: 356,
-                          height: 41,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2), // Light Green
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF1a1a1a),
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFFDFF7E2),
-                              hintText: 'example@example.com',
-                              hintStyle: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                height: 14 / 16,
-                                color: Color(0xFF093030).withOpacity(0.45),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!value.contains('@')) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Password label
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          margin: const EdgeInsets.only(left: 29, bottom: 8),
-                          child: const Text(
-                            'Password',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              height: 22 / 15,
-                              color: Color(0xFF093030), // Letters and Icons
-                              
-                            ),
-                            
-                          ),
-                        ),
-
-                        // Password Input Field
-                        Container(
-                          width: 356,
-                          height: 41,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2), // Light Green
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF1a1a1a),
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFFDFF7E2),
-                              hintText: '••••••••',
-                              hintStyle: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                height: 14 / 12, // 117% line height
-                                color: const Color(0xFF0E3E3E).withOpacity(0.45), // Dark Mode Green bar
-                                letterSpacing: 4.2, // 0.7em spacing
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: Color(0xFF0E3E3E).withOpacity(0.6),
-                                  size: 24,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 50),
-
-                        // Login Button
-                        if (_isLoading)
-                          const CircularProgressIndicator(
-                            color: Color(0xFF00D09E),
-                          )
-                        else
-                          Container(
-                            width: 207,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E), // Main Green
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: TextButton(
-                              onPressed: _handleLogin,
-                              child: const Text(
-                                'Log In',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  height: 22 / 20, // 110% line height
-                                  color: Color(0xFF093030), // Letters and Icons
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        const SizedBox(height: 10),
-                        // Forgot Password Link
-                        GestureDetector(
-                          onTap: () {
-                            context.push('/forgot-password');
-                          },
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontFamily: 'League Spartan',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              height: 13 / 14,
-                              color: Color(0xFF093030), // Letters and Icons
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-                        // Sign Up Button
-                        Container(
-                          width: 207,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2), // Light Green
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              context.go('/register');
-                            },
-                            child: const Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                height: 22 / 20,
-                                color: Color(0xFF0E3E3E), // Dark Mode Green bar
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 30),
-
-                        // Mobile only: PIN and biometric (fingerprint/face) login
-                        if (BiometricService.isMobile) ...[
-                          // Login with PIN button
-                          GestureDetector(
-                            onTap: () {
-                              context.push('/pin-login');
-                            },
-                            child: RichText(
-                              text: const TextSpan(
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  height: 22 / 14,
-                                  color: Color(0xFF0E3E3E),
-                                ),
-                                children: [
-                                  TextSpan(text: 'Use '),
-                                  TextSpan(
-                                    text: 'PIN',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                  TextSpan(text: ' to login'),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          // Use fingerprint/face to access
-                          GestureDetector(
-                            onTap: () async {
-                              final authenticated = await BiometricService.authenticate(
-                                reason: 'Log in to UtilityHub360',
-                              );
-                              if (!mounted) return;
-                              if (!authenticated) {
-                                NavigationHelper.showSnackBar(
-                                  context,
-                                  'Biometric authentication failed or was cancelled',
-                                  backgroundColor: Colors.orange,
-                                );
-                                return;
-                              }
-                              final restored = await AuthService.restoreSessionFromStorage();
-                              if (!mounted) return;
-                              if (restored) {
-                                NavigationHelper.showSnackBar(
-                                  context,
-                                  'Welcome back!',
-                                  backgroundColor: const Color(0xFF00D09E),
-                                );
-                                context.go('/');
-                              } else {
-                                NavigationHelper.showSnackBar(
-                                  context,
-                                  'No saved session. Please log in with email/password first.',
-                                  backgroundColor: Colors.orange,
-                                );
-                              }
-                            },
-                            child: RichText(
-                              text: const TextSpan(
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  height: 22 / 14,
-                                  color: Color(0xFF0E3E3E),
-                                ),
-                                children: [
-                                  TextSpan(text: 'Use '),
-                                  TextSpan(
-                                    text: 'fingerprint or face',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                  TextSpan(text: ' to access'),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                        ] else
-                          const SizedBox(height: 40),
-
-                        // or sign up with
-                        const Text(
-                          'or sign up with',
-                          style: TextStyle(
-                            fontFamily: 'League Spartan',
-                            fontSize: 13,
-                            fontWeight: FontWeight.w300,
-                            height: 15 / 13, // 115% line height
-                            color: Color(0xFF093030), // Letters and Icons
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Social Login Buttons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Facebook Button
-                            Container(
-                              width: 32.71,
-                              height: 32.65,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color(0xFF0E3E3E), // Dark Mode Green bar
-                                  width: 1.3,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: const Icon(
-                                  Icons.facebook,
-                                  color: Color(0xFF0E3E3E),
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  // TODO: Implement Facebook login
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            // Google Button
-                            Container(
-                              width: 32.71,
-                              height: 32.71,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color(0xFF0E3E3E), // Dark Mode Green bar
-                                  width: 1.3,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: const Icon(
-                                  Icons.g_mobiledata,
-                                  color: Color(0xFF0E3E3E),
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  // TODO: Implement Google login
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 50),
-
-                        // Don't have an account? Sign Up
-                        GestureDetector(
-                          onTap: () {
-                            context.go('/register');
-                          },
-                          child: RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                fontFamily: 'League Spartan',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w300,
-                                height: 15 / 13,
-                                color: Color(0xFF093030), // Default color for normal text
-                              ),
-                              children: const [
-                                TextSpan(
-                                  text: "Don't have an account? ",
-                                ),
-                                TextSpan(
-                                  text: "Sign Up",
-                                  style: TextStyle(
-                                    color: Colors.blue, // Blue color for "Sign Up"
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+
+                  const SizedBox(height: 32),
+
+                  // Welcome Back
+                  const Text(
+                    'Welcome Back',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: _textDark,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Sign in to continue',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: _textGray,
+                    ),
+                  ),
+
+                  const SizedBox(height: 36),
+
+                  // Email field (white bg, light gray border, envelope icon)
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    style: const TextStyle(fontSize: 16, color: _textDark),
+                    decoration: InputDecoration(
+                      hintText: 'Email address',
+                      hintStyle: TextStyle(color: _textGray, fontSize: 15),
+                      prefixIcon: Icon(Icons.mail_outline, color: _textGray, size: 22),
+                      filled: true,
+                      fillColor: _white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: _borderLight),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: _borderLight),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: _lightGreen, width: 1.5),
+                      ),
+                    ),
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Please enter your email';
+                      if (!v.contains('@')) return 'Please enter a valid email';
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Password field (padlock + eye)
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    style: const TextStyle(fontSize: 16, color: _textDark),
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      hintStyle: TextStyle(color: _textGray, fontSize: 15),
+                      prefixIcon: Icon(Icons.lock_outline, color: _textGray, size: 22),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          color: _textGray,
+                          size: 22,
+                        ),
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      ),
+                      filled: true,
+                      fillColor: _white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: _borderLight),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: _borderLight),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: _lightGreen, width: 1.5),
+                      ),
+                    ),
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Please enter your password';
+                      if (v.length < 6) return 'Password must be at least 6 characters';
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Forgot Password? (right-aligned, light green)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => context.push('/forgot-password'),
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: _lightGreen,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Sign In button (light green, white text, arrow)
+                  SizedBox(
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _lightGreen,
+                        foregroundColor: _white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: _white),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Icon(Icons.arrow_forward_rounded, size: 20),
+                              ],
+                            ),
+                    ),
+                  ),
+
+                  if (BiometricService.isMobile) ...[
+                    const SizedBox(height: 28),
+                    // Biometric and PIN icon buttons (side by side)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _IconActionButton(
+                          icon: Icons.fingerprint_rounded,
+                          onTap: () async {
+                            final ok = await BiometricService.authenticate(reason: 'Log in to UtilityHub360');
+                            if (!mounted) return;
+                            if (!ok) {
+                              NavigationHelper.showSnackBar(
+                                context,
+                                'Biometric authentication failed or was cancelled',
+                                backgroundColor: Colors.orange,
+                              );
+                              return;
+                            }
+                            final restored = await AuthService.restoreSessionFromStorage();
+                            if (!mounted) return;
+                            if (restored) {
+                              NavigationHelper.showSnackBar(context, 'Welcome back!', backgroundColor: _lightGreen);
+                              context.go('/');
+                            } else {
+                              NavigationHelper.showSnackBar(
+                                context,
+                                'No saved session. Please log in with email/password first.',
+                                backgroundColor: Colors.orange,
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 20),
+                        _IconActionButton(
+                          icon: Icons.key_rounded,
+                          onTap: () => context.push('/pin-login'),
+                        ),
+                      ],
+                    ),
+                  ],
+
+                  const SizedBox(height: 32),
+
+                  // Or continue with (divider + text)
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: _borderLight, thickness: 1)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'Or continue with',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 13,
+                            color: _textGray,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: _borderLight, thickness: 1)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Google and Facebook buttons (white, light green border)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            // TODO: Google login
+                          },
+                          icon: Icon(Icons.g_mobiledata_rounded, color: _lightGreen, size: 24),
+                          label: const Text(
+                            'Google',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: _textDark,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: _lightGreenBorder),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            // TODO: Facebook login
+                          },
+                          icon: Icon(Icons.facebook_rounded, color: _lightGreen, size: 24),
+                          label: const Text(
+                            'Facebook',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: _textDark,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: _lightGreenBorder),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Don't have an account? Sign Up
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account? ",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: _textGray,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => context.go('/register'),
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: _lightGreen,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
       ),
     );
   }
 }
 
+/// Small square button with icon (for biometric / PIN).
+class _IconActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _IconActionButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xFFE0E0E0)),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(icon, size: 28, color: const Color(0xFF1a1a1a)),
+        ),
+      ),
+    );
+  }
+}

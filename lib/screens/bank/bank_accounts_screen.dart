@@ -4,6 +4,7 @@ import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_widget.dart';
+import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../utils/theme.dart';
 
 class BankAccountsScreen extends StatefulWidget {
@@ -155,6 +156,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                     ),
                   ],
                 ),
+      bottomNavigationBar: const BottomNavBarFigma(currentIndex: 0),
     );
   }
 }

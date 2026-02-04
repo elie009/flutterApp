@@ -10,7 +10,7 @@ class QuickAnalysisScreen extends StatelessWidget {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -264,7 +264,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                 width: 32.26,
                 height: 30,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF00D09E),
+                  color: Color(0xFFb3ee9a),
                   borderRadius: BorderRadius.all(Radius.circular(12.45)),
                 ),
                 child: const Icon(
@@ -282,7 +282,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                 width: 32.26,
                 height: 30,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF00D09E),
+                  color: Color(0xFFb3ee9a),
                   borderRadius: BorderRadius.all(Radius.circular(12.45)),
                 ),
                 child: const Icon(
@@ -309,7 +309,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                         width: 6,
                         height: 15,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00D09E),
+                          color: Color(0xFFb3ee9a),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(31),
                             topRight: Radius.circular(31),
@@ -328,7 +328,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                         width: 6,
                         height: 15,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00D09E),
+                          color: Color(0xFFb3ee9a),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(31),
                             topRight: Radius.circular(31),
@@ -358,7 +358,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                         width: 6,
                         height: 33,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00D09E),
+                          color: Color(0xFFb3ee9a),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(31),
                             topRight: Radius.circular(31),
@@ -388,7 +388,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                         width: 6,
                         height: 66,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00D09E),
+                          color: Color(0xFFb3ee9a),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(31),
                             topRight: Radius.circular(31),
@@ -581,7 +581,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                                 border: Border(
                                   left: BorderSide(
                                     width: 1.01,
-                                    color: Color(0xFF00D09E),
+                                    color: Color(0xFFb3ee9a),
                                   ),
                                 ),
                               ),
@@ -670,7 +670,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                                 border: Border(
                                   left: BorderSide(
                                     width: 1.01,
-                                    color: Color(0xFF00D09E),
+                                    color: Color(0xFFb3ee9a),
                                   ),
                                 ),
                               ),
@@ -759,7 +759,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                                 border: Border(
                                   left: BorderSide(
                                     width: 1.01,
-                                    color: Color(0xFF00D09E),
+                                    color: Color(0xFFb3ee9a),
                                   ),
                                 ),
                               ),
@@ -834,7 +834,7 @@ class QuickAnalysisScreen extends StatelessWidget {
                             width: 57,
                             height: 53,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E),
+                              color: const Color(0xFFb3ee9a),
                               borderRadius: BorderRadius.circular(22),
                             ),
                           ),

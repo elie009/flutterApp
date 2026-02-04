@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../config/app_config.dart';
 import '../../models/loan.dart';
 import '../../services/data_service.dart';
 import '../../utils/formatters.dart';
@@ -56,7 +58,7 @@ class _LoansScreenState extends State<LoansScreen> {
   static const _iconColors = [
     Color(0xFF6CB5FD),
     Color(0xFF3299FF),
-    Color(0xFF00D09E),
+    Color(0xFFb3ee9a),
   ];
 
   Color _loanIconColor(int index) =>
@@ -78,313 +80,321 @@ class _LoansScreenState extends State<LoansScreen> {
     return '${months[date.month - 1]} ${date.day}';
   }
 
+  static const _lightGreen = Color(0xFFb3ee9a);
+  static const _headerDark = Color(0xFF093030);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 3),
-      backgroundColor: const Color(0xFFFFFFFF),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
-        ),
-        child: Stack(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        top: false,
+        child: Column(
           children: [
-
-            // Small top-right triangle
-            Positioned.fill(
-              child: Transform.rotate(
-                angle: 0.4,
-                child: CustomPaint(
-                  painter: TrianglePainter(),
-                ),
+            // Header: light green with subtle pattern
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 8,
+                left: 16,
+                right: 16,
+                bottom: 20,
               ),
-            ),
-
-            // Back button with icon
-            Positioned(
-              left: 38,
-              top: 69,
-              child: GestureDetector(
-                onTap: () => NavigationHelper.navigateBack(context),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  child: const Center(
-                    child: Icon(
-                      Icons.arrow_back,
-                      color: Color(0xFFF1FFF3),
-                      size: 19,
-                    ),
+              decoration: const BoxDecoration(
+                color: _lightGreen,
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => NavigationHelper.navigateBack(context),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.4),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.chevron_left,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                      const Text(
+                        'Loans',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notifications_outlined,
+                              color: _headerDark,
+                              size: 22,
+                            ),
+                          ),
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: Colors.white, width: 1),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
             ),
-
-            // Title "Loans"
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 50,
-              child: Center(
-                child: Text(
-                  'Loans',
-                  style: const TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: 32,
-                    fontFamily: 'Loans',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-         
-            // Notification icon
-            Positioned(
-              left: 364,
-              top: 51,
+            // White content area
+            Expanded(
               child: Container(
-                width: 30,
-                height: 30,
+                width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                  color: Colors.white,
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.notifications,
-                    color: Color(0xFF093030),
-                    size: 21,
-                  ),
-                ),
-              ),
-            ),
-
-            // White bottom section with dynamic content
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 176,
-              bottom: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
-                  child: _isLoading
-                      ? const LoadingIndicator(message: 'Loading loans...')
-                      : _errorMessage != null
-                          ? app_error.ErrorDisplay(
-                              message: _errorMessage!,
-                              onRetry: _loadLoans,
-                            )
-                          : _loans.isEmpty
-                              ? EmptyState(
-                                  icon: Icons.account_balance_wallet_outlined,
-                                  title: 'No loans yet',
-                                  message:
-                                      'Your loans will appear here. Tap + to apply for a loan.',
-                                  actionLabel: 'Refresh',
-                                  onAction: _loadLoans,
-                                )
-                              : RefreshIndicator(
-                                  onRefresh: _loadLoans,
-                                  color: const Color(0xFF00D09E),
-                                  child: ListView.builder(
-                                    padding: const EdgeInsets.only(
-                                      left: 24,
-                                      right: 24,
-                                      top: 24,
-                                      bottom: 100,
-                                    ),
-                                    itemCount: _loans.length,
-                                    itemBuilder: (context, index) {
-                                      final loan = _loans[index];
-                                      final displayDate = loan.nextDueDate ??
-                                          loan.appliedAt;
-                                      final monthLabel = _getMonthLabel(
-                                          displayDate);
-                                      final showMonthHeader = index == 0 ||
-                                          _getMonthLabel(_loans[index - 1]
-                                                  .nextDueDate ??
-                                              _loans[index - 1].appliedAt) !=
-                                              monthLabel;
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          if (showMonthHeader) ...[
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 8),
-                                              child: Text(
-                                                monthLabel,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF093030),
-                                                  fontSize: 15,
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                child: _isLoading
+                    ? const LoadingIndicator(message: 'Loading loans...')
+                    : _errorMessage != null
+                        ? app_error.ErrorDisplay(
+                            message: _errorMessage!,
+                            onRetry: _loadLoans,
+                          )
+                        : _loans.isEmpty
+                            ? EmptyState(
+                                icon: Icons.account_balance_wallet_outlined,
+                                title: 'No loans yet',
+                                message:
+                                    'Your loans will appear here. Tap + to apply for a loan.',
+                                actionLabel: 'Refresh',
+                                onAction: _loadLoans,
+                              )
+                            : RefreshIndicator(
+                                onRefresh: _loadLoans,
+                                color: _lightGreen,
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.only(
+                                    left: 24,
+                                    right: 24,
+                                    top: 24,
+                                    bottom: 100,
+                                  ),
+                                  itemCount: _loans.length,
+                                  itemBuilder: (context, index) {
+                                    final loan = _loans[index];
+                                    final displayDate = loan.nextDueDate ??
+                                        loan.appliedAt;
+                                    final monthLabel =
+                                        _getMonthLabel(displayDate);
+                                    final showMonthHeader = index == 0 ||
+                                        _getMonthLabel(_loans[index - 1]
+                                                .nextDueDate ??
+                                            _loans[index - 1].appliedAt) !=
+                                            monthLabel;
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (showMonthHeader) ...[
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                bottom: 16),
-                                            child: GestureDetector(
-                                              onTap: () =>
-                                                  NavigationHelper.navigateTo(
-                                                context,
-                                                'loan-detail',
-                                                params: {'id': loan.id},
-                                              ),
-                                              behavior:
-                                                  HitTestBehavior.opaque,
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 57,
-                                                    height: 53,
-                                                    decoration: BoxDecoration(
-                                                      color: _loanIconColor(
-                                                          index),
-                                                      borderRadius:
-                                                          BorderRadius
-                                                              .circular(22),
-                                                    ),
-                                                    child: const Center(
-                                                      child: Icon(
-                                                        Icons
-                                                            .account_balance_wallet_outlined,
-                                                        color: Colors.white,
-                                                        size: 26,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 16),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          loan.purpose
-                                                                  ?.isNotEmpty ==
-                                                                  true
-                                                              ? loan.purpose!
-                                                              : 'Loan',
-                                                          style: const TextStyle(
-                                                            color: Color(
-                                                                0xFF052224),
-                                                            fontSize: 15,
-                                                            fontFamily:
-                                                                'Poppins',
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 4),
-                                                        Text(
-                                                          _formatLoanDate(
-                                                              displayDate),
-                                                          style: const TextStyle(
-                                                            color: Color(
-                                                                0xFF0068FF),
-                                                            fontSize: 12,
-                                                            fontFamily:
-                                                                'Poppins',
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '-${Formatters.formatCurrency(loan.monthlyPayment, symbol: '\$')}',
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF0068FF),
-                                                      fontSize: 15,
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
+                                                bottom: 8),
+                                            child: Text(
+                                              monthLabel,
+                                              style: const TextStyle(
+                                                color: _headerDark,
+                                                fontSize: 16,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ),
                                         ],
-                                      );
-                                    },
-                                  ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 12),
+                                          child: _LoanCard(
+                                            loan: loan,
+                                            displayDate: displayDate,
+                                            iconColor: _loanIconColor(index),
+                                            formatDate: _formatLoanDate,
+                                            onTap: () =>
+                                                NavigationHelper.navigateTo(
+                                              context,
+                                              'loan-detail',
+                                              params: {'id': loan.id},
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
+                              ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: GestureDetector(
+          onTap: () async {
+            final added = await showModalBottomSheet<bool>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (ctx) => _AddLoanModalContent(
+                onSaved: () => Navigator.of(ctx).pop(true),
+                onCancel: () => Navigator.of(ctx).pop(false),
+              ),
+            );
+            if (mounted && added == true) _loadLoans();
+          },
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: _lightGreen,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: _lightGreen.withOpacity(0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+}
+
+/// Card matching design: circular light blue icon, name, date, amount on right.
+class _LoanCard extends StatelessWidget {
+  const _LoanCard({
+    required this.loan,
+    required this.displayDate,
+    required this.iconColor,
+    required this.formatDate,
+    required this.onTap,
+  });
+
+  final Loan loan;
+  final DateTime displayDate;
+  final Color iconColor;
+  final String Function(DateTime) formatDate;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final purpose = loan.purpose?.isNotEmpty == true
+        ? loan.purpose!
+        : 'Loan';
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.description_outlined,
+                  color: Colors.white,
+                  size: 24,
                 ),
               ),
             ),
-
-            // Floating Add Loan button (bottom right)
-            Positioned(
-              right: 28,
-              bottom: 16,
-              child: GestureDetector(
-                onTap: () async {
-                  final added = await showModalBottomSheet<bool>(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (ctx) => _AddLoanModalContent(
-                      onSaved: () => Navigator.of(ctx).pop(true),
-                      onCancel: () => Navigator.of(ctx).pop(false),
-                    ),
-                  );
-                  if (mounted && added == true) _loadLoans();
-                },
-                child: Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: const Color(0xFF00D09E), // green border
-                      width: 2.5,
-                    ),
-                    borderRadius: BorderRadius.circular(12), // square with rounded corners
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x2900D09E),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.add,
-                      color: const Color(0xFF00D09E),
-                      size: 36,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    purpose,
+                    style: const TextStyle(
+                      color: Color(0xFF052224),
+                      fontSize: 15,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    formatDate(displayDate),
+                    style: const TextStyle(
+                      color: Color(0xFF0068FF),
+                      fontSize: 12,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            
-
-           
+            Text(
+              '-${Formatters.formatCurrency(loan.monthlyPayment, symbol: AppConfig.currencySymbol)}',
+              style: const TextStyle(
+                color: Color(0xFF4A5FBF),
+                fontSize: 15,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
@@ -485,7 +495,7 @@ class _AddLoanModalContentState extends State<_AddLoanModalContent> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Loan application submitted.'),
-            backgroundColor: Color(0xFF00D09E),
+            backgroundColor: Color(0xFFb3ee9a),
           ),
         );
         widget.onSaved();
@@ -649,7 +659,7 @@ class _AddLoanModalContentState extends State<_AddLoanModalContent> {
                               onPressed: _isSaving ? null : widget.onCancel,
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFF093030),
-                                side: const BorderSide(color: Color(0xFF00D09E)),
+                                side: const BorderSide(color: Color(0xFFb3ee9a)),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),
                               child: const Text('Cancel'),
@@ -660,7 +670,7 @@ class _AddLoanModalContentState extends State<_AddLoanModalContent> {
                             child: ElevatedButton(
                               onPressed: _isSaving ? null : _saveLoan,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00D09E),
+                                backgroundColor: const Color(0xFFb3ee9a),
                                 foregroundColor: const Color(0xFF093030),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),

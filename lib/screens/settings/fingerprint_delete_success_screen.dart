@@ -17,7 +17,7 @@ class FingerprintDeleteSuccessScreen extends StatelessWidget {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -85,7 +85,7 @@ class FingerprintDeleteSuccessScreen extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.check,
-                          color: Color(0xFF00D09E),
+                          color: Color(0xFFb3ee9a),
                           size: 14,
                         ),
                       ),

@@ -114,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: const Color(0xFF00D09E), // Main Green background
+        color: const Color(0xFFb3ee9a), // Main Green background
         child: Stack(
           children: [
             // Back Button
@@ -561,14 +561,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Register Button
                         if (_isLoading)
                           const CircularProgressIndicator(
-                            color: Color(0xFF00D09E),
+                            color: Color(0xFFb3ee9a),
                           )
                         else
                           Container(
                             width: 207,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E), // Main Green
+                              color: const Color(0xFFb3ee9a), // Main Green
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../config/app_config.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
 import '../../models/transaction.dart';
@@ -100,218 +101,192 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     }
   }
 
+  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _headerDark = Color(0xFF093030);
+  static const _debitRed = Color(0xFFD32F2F);
+  static const _debitBg = Color(0xFFFFEBE7);
+  static const _creditBg = Color(0xFFE8F5E9);
+  static const _textGray = Color(0xFF666666);
+
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final designWidth = 412.0;
-    final designHeight = 932.0;
-    
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: Colors.white,
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 2),
-      body: Center(
-        child: SizedBox(
-          width: designWidth,
-          height: designHeight,
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF00D09E),
-            ),
-            child: Stack(
-              children: [
-
-            // Small top-right triangle
-            Positioned.fill(
-              child: Transform.rotate(
-                angle: 0.4,
-                child: CustomPaint(
-                  painter: TrianglePainter(),
-                ),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            // Header: light green with subtle pattern
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 12,
+                left: 24,
+                right: 24,
+                bottom: 20,
               ),
-            ),
-           
-          
-            // White bottom section
-            Positioned(
-              left: 0,
-              top: 191,
-              width: 413,
-              height: 751,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
-                ),
-              ),
-            ),
-            
-            // Title "Recent Transactions" (centered)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 64,
-              child: Center(
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: const TextSpan(
+              decoration: const BoxDecoration(color: _primaryGreen),
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextSpan(
-                        text: 'Recent Transactions',
+                      const Text(
+                        'Transactions',
                         style: TextStyle(
-                          color: Color(0xFFFFFFFF),
-                          fontSize: 20,
+                          color: Colors.white,
+                          fontSize: 22,
                           fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w700, // Changed to bold
-                          height: 1.10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: _primaryGreen, width: 1.5),
+                        ),
+                        child: const Icon(
+                          Icons.notifications_outlined,
+                          color: _headerDark,
+                          size: 22,
                         ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-            
-            // Notification icon
-            Positioned(
-              left: 364,
-              top: 51,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.notifications,
-                    color: Color(0xFF093030),
-                    size: 21,
-                  ),
-                ),
-              ),
-            ),
-            // Three summary cards side by side (Total Balance, Total Income, Total Expense)
-            // Total Balance card (leftmost)
-            // Center the three summary cards with a Row inside a Positioned
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 115,
+            // Three summary cards
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: () => _showSummaryModal(context,  const Color(0xFF0E3E3E)),
-                    child: _buildThreeCardSummary(
-                      label: 'Total Balance',
-                      amount: _totalBalance,
-                      icon: Icons.check,
-                      iconColor: const Color(0xFF0E3E3E),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _showSummaryModal(context, _headerDark),
+                      child: _buildSummaryCard(
+                        label: 'Total Balance',
+                        amount: _totalBalance,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  GestureDetector(
-                    onTap: () => _showSummaryModal(context, const Color(0xFF00D09E)),
-                    child: _buildThreeCardSummary(
-                      label: 'Total Income',
-                      amount: _totalIncome,
-                      icon: Icons.trending_up,
-                      iconColor: const Color(0xFF00D09E),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _showSummaryModal(context, _primaryGreen),
+                      child: _buildSummaryCard(
+                        label: 'Total Income',
+                        amount: _totalIncome,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  GestureDetector(
-                    onTap: () => _showSummaryModal(context,const Color(0xFFFF4444)),
-                    child: _buildThreeCardSummary(
-                      label: 'Total Expense',
-                      amount: _totalExpense,
-                      icon: Icons.trending_down,
-                      iconColor: const Color(0xFFFF4444),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _showSummaryModal(context, _debitRed),
+                      child: _buildSummaryCard(
+                        label: 'Total Expense',
+                        amount: _totalExpense,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            // White bottom section (top: 205)
-            Positioned(
-              left: 0,
-              top: 205,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
-                ),
-                child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF00D09E),
-                        ),
-                      )
-                    : _buildTransactionsList(),
-              ),
+            // Transaction list
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: _primaryGreen),
+                    )
+                  : _buildTransactionsList(),
             ),
-
-                // Floating action button at lower right corner (square, white background, green border)
-                Positioned(
-                  right: 28,
-                  bottom: 16,
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      bool isHovered = false;
-                      return MouseRegion(
-                        onEnter: (_) => setState(() => isHovered = true),
-                        onExit: (_) => setState(() => isHovered = false),
-                        child: GestureDetector(
-                          onTap: () {
-                            _showAddTransactionModal(context);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 65,
-                            height: 65,
-                            decoration: BoxDecoration(
-                              color: isHovered ? const Color(0xFF00D09E) : Colors.white,
-                              border: Border.all(
-                                color: const Color(0xFF00D09E), // green border
-                                width: 2.5,
-                              ),
-                              borderRadius: BorderRadius.circular(12), // square with slightly rounded corners
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x2900D09E),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
-                                )
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.add,
-                                color: isHovered ? Colors.white : const Color(0xFF00D09E),
-                                size: 36,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+          ],
+        ),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: GestureDetector(
+          onTap: () => _showAddTransactionModal(context),
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: _primaryGreen,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: _primaryGreen.withOpacity(0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
+            child: const Icon(Icons.add, color: Colors.white, size: 28),
           ),
         ),
       ),
-      
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  Widget _buildSummaryCard({required String label, required double amount}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.check_circle, color: _primaryGreen, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: _textGray,
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _formatCurrency(amount),
+            style: const TextStyle(
+              color: Color(0xFF052224),
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w700,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -348,9 +323,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
     return RefreshIndicator(
       onRefresh: _loadData,
-      color: const Color(0xFF00D09E),
+      color: _primaryGreen,
       child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(37, 30, 37, 100),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
         itemCount: sortedMonths.length,
         itemBuilder: (context, monthIndex) {
           final month = sortedMonths[monthIndex];
@@ -397,184 +372,144 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Widget _buildTransactionItem(Transaction transaction) {
-    final isPositive = transaction.isIncome;
-    final amount = isPositive ? transaction.amount : -transaction.amount;
-    final dateFormat = DateFormat('HH:mm - MMMM dd');
-    final formattedDate = dateFormat.format(transaction.transactionDate);
+    final isCredit = transaction.isIncome;
+    final amount = transaction.amount;
+    final dateStr = DateFormat('MMM d, yyyy').format(transaction.transactionDate);
+    final typeStr = isCredit ? 'Credit' : 'Debit';
+    final categoryStr = transaction.category ?? 'Uncategorized';
+    final accentColor = isCredit ? _primaryGreen : _debitRed;
+    final bgColor = isCredit ? _creditBg : _debitBg;
 
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon (circular with line-graph icon)
-            _buildTransactionIcon(transaction, isPositive),
-            
-            const SizedBox(width: 16),
-            
-            // Transaction details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Description (bold)
-                  Text(
-                    transaction.description,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFF052224),
-                      fontSize: 15,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  // Timestamp and category side by side
-                  Row(
-                    children: [
-                      // Timestamp (blue)
-                      Flexible(
-                        child: Text(
-                          formattedDate,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF0068FF),
-                            fontSize: 12,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      // Vertical separator
-                      Container(
-                        width: 1,
-                        height: 12,
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        color: const Color(0xFF00D09E),
-                      ),
-                      // Category (teal/green)
-                      Flexible(
-                        child: Text(
-                          transaction.category ?? 'Uncategorized',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF00D09E),
-                            fontSize: 12,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row 1: name + arrow, amount
+          Row(
+            children: [
+              Icon(
+                isCredit ? Icons.arrow_upward : Icons.arrow_downward,
+                size: 18,
+                color: accentColor,
               ),
-            ),
-            
-            const SizedBox(width: 8),
-            
-            // Amount (green for income, red for expense)
-            Flexible(
-              child: Text(
-                '${isPositive ? '' : '-'}${_formatCurrencyEuropean(amount.abs())}',
-                textAlign: TextAlign.end,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  transaction.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF052224),
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Text(
+                '${isCredit ? '' : '-'}${_formatCurrency(amount.abs())}',
                 style: TextStyle(
-                  color: isPositive ? const Color(0xFF00D09E) : const Color(0xFFFF4444),
+                  color: isCredit ? _primaryGreen : const Color(0xFF052224),
                   fontSize: 15,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-          ],
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Separator line (light grey, full width)
-        Container(
-          height: 1,
-          color: Colors.grey.withOpacity(0.2),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTransactionIcon(Transaction transaction, bool isIncome) {
-    // Blue for income, red for expenses
-    final iconColor = isIncome 
-        ? const Color(0xFF6DB6FE) 
-        : const Color(0xFFFF4444);
-
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: iconColor,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        isIncome ? Icons.trending_up : Icons.trending_down,
-        color: Colors.white,
-        size: 24,
-      ),
-    );
-  }
-  
-  Widget _buildThreeCardSummary({
-    required String label,
-    required double amount,
-    required IconData icon,
-    required Color iconColor,
-  }) {
-    return Container(
-      width: 110,
-      height: 60,
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1FFF3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          // Amount (centered, first row)
-          Text(
-            _formatCurrencyEuropean(amount),
-            style: const TextStyle(
-              color: Color(0xFF052224),
-              fontSize: 15,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w700,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
+            ],
           ),
-          // Icon and label row (icon left, label right) - no spacing between amount and this row
+          const SizedBox(height: 8),
+          // Row 2: date
+          Text(
+            dateStr,
+            style: const TextStyle(
+              color: _textGray,
+              fontSize: 12,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Two columns: Category / Type (left), Account / Split (right)
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 16,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _detailLabel('Category'),
+                    Text(
+                      categoryStr,
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 13,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _detailLabel('Type'),
+                    Row(
+                      children: [
+                        Icon(
+                          isCredit ? Icons.arrow_upward : Icons.arrow_downward,
+                          size: 14,
+                          color: accentColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          typeStr,
+                          style: TextStyle(
+                            color: accentColor,
+                            fontSize: 13,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    color: Color(0xFF052224),
-                    fontSize: 11,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _detailLabel('Account'),
+                    const Text(
+                      '—',
+                      style: TextStyle(
+                        color: Color(0xFF052224),
+                        fontSize: 13,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _detailLabel('Split'),
+                    const Text(
+                      '1',
+                      style: TextStyle(
+                        color: Color(0xFF052224),
+                        fontSize: 13,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -583,18 +518,24 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
     );
   }
-  String _formatCurrencyEuropean(double amount) {
-    // US format: 19,150.00 (comma as thousands separator, period as decimal separator)
-    final formatter = NumberFormat('#,##0.00', 'en_US');
-    return '\$' + formatter.format(amount);
-  }
 
-  String _formatCurrency(double amount) {
-    final formatter = NumberFormat.currency(
-      symbol: '\$',
-      decimalDigits: 2,
+  Widget _detailLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: _textGray,
+          fontSize: 11,
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w400,
+        ),
+      ),
     );
-    return formatter.format(amount);
+  }
+  String _formatCurrency(double amount) {
+    final formatter = NumberFormat('#,##0.00', 'en_US');
+    return '${AppConfig.currencySymbol}${formatter.format(amount)}';
   }
 
   void _showSummaryModal(BuildContext context, Color iconColor) {
@@ -848,7 +789,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF00D09E),
+                                  backgroundColor: const Color(0xFFb3ee9a),
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -1003,7 +944,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFF00D09E).withOpacity(0.3),
+            color: const Color(0xFFb3ee9a).withOpacity(0.3),
             width: 1,
           ),
           boxShadow: [
@@ -1022,12 +963,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF00D09E).withOpacity(0.1),
+                color: const Color(0xFFb3ee9a).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF00D09E),
+                color: const Color(0xFFb3ee9a),
                 size: 24,
               ),
             ),
@@ -1211,7 +1152,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                                   isRecurring = value;
                                 });
                               },
-                              activeColor: const Color(0xFF00D09E),
+                              activeColor: const Color(0xFFb3ee9a),
                             ),
                           ],
                         ),
@@ -1346,7 +1287,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                             height: 56,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color(0xFF00D09E).withOpacity(0.3),
+                                color: const Color(0xFFb3ee9a).withOpacity(0.3),
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -1394,7 +1335,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00D09E),
+                        backgroundColor: const Color(0xFFb3ee9a),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1434,7 +1375,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
           height: 56,
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF00D09E).withOpacity(0.3),
+              color: const Color(0xFFb3ee9a).withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1460,7 +1401,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
               onChanged: onChanged,
               icon: const Icon(
                 Icons.keyboard_arrow_down,
-                color: Color(0xFF00D09E),
+                color: Color(0xFFb3ee9a),
               ),
             ),
           ),
@@ -1491,7 +1432,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
         Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF00D09E).withOpacity(0.3),
+              color: const Color(0xFFb3ee9a).withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1540,7 +1481,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
             height: 56,
             decoration: BoxDecoration(
               border: Border.all(
-                color: const Color(0xFF00D09E).withOpacity(0.3),
+                color: const Color(0xFFb3ee9a).withOpacity(0.3),
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -1560,7 +1501,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                 ),
                 const Icon(
                   Icons.calendar_today,
-                  color: Color(0xFF00D09E),
+                  color: Color(0xFFb3ee9a),
                   size: 20,
                 ),
               ],

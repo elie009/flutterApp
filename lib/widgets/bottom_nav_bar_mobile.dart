@@ -70,7 +70,7 @@ class BottomNavBarMobile extends StatelessWidget {
               width: 57,
               height: 53,
               decoration: BoxDecoration(
-                color: currentIndex == 2 ? const Color(0xFF00D09E) : Colors.transparent, // Green highlight for active
+                color: currentIndex == 2 ? const Color(0xFFb3ee9a) : Colors.transparent, // Green highlight for active
                 borderRadius: BorderRadius.circular(22),
               ),
               child: _buildNavItem(

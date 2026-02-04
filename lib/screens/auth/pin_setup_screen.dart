@@ -150,7 +150,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
       NavigationHelper.showSnackBar(
         context,
         'PIN set successfully!',
-        backgroundColor: const Color(0xFF00D09E),
+        backgroundColor: const Color(0xFFb3ee9a),
       );
       // Navigate back to settings or security screen
       Future.delayed(const Duration(seconds: 1), () {
@@ -175,7 +175,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          color: const Color(0xFF00D09E), // Main Green background
+          color: const Color(0xFFb3ee9a), // Main Green background
           child: Stack(
             children: [
               // Back Button
@@ -243,7 +243,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                           child: const Icon(
                             Icons.lock_open_outlined,
                             size: 40,
-                            color: Color(0xFF00D09E),
+                            color: Color(0xFFb3ee9a),
                           ),
                         ),
 
@@ -292,7 +292,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                                 borderRadius: BorderRadius.circular(18),
                                 border: Border.all(
                                   color: _pinFocusNodes[index].hasFocus
-                                      ? const Color(0xFF00D09E)
+                                      ? const Color(0xFFb3ee9a)
                                       : Colors.transparent,
                                   width: 2,
                                 ),
@@ -365,7 +365,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
                                     color: _confirmPinFocusNodes[index].hasFocus
-                                        ? const Color(0xFF00D09E)
+                                        ? const Color(0xFFb3ee9a)
                                         : Colors.transparent,
                                     width: 2,
                                   ),
@@ -441,14 +441,14 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                         // Set PIN Button
                         if (_isLoading)
                           const CircularProgressIndicator(
-                            color: Color(0xFF00D09E),
+                            color: Color(0xFFb3ee9a),
                           )
                         else
                           Container(
                             width: 207,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E), // Main Green
+                              color: const Color(0xFFb3ee9a), // Main Green
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(

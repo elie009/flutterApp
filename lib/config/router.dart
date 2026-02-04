@@ -11,6 +11,7 @@ import '../screens/bills/bill_detail_screen.dart';
 import '../screens/bills/add_bill_screen.dart';
 import '../screens/loans/loans_screen.dart';
 import '../screens/loans/loan_detail_screen.dart';
+import '../screens/savings/savings_screen.dart';
 import '../screens/income/income_sources_screen.dart';
 import '../screens/income/add_edit_income_source_screen.dart';
 import '../screens/bank/bank_accounts_screen.dart';
@@ -40,57 +41,70 @@ import '../widgets/auth_guard.dart';
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/launch',
+    debugLogDiagnostics: true,
+    errorBuilder: (context, state) {
+      final errorMsg = state.error?.toString() ?? 'Page not found';
+      final location = state.uri.toString();
+      debugPrint('GoRouter error: $errorMsg for location: $location');
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(errorMsg, textAlign: TextAlign.center),
+              if (location.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('Path: $location', style: const TextStyle(fontSize: 12)),
+              ],
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => GoRouter.of(context).go('/'),
+                child: const Text('Go to Home'),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
     redirect: (BuildContext context, GoRouterState state) {
       final isLoggedIn = AuthService.isAuthenticated();
       final currentLocation = state.matchedLocation;
-      
-      debugPrint('🔀 ROUTER REDIRECT: currentLocation=$currentLocation, isLoggedIn=$isLoggedIn');
-      
-      // Define public routes that don't require authentication
+
       final publicRoutes = [
-        '/login',
-        '/register',
-        '/auth-selection',
-        '/landing',
-        '/forgot-password',
-        '/security-pin',
-        '/pin-login',
-        '/pin-setup',
-        '/launch',
-        '/onboarding',
+        '/login', '/register', '/auth-selection', '/landing',
+        '/forgot-password', '/security-pin', '/pin-login', '/pin-setup',
+        '/launch', '/onboarding',
       ];
-      
       final isPublicRoute = publicRoutes.contains(currentLocation);
 
-      // Always allow launch screen and onboarding
       if (currentLocation == '/launch' || currentLocation == '/onboarding') {
-        debugPrint('🔀 ROUTER: Allowing launch/onboarding screen');
         return null;
       }
 
-      // If user is not logged in and trying to access protected routes
       if (!isLoggedIn && !isPublicRoute) {
-        debugPrint('🔀 ROUTER: User not logged in, redirecting to /landing');
         return '/landing';
       }
 
-      // If user is logged in and on auth routes (except pin-related), redirect to home
       if (isLoggedIn && (currentLocation == '/login' ||
           currentLocation == '/register' ||
           currentLocation == '/auth-selection' ||
           currentLocation == '/landing')) {
-        debugPrint('🔀 ROUTER: User logged in but on auth page, redirecting to /');
         return '/';
       }
 
-      debugPrint('🔀 ROUTER: No redirect needed');
-      return null; // No redirect needed
+      return null;
     },
     routes: [
       GoRoute(
         path: '/',
         name: 'home',
         builder: (context, state) => const AuthGuard(child: DashboardScreen()),
+      ),
+      GoRoute(
+        path: '/savings',
+        name: 'savings',
+        builder: (context, state) => const AuthGuard(child: SavingsScreen()),
       ),
       GoRoute(
         path: '/landing',

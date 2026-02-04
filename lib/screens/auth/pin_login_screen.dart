@@ -141,7 +141,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
       NavigationHelper.showSnackBar(
         context,
         'Welcome back!',
-        backgroundColor: const Color(0xFF00D09E),
+        backgroundColor: const Color(0xFFb3ee9a),
       );
       context.go('/');
     } else {
@@ -170,7 +170,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          color: const Color(0xFF00D09E), // Main Green background
+          color: const Color(0xFFb3ee9a), // Main Green background
           child: Stack(
             children: [
               // Back Button
@@ -244,7 +244,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                           child: const Icon(
                             Icons.lock_outline,
                             size: 40,
-                            color: Color(0xFF00D09E),
+                            color: Color(0xFFb3ee9a),
                           ),
                         ),
 
@@ -279,7 +279,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                                 borderRadius: BorderRadius.circular(18),
                                 border: Border.all(
                                   color: _focusNodes[index].hasFocus
-                                      ? const Color(0xFF00D09E)
+                                      ? const Color(0xFFb3ee9a)
                                       : Colors.transparent,
                                   width: 2,
                                 ),
@@ -354,14 +354,14 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                         // Login Button
                         if (_isLoading)
                           const CircularProgressIndicator(
-                            color: Color(0xFF00D09E),
+                            color: Color(0xFFb3ee9a),
                           )
                         else
                           Container(
                             width: 207,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D09E), // Main Green
+                              color: const Color(0xFFb3ee9a), // Main Green
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(

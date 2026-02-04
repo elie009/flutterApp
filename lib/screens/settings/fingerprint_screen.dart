@@ -79,7 +79,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFF00D09E),
+          color: Color(0xFFb3ee9a),
         ),
         child: Stack(
           children: [
@@ -176,13 +176,13 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(22),
                               border: Border.all(
-                                color: Color(0xFF00D09E), // Green border
+                                color: Color(0xFFb3ee9a), // Green border
                                 width: 2,
                               ),
                             ),
                             child: const Icon(
                               Icons.fingerprint,
-                              color: Color(0xFF00D09E), // Green icon
+                              color: Color(0xFFb3ee9a), // Green icon
                               size: 24,
                             ),
                           ),
@@ -235,13 +235,13 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(22),
                             border: Border.all(
-                              color: Color(0xFF00D09E), // Green border
+                              color: Color(0xFFb3ee9a), // Green border
                               width: 2,
                             ),
                           ),
                           child: const Icon(
                             Icons.add,
-                            color: Color(0xFF00D09E), // Green icon
+                            color: Color(0xFFb3ee9a), // Green icon
                             size: 24,
                           ),
                         ),
