@@ -332,35 +332,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   color: _headerDark,
                 ),
               ),
-              // Move notification bell a bit lower
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0), // Adjust this value to move it further down
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.notifications_outlined, color: _headerDark, size: 22),
-                    ),
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: Container(
-                        width: 10,
-                        height: 10,
+              // Move notification bell a bit lower - tap to open notifications screen
+              GestureDetector(
+                onTap: () => context.push('/notifications'),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10.0), // Adjust this value to move it further down
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
                         decoration: const BoxDecoration(
-                          color: Colors.red,
+                          color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1)),
+                        ),
+                        child: const Icon(Icons.notifications_outlined, color: _headerDark, size: 22),
+                      ),
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1)),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
