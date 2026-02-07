@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
 import '../../services/biometric_service.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,17 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   // Design colors (from provided design)
-  static const _lightGreen = Color(0xFFb3ee9a); // Primary
+  static const _lightGreen = AppTheme.primaryColor;
   static const _lightGreenBorder = Color(0xFFB8E6A8);
   static const _textDark = Color(0xFF1a1a1a);
   static const _textGray = Color(0xFF757575);
   static const _borderLight = Color(0xFFE0E0E0);
   static const _white = Color(0xFFFFFFFF);
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {

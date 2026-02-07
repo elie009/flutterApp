@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
 
@@ -44,7 +45,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
                   'UtilityHub360',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0xFFb3ee9a),
+                    color: AppTheme.primaryColor,
                     fontSize: 52.14,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
@@ -81,7 +82,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
                 width: 40,
                 height: 40,
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFb3ee9a)),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
                   strokeWidth: 3,
                 ),
               ),

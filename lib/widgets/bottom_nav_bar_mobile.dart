@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../utils/theme.dart';
 
 class BottomNavBarMobile extends StatelessWidget {
   final int currentIndex;
@@ -70,7 +71,7 @@ class BottomNavBarMobile extends StatelessWidget {
               width: 57,
               height: 53,
               decoration: BoxDecoration(
-                color: currentIndex == 2 ? const Color(0xFFb3ee9a) : Colors.transparent, // Green highlight for active
+                color: currentIndex == 2 ? AppTheme.primaryColor : Colors.transparent, // Green highlight for active
                 borderRadius: BorderRadius.circular(22),
               ),
               child: _buildNavItem(

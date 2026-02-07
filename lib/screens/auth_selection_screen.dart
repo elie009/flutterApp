@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../utils/theme.dart';
 
 class AuthSelectionScreen extends StatelessWidget {
   const AuthSelectionScreen({super.key});
 
-  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _primaryGreen = AppTheme.primaryColor;
   static const _darkGreen = Color(0xFF388E3C);
   static const _textMuted = Color(0xFF555555);
   static const _lightGreenBg = Color(0xFFE6F9E6);

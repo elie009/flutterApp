@@ -10,6 +10,7 @@ import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/error_widget.dart' as app_error;
 import '../../widgets/loading_indicator.dart';
+import '../../utils/theme.dart';
 import '../../widgets/triangle_painter.dart';
 class LoansScreen extends StatefulWidget {
   const LoansScreen({super.key});
@@ -58,7 +59,7 @@ class _LoansScreenState extends State<LoansScreen> {
   static const _iconColors = [
     Color(0xFF6CB5FD),
     Color(0xFF3299FF),
-    Color(0xFFb3ee9a),
+    AppTheme.primaryColor,
   ];
 
   Color _loanIconColor(int index) =>
@@ -80,7 +81,7 @@ class _LoansScreenState extends State<LoansScreen> {
     return '${months[date.month - 1]} ${date.day}';
   }
 
-  static const _lightGreen = Color(0xFFb3ee9a);
+  static const _lightGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
 
   @override
@@ -127,13 +128,17 @@ class _LoansScreenState extends State<LoansScreen> {
                           ),
                         ),
                       ),
-                      const Text(
-                        'Loans',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        
+                        child: const Text(
+                          'Loans',
+                          style: TextStyle(
+                            color: Color(0xFF093030),
+                            fontSize: 22,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Stack(
@@ -495,7 +500,7 @@ class _AddLoanModalContentState extends State<_AddLoanModalContent> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Loan application submitted.'),
-            backgroundColor: Color(0xFFb3ee9a),
+            backgroundColor: AppTheme.primaryColor,
           ),
         );
         widget.onSaved();
@@ -659,7 +664,7 @@ class _AddLoanModalContentState extends State<_AddLoanModalContent> {
                               onPressed: _isSaving ? null : widget.onCancel,
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFF093030),
-                                side: const BorderSide(color: Color(0xFFb3ee9a)),
+                                side: const BorderSide(color: AppTheme.primaryColor),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),
                               child: const Text('Cancel'),
@@ -670,7 +675,7 @@ class _AddLoanModalContentState extends State<_AddLoanModalContent> {
                             child: ElevatedButton(
                               onPressed: _isSaving ? null : _saveLoan,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFb3ee9a),
+                                backgroundColor: AppTheme.primaryColor,
                                 foregroundColor: const Color(0xFF093030),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),

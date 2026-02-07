@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/navigation_helper.dart';
 import '../../services/data_service.dart';
@@ -108,7 +109,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Bill created successfully'),
-          backgroundColor: Color(0xFFb3ee9a),
+          backgroundColor: AppTheme.primaryColor,
         ),
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -141,7 +142,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
+          color: AppTheme.primaryColor,
         ),
         child: Stack(
           children: [
@@ -263,7 +264,7 @@ class _AddBillScreenState extends State<AddBillScreen> {
                           width: 23.66,
                           height: 22,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFb3ee9a),
+                            color: AppTheme.primaryColor,
                             borderRadius: BorderRadius.circular(9.13),
                           ),
                           child: const Icon(
@@ -570,8 +571,8 @@ class _AddBillScreenState extends State<AddBillScreen> {
                   height: 36,
                   decoration: BoxDecoration(
                     color: _isSubmitting
-                        ? const Color(0xFFb3ee9a).withOpacity(0.6)
-                        : const Color(0xFFb3ee9a),
+                        ? AppTheme.primaryColor.withOpacity(0.6)
+                        : AppTheme.primaryColor,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,

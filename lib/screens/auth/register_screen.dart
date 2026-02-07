@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -114,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: const Color(0xFFb3ee9a), // Main Green background
+        color: AppTheme.primaryColor, // Main Green background
         child: Stack(
           children: [
             // Back Button
@@ -561,14 +562,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Register Button
                         if (_isLoading)
                           const CircularProgressIndicator(
-                            color: Color(0xFFb3ee9a),
+                            color: AppTheme.primaryColor,
                           )
                         else
                           Container(
                             width: 207,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFb3ee9a), // Main Green
+                              color: AppTheme.primaryColor, // Main Green
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(

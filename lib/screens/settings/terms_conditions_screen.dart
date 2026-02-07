@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import '../../utils/navigation_helper.dart';
 
 class TermsConditionsScreen extends StatefulWidget {
@@ -50,7 +51,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
+          color: AppTheme.primaryColor,
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -304,7 +305,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
                   width: 202,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFb3ee9a),
+                    color: AppTheme.primaryColor,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,
@@ -424,7 +425,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
                             width: 57,
                             height: 53,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFb3ee9a),
+                              color: AppTheme.primaryColor,
                               borderRadius: BorderRadius.circular(22),
                             ),
                           ),

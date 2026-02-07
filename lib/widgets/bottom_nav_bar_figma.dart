@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../utils/theme.dart';
 
 class BottomNavBarFigma extends StatelessWidget {
   final int currentIndex;
@@ -36,7 +37,7 @@ class BottomNavBarFigma extends StatelessWidget {
     GoRouter.of(context).go(location);
   }
 
-  static const _lightGreen = Color(0xFFb3ee9a);
+  static const _lightGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
 
   @override

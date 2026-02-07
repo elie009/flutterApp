@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -10,7 +11,7 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  static const _lightGreen = Color(0xFFb3ee9a);
+  static const _lightGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
   static const _textGray = Color(0xFF666666);
 
@@ -395,7 +396,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 }
 
 class _HeaderShapesPainter extends CustomPainter {
-  static const _lightGreen = Color(0xFFb3ee9a);
+  static const _lightGreen = AppTheme.primaryColor;
 
   @override
   void paint(Canvas canvas, Size size) {

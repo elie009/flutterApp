@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class SecurityPinScreen extends StatefulWidget {
@@ -69,7 +70,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Pin verified successfully!'),
-          backgroundColor: Color(0xFFb3ee9a),
+          backgroundColor: AppTheme.primaryColor,
         ),
       );
       // Navigate to next screen or back
@@ -92,7 +93,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Pin code sent again!'),
-        backgroundColor: Color(0xFFb3ee9a),
+        backgroundColor: AppTheme.primaryColor,
       ),
     );
   }
@@ -115,7 +116,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          color: const Color(0xFFb3ee9a), // Main Green background
+          color: AppTheme.primaryColor, // Main Green background
           child: Stack(
             children: [
               // Back Button
@@ -233,7 +234,7 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(18),
                                     borderSide: BorderSide(
-                                      color: const Color(0xFFb3ee9a),
+                                      color: AppTheme.primaryColor,
                                       width: 2,
                                     ),
                                   ),
@@ -249,14 +250,14 @@ class _SecurityPinScreenState extends State<SecurityPinScreen> {
                         // Accept Button
                         if (_isLoading)
                           const CircularProgressIndicator(
-                            color: Color(0xFFb3ee9a),
+                            color: AppTheme.primaryColor,
                           )
                         else
                           Container(
                             width: 207,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFb3ee9a), // Main Green
+                              color: AppTheme.primaryColor, // Main Green
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(

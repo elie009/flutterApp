@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../widgets/triangle_painter.dart';
+
 class ChangePinScreen extends StatefulWidget {
   const ChangePinScreen({super.key});
 
@@ -11,57 +15,136 @@ class ChangePinScreen extends StatefulWidget {
 }
 
 class _ChangePinScreenState extends State<ChangePinScreen> {
-  final _formKey = GlobalKey<FormState>();
+  static const _pinKey = 'user_pin';
+  static const _lightGreen = AppTheme.primaryColor;
+  static const _headerDark = Color(0xFF093030);
+  static const _headerLight = Color(0xFFF1FFF3);
+  static const _textDark = Color(0xFF333333);
+  static const _textMuted = Color(0xFF757575);
+  static const _boxBorder = Color(0xFFE0E0E0);
+  static const _tipsBg = Color(0xFFE8F5E9);
+
+  int _step = 0; // 0: Current, 1: New PIN, 2: Confirm
   final _currentPinController = TextEditingController();
   final _newPinController = TextEditingController();
   final _confirmPinController = TextEditingController();
+  final _focusNode = FocusNode();
 
   bool _isLoading = false;
-  bool _showCurrentPin = false;
-  bool _showNewPin = false;
-  bool _showConfirmPin = false;
+  bool _showPin = false;
+
+  TextEditingController get _activeController {
+    switch (_step) {
+      case 0:
+        return _currentPinController;
+      case 1:
+        return _newPinController;
+      case 2:
+        return _confirmPinController;
+      default:
+        return _currentPinController;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPinController.addListener(() => setState(() {}));
+    _newPinController.addListener(() => setState(() {}));
+    _confirmPinController.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
     _currentPinController.dispose();
     _newPinController.dispose();
     _confirmPinController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
-  Future<void> _changePin() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    // Check if new PIN and confirm PIN match
-    if (_newPinController.text != _confirmPinController.text) {
+  Future<void> _onContinue() async {
+    final pin = _activeController.text;
+    if (pin.length != 6) {
       NavigationHelper.showSnackBar(
         context,
-        'New PIN and confirm PIN do not match',
+        'Please enter all 6 digits',
         backgroundColor: Colors.red,
       );
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    if (_step == 0) {
+      final storedPin = StorageService.getString(_pinKey);
+      if (storedPin == null || storedPin.isEmpty) {
+        NavigationHelper.showSnackBar(
+          context,
+          'No PIN set. Set up a PIN first.',
+          backgroundColor: Colors.orange,
+        );
+        return;
+      }
+      if (pin != storedPin) {
+        NavigationHelper.showSnackBar(
+          context,
+          'Incorrect current PIN. Try again.',
+          backgroundColor: Colors.red,
+        );
+        _currentPinController.clear();
+        return;
+      }
+      setState(() {
+        _step = 1;
+        _showPin = false;
+      });
+      return;
+    }
 
-    // TODO: Implement PIN change logic with backend
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+    if (_step == 1) {
+      setState(() {
+        _step = 2;
+        _showPin = false;
+      });
+      return;
+    }
 
-    setState(() {
-      _isLoading = false;
-    });
+    // _step == 2: Confirm
+    if (pin != _newPinController.text) {
+      NavigationHelper.showSnackBar(
+        context,
+        'New PIN and confirm PIN do not match',
+        backgroundColor: Colors.red,
+      );
+      _confirmPinController.clear();
+      return;
+    }
 
-    // Navigate to success screen
-    Navigator.of(context).pushReplacementNamed('pin-change-success');
+    setState(() => _isLoading = true);
+    await StorageService.saveString(_pinKey, pin);
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    NavigationHelper.showSnackBar(context, 'PIN changed successfully!', backgroundColor: _lightGreen);
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      context.go('/profile');
+    }
   }
 
-  String _getPinDots(String pin) {
-    if (pin.isEmpty) return '';
-    return '●' * pin.length;
+  void _onBack() {
+    if (_step > 0) {
+      setState(() {
+        _step--;
+        _activeController.clear();
+      });
+    } else {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else {
+        context.go('/profile');
+      }
+    }
   }
 
   @override
@@ -70,442 +153,370 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
       backgroundColor: const Color(0xFFFFFFFF),
       body: Container(
-        width: 430,
-        height: 932,
-        decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
-        ),
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(color: AppTheme.primaryColor),
         child: Stack(
           children: [
-         
-            // Small top-right triangle
-            Positioned.fill(
-              child: Transform.rotate(
-                angle: 0.4,
-                child: CustomPaint(
-                  painter: TrianglePainter(),
-                ),
-              ),
-            ),
-
-         
-            // White bottom section
-            Positioned(
-              left: 0,
-              top: 176,
-              width: 413,
-              height: 800,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
-                  ),
-                ),
-              ),
-            ),
-
-            // Back button
-            Positioned(
-              left: 38,
-              top: 69,
-              child: GestureDetector(
-                onTap: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
-                  } else {
-                    context.go('/profile');
-                  }
-                },
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFFF1FFF3),
-                  size: 19,
-                ),
-              ),
-            ),
-
-            // Title "Profile"
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 50,
-              child: Center(
-                child: Text(
-                  'Change Pin',
-                  style: const TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: 32,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-
-            // Current PIN field background
-            Positioned(
-              left: 37,
-              top: 287,
-              child: Container(
-                width: 356,
-                height: 41,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Stack(
-                  children: [
-                    // Invisible text field for input
-                    Positioned.fill(
-                      child: TextFormField(
-                        controller: _currentPinController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 4,
-                        obscureText: !_showCurrentPin,
-                        style: const TextStyle(color: Colors.transparent),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          counterText: '',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        onChanged: (value) => setState(() {}),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter current PIN';
-                          }
-                          if (value.length != 4) {
-                            return 'PIN must be 4 digits';
-                          }
-                          return null;
-                        },
+            
+            SafeArea(
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(70),
+                        topRight: Radius.circular(70),
                       ),
-                    ),
-                    // Visible dots or text
-                    Positioned(
-                      left: 21,
-                      top: 14,
-                      child: SizedBox(
-                        width: 293,
-                        child: Opacity(
-                          opacity: 0.45,
-                          child: Text(
-                            _showCurrentPin
-                                ? _currentPinController.text
-                                : _getPinDots(_currentPinController.text),
-                            style: const TextStyle(
-                              color: Color(0xFF0E3E3E),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w400,
-                              height: 1.17,
-                              letterSpacing: 8.40,
-                            ),
+                      child: Container(
+                        width: double.infinity,
+                        color: Colors.white,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 24),
+                              _buildPadlock(),
+                              const SizedBox(height: 24),
+                              _buildStepTitle(),
+                              const SizedBox(height: 8),
+                              _buildStepSubtitle(),
+                              const SizedBox(height: 28),
+                              Stack(
+                                children: [
+                                  _buildSixDigitBoxes(),
+                                  Positioned(
+                                    left: 0,
+                                    top: 0,
+                                    child: _buildHiddenField(),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              _buildShowPin(),
+                              if (_step == 0) ...[
+                                const SizedBox(height: 32),
+                                _buildSecurityTips(),
+                              ],
+                              const SizedBox(height: 40),
+                              _buildContinueButton(),
+                              const SizedBox(height: 32),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    // Eye icon
-                    Positioned(
-                      right: 12,
-                      top: 16,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showCurrentPin = !_showCurrentPin;
-                          });
-                        },
-                        child: Icon(
-                          _showCurrentPin ? Icons.visibility : Icons.visibility_off,
-                          color: const Color(0xFF0E3E3E),
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // New PIN field background
-            Positioned(
-              left: 37,
-              top: 401,
-              child: Container(
-                width: 356,
-                height: 41,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Stack(
-                  children: [
-                    // Invisible text field for input
-                    Positioned.fill(
-                      child: TextFormField(
-                        controller: _newPinController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 4,
-                        obscureText: !_showNewPin,
-                        style: const TextStyle(color: Colors.transparent),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          counterText: '',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        onChanged: (value) => setState(() {}),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter new PIN';
-                          }
-                          if (value.length != 4) {
-                            return 'PIN must be 4 digits';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    // Visible dots or text
-                    Positioned(
-                      left: 21,
-                      top: 14,
-                      child: SizedBox(
-                        width: 293,
-                        child: Opacity(
-                          opacity: 0.45,
-                          child: Text(
-                            _showNewPin
-                                ? _newPinController.text
-                                : _getPinDots(_newPinController.text),
-                            style: const TextStyle(
-                              color: Color(0xFF0E3E3E),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w400,
-                              height: 1.17,
-                              letterSpacing: 8.40,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Eye icon
-                    Positioned(
-                      right: 12,
-                      top: 16,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showNewPin = !_showNewPin;
-                          });
-                        },
-                        child: Icon(
-                          _showNewPin ? Icons.visibility : Icons.visibility_off,
-                          color: const Color(0xFF0E3E3E),
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Confirm PIN field background
-            Positioned(
-              left: 37,
-              top: 517,
-              child: Container(
-                width: 356,
-                height: 41,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Stack(
-                  children: [
-                    // Invisible text field for input
-                    Positioned.fill(
-                      child: TextFormField(
-                        controller: _confirmPinController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 4,
-                        obscureText: !_showConfirmPin,
-                        style: const TextStyle(color: Colors.transparent),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          counterText: '',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        onChanged: (value) => setState(() {}),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please confirm new PIN';
-                          }
-                          if (value.length != 4) {
-                            return 'PIN must be 4 digits';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    // Visible dots or text
-                    Positioned(
-                      left: 21,
-                      top: 14,
-                      child: SizedBox(
-                        width: 293,
-                        child: Opacity(
-                          opacity: 0.45,
-                          child: Text(
-                            _showConfirmPin
-                                ? _confirmPinController.text
-                                : _getPinDots(_confirmPinController.text),
-                            style: const TextStyle(
-                              color: Color(0xFF0E3E3E),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w400,
-                              height: 1.17,
-                              letterSpacing: 8.40,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Eye icon
-                    Positioned(
-                      right: 12,
-                      top: 16,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showConfirmPin = !_showConfirmPin;
-                          });
-                        },
-                        child: Icon(
-                          _showConfirmPin ? Icons.visibility : Icons.visibility_off,
-                          color: const Color(0xFF0E3E3E),
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Field labels
-            Positioned(
-              left: 37,
-              top: 267.5,
-              child: Transform.translate(
-                offset: const Offset(0, -10),
-                child: const Text(
-                  'Current Pin',
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 15,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
                   ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 37,
-              top: 381.5,
-              child: Transform.translate(
-                offset: const Offset(0, -10),
-                child: const Text(
-                  'New Pin',
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 15,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              left: 38,
-              top: 497.5,
-              child: Transform.translate(
-                offset: const Offset(0, -10),
-                child: const Text(
-                  'Confirm Pin',
-                  style: TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 15,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-
-            // Change PIN button
-            Positioned(
-              left: 106,
-              top: 593,
-              child: GestureDetector(
-                onTap: _isLoading ? null : _changePin,
-                child: Container(
-                  width: 218,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFb3ee9a),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  alignment: Alignment.center,
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF093030)),
-                          ),
-                        )
-                      : const Text(
-                          'Change Pin',
-                          style: TextStyle(
-                            color: Color(0xFF093030),
-                            fontSize: 15,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                ),
-              ),
-            ),
-
-            // Notification icon
-            Positioned(
-              left: 364,
-              top: 51,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.notifications,
-                    color: Color(0xFF093030),
-                    size: 21,
-                  ),
-                ),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: _onBack,
+                child: const Icon(Icons.arrow_back, color: _headerLight, size: 28),
+              ),
+              const Text(
+                'Change PIN',
+                style: TextStyle(
+                  color: _headerLight,
+                  fontSize: 22,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFDFF7E2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.notifications_outlined, color: _headerDark, size: 22),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildProgressIndicator(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressIndicator() {
+    const steps = ['Current', 'New PIN', 'Confirm'];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (int i = 0; i < 3; i++) ...[
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: i <= _step ? _headerDark : Colors.white,
+                  border: Border.all(
+                    color: i <= _step ? _headerDark : _boxBorder,
+                    width: 1.5,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    '${i + 1}',
+                    style: TextStyle(
+                      color: i <= _step ? Colors.white : _textMuted,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                steps[i],
+                style: TextStyle(
+                  color: i <= _step ? _headerDark : _textMuted,
+                  fontSize: 12,
+                  fontWeight: i == _step ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+          if (i < 2)
+            Container(
+              width: 40,
+              margin: const EdgeInsets.only(bottom: 20),
+              height: 2,
+              color: i < _step ? _headerDark : _boxBorder,
+            ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPadlock() {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        color: _tipsBg,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.lock_outline, color: _lightGreen, size: 36),
+    );
+  }
+
+  Widget _buildStepTitle() {
+    const titles = [
+      'Enter Current PIN',
+      'Enter New PIN',
+      'Confirm New PIN',
+    ];
+    return Text(
+      titles[_step],
+      style: const TextStyle(
+        color: _textDark,
+        fontSize: 20,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.bold,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildStepSubtitle() {
+    const subtitles = [
+      'Enter your current 6-digit PIN to continue',
+      'Enter your new 6-digit PIN',
+      'Re-enter your new 6-digit PIN to confirm',
+    ];
+    return Text(
+      subtitles[_step],
+      style: const TextStyle(
+        color: _textMuted,
+        fontSize: 14,
+        height: 1.4,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildSixDigitBoxes() {
+    final pin = _activeController.text;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(6, (i) {
+        final hasDigit = i < pin.length;
+        final char = hasDigit ? (_showPin ? pin[i] : '●') : '';
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(_focusNode);
+          },
+          child: Container(
+            width: 44,
+            height: 52,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _boxBorder, width: 1.5),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              char,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: _headerDark,
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildHiddenField() {
+    return SizedBox(
+      width: 1,
+      height: 1,
+      child: TextField(
+        focusNode: _focusNode,
+        controller: _activeController,
+        keyboardType: TextInputType.number,
+        maxLength: 6,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        onChanged: (_) => setState(() {}),
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          counterText: '',
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShowPin() {
+    return GestureDetector(
+      onTap: () => setState(() => _showPin = !_showPin),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            _showPin ? Icons.visibility : Icons.visibility_off,
+            size: 20,
+            color: _headerDark,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            _showPin ? 'Hide PIN' : 'Show PIN',
+            style: const TextStyle(
+              color: _headerDark,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSecurityTips() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _tipsBg,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Security Tips:',
+            style: TextStyle(
+              color: _textDark,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _tipBullet('Don\'t use sequential numbers (e.g., 123456)'),
+          _tipBullet('Avoid using birthdays or common patterns'),
+          _tipBullet('Keep your PIN private and secure'),
+        ],
+      ),
+    );
+  }
+
+  Widget _tipBullet(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '• ',
+            style: TextStyle(color: _headerDark, fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(color: _headerDark, fontSize: 14, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContinueButton() {
+    final isLastStep = _step == 2;
+    final label = isLastStep ? 'Change PIN' : 'Continue';
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _onContinue,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _lightGreen,
+          foregroundColor: _headerDark,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(_headerDark),
+                ),
+              )
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
       ),
     );
   }

@@ -4,12 +4,13 @@ import 'package:intl/intl.dart';
 import '../config/app_config.dart';
 import '../services/data_service.dart';
 import '../widgets/bottom_nav_bar_figma.dart';
+import '../utils/theme.dart';
 import '../widgets/triangle_painter.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
-  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _primaryGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
   static const _textGray = Color(0xFF666666);
   static const _textLightGray = Color(0xFF999999);
@@ -44,7 +45,7 @@ class CategoriesScreen extends StatelessWidget {
                       const Text(
                         'Categories',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF093030),
                           fontSize: 26,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
@@ -287,7 +288,7 @@ class _CategoryItem extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _primaryGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
 
   @override

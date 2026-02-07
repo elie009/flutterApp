@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../widgets/triangle_painter.dart';
 
@@ -14,7 +15,7 @@ class SecurityScreen extends StatelessWidget {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
+          color: AppTheme.primaryColor,
         ),
         child: Stack(
           children: [
@@ -89,8 +90,10 @@ class SecurityScreen extends StatelessWidget {
             Positioned(
               left: 38,
               top: 233,
+              right: 38,
               child: GestureDetector(
-                onTap: () => context.go('/pin-setup'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => context.push('/pin-setup'),
                 child: Row(
                   children: [
                     const SizedBox(
@@ -105,8 +108,7 @@ class SecurityScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 170),
-                    // Use the 'next page' icon
+                    const Spacer(),
                     const Icon(
                       Icons.navigate_next,
                       color: Color(0xFF093030),

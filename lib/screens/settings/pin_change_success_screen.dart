@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 
 class PinChangeSuccessScreen extends StatelessWidget {
   const PinChangeSuccessScreen({super.key});
@@ -16,9 +17,9 @@ class PinChangeSuccessScreen extends StatelessWidget {
       body: Container(
         width: 430,
         height: 932,
-        decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
+        decoration: BoxDecoration(
+          color: AppTheme.primaryColor,
+          borderRadius: const BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
           children: [
@@ -83,9 +84,9 @@ class PinChangeSuccessScreen extends StatelessWidget {
                           color: Color(0xFFDFF7E2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.check,
-                          color: Color(0xFFb3ee9a),
+                          color: AppTheme.primaryColor,
                           size: 14,
                         ),
                       ),

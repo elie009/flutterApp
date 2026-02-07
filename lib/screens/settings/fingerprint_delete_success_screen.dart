@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 
 class FingerprintDeleteSuccessScreen extends StatelessWidget {
   const FingerprintDeleteSuccessScreen({super.key});
@@ -17,7 +18,7 @@ class FingerprintDeleteSuccessScreen extends StatelessWidget {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
+          color: AppTheme.primaryColor,
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -85,7 +86,7 @@ class FingerprintDeleteSuccessScreen extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.check,
-                          color: Color(0xFFb3ee9a),
+                          color: AppTheme.primaryColor,
                           size: 14,
                         ),
                       ),

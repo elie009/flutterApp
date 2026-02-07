@@ -10,6 +10,7 @@ import '../../config/app_config.dart';
 import '../../models/transaction.dart';
 import '../../models/bank_account.dart';
 import '../../models/dashboard_summary.dart';
+import '../../utils/theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -256,7 +257,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Design colors from reference (light green dashboard)
-  static const _lightGreen = Color(0xFFb3ee9a);
+  static const _lightGreen = AppTheme.primaryColor;
   static const _lightGreenBg = Color(0xFFE8F5E9);
   static const _headerDark = Color(0xFF093030);
   static const _textGray = Color(0xFF666666);
@@ -477,8 +478,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onTap: () => context.push('/bills'),
           ),
           _buildQuickAccessButton(
-            icon: Icons.bar_chart_rounded,
-            label: 'REPORTS',
+            icon: Icons.receipt_long_rounded, // Changed icon for RECEIVABLES
+            label: 'RECEIVABLES',
             onTap: () {},
           ),
         ],
@@ -529,7 +530,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             children: [
               const Text(
-                'Your Cards',
+                'Bank Accounts',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 16,
@@ -1102,7 +1103,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFFb3ee9a).withOpacity(0.3),
+            color: AppTheme.primaryColor.withOpacity(0.3),
             width: 1,
           ),
           boxShadow: [
@@ -1121,12 +1122,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFFb3ee9a).withOpacity(0.1),
+                color: AppTheme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFFb3ee9a),
+                color: AppTheme.primaryColor,
                 size: 24,
               ),
             ),
@@ -1333,7 +1334,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                                   isRecurring = value;
                                 });
                               },
-                              activeColor: const Color(0xFFb3ee9a),
+                              activeColor: AppTheme.primaryColor,
                             ),
                           ],
                         ),
@@ -1468,7 +1469,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                             height: 56,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color(0xFFb3ee9a).withOpacity(0.3),
+                                color: AppTheme.primaryColor.withOpacity(0.3),
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -1516,7 +1517,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFb3ee9a),
+                        backgroundColor: AppTheme.primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1556,7 +1557,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
           height: 56,
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFFb3ee9a).withOpacity(0.3),
+              color: AppTheme.primaryColor.withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1582,7 +1583,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
               onChanged: onChanged,
               icon: const Icon(
                 Icons.keyboard_arrow_down,
-                color: Color(0xFFb3ee9a),
+                color: AppTheme.primaryColor,
               ),
             ),
           ),
@@ -1613,7 +1614,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
         Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFFb3ee9a).withOpacity(0.3),
+              color: AppTheme.primaryColor.withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1662,7 +1663,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
             height: 56,
             decoration: BoxDecoration(
               border: Border.all(
-                color: const Color(0xFFb3ee9a).withOpacity(0.3),
+                color: AppTheme.primaryColor.withOpacity(0.3),
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -1682,7 +1683,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                 ),
                 const Icon(
                   Icons.calendar_today,
-                  color: Color(0xFFb3ee9a),
+                  color: AppTheme.primaryColor,
                   size: 20,
                 ),
               ],

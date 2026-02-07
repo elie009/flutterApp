@@ -6,6 +6,7 @@ import '../../models/savings_account.dart';
 import '../../models/savings_summary.dart';
 import '../../services/data_service.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/error_widget.dart' as app_error;
@@ -24,7 +25,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _primaryGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
   static const _textGray = Color(0xFF666666);
 
@@ -109,7 +110,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                   const Text(
                     'Savings',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF052224),
                       fontSize: 22,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
@@ -357,7 +358,7 @@ class _SavingsAccountCard extends StatelessWidget {
   final String Function(String) formatType;
   final VoidCallback onTap;
 
-  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _primaryGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
   static const _textGray = Color(0xFF666666);
 
@@ -522,7 +523,7 @@ class _AddSavingsAccountSheetState extends State<_AddSavingsAccountSheet> {
       }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.existing != null ? 'Savings account updated' : 'Savings account created'), backgroundColor: const Color(0xFFb3ee9a)),
+          SnackBar(content: Text(widget.existing != null ? 'Savings account updated' : 'Savings account created'), backgroundColor: AppTheme.primaryColor),
         );
         widget.onSaved();
       }
@@ -604,7 +605,7 @@ class _AddSavingsAccountSheetState extends State<_AddSavingsAccountSheet> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _saving ? null : widget.onCancel,
-                      style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF093030), side: const BorderSide(color: Color(0xFFb3ee9a))),
+                      style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF093030), side: const BorderSide(color: AppTheme.primaryColor)),
                       child: const Text('Cancel'),
                     ),
                   ),
@@ -612,7 +613,7 @@ class _AddSavingsAccountSheetState extends State<_AddSavingsAccountSheet> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _saving ? null : _submit,
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFb3ee9a), foregroundColor: const Color(0xFF093030)),
+                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor, foregroundColor: const Color(0xFF093030)),
                       child: _saving ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Save'),
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../widgets/triangle_painter.dart';
 class FingerprintScreen extends StatefulWidget {
@@ -79,7 +80,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
+          color: AppTheme.primaryColor,
         ),
         child: Stack(
           children: [
@@ -176,13 +177,13 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(22),
                               border: Border.all(
-                                color: Color(0xFFb3ee9a), // Green border
+                                color: AppTheme.primaryColor, // Green border
                                 width: 2,
                               ),
                             ),
                             child: const Icon(
                               Icons.fingerprint,
-                              color: Color(0xFFb3ee9a), // Green icon
+                              color: AppTheme.primaryColor, // Green icon
                               size: 24,
                             ),
                           ),
@@ -235,13 +236,13 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(22),
                             border: Border.all(
-                              color: Color(0xFFb3ee9a), // Green border
+                              color: AppTheme.primaryColor, // Green border
                               width: 2,
                             ),
                           ),
                           child: const Icon(
                             Icons.add,
-                            color: Color(0xFFb3ee9a), // Green icon
+                            color: AppTheme.primaryColor, // Green icon
                             size: 24,
                           ),
                         ),

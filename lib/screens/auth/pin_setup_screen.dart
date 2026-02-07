@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
+import '../../utils/theme.dart';
 
 class PinSetupScreen extends StatefulWidget {
   const PinSetupScreen({super.key});
@@ -11,41 +12,35 @@ class PinSetupScreen extends StatefulWidget {
 }
 
 class _PinSetupScreenState extends State<PinSetupScreen> {
-  final List<TextEditingController> _pinControllers = List.generate(
-    6,
-    (index) => TextEditingController(),
-  );
-  final List<TextEditingController> _confirmPinControllers = List.generate(
-    6,
-    (index) => TextEditingController(),
-  );
-  final List<FocusNode> _pinFocusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
-  final List<FocusNode> _confirmPinFocusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
+  static const _lightGreen = AppTheme.primaryColor;
+  static const _lightGreenBg = Color(0xFFDFF7E2);
+  static const _headerDark = Color(0xFF093030);
+  static const _textMuted = Color(0xFF0E3E3E);
+
+  final List<TextEditingController> _pinControllers =
+      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _confirmPinControllers =
+      List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _pinFocusNodes = List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _confirmPinFocusNodes = List.generate(6, (_) => FocusNode());
   bool _isLoading = false;
   bool _obscurePin = true;
   bool _showConfirmPin = false;
   static const String _pinKey = 'user_pin';
 
   @override
+  void initState() {
+    super.initState();
+    for (var n in _pinFocusNodes) n.addListener(() => setState(() {}));
+    for (var n in _confirmPinFocusNodes) n.addListener(() => setState(() {}));
+  }
+
+  @override
   void dispose() {
-    for (var controller in _pinControllers) {
-      controller.dispose();
-    }
-    for (var controller in _confirmPinControllers) {
-      controller.dispose();
-    }
-    for (var node in _pinFocusNodes) {
-      node.dispose();
-    }
-    for (var node in _confirmPinFocusNodes) {
-      node.dispose();
-    }
+    for (var c in _pinControllers) c.dispose();
+    for (var c in _confirmPinControllers) c.dispose();
+    for (var n in _pinFocusNodes) n.dispose();
+    for (var n in _confirmPinFocusNodes) n.dispose();
     super.dispose();
   }
 
@@ -59,43 +54,29 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
       focusNodes[index - 1].requestFocus();
     }
 
-    // Auto-move to confirm PIN when all 6 digits are entered
-    if (!isConfirm && index == 5 && value.isNotEmpty) {
-      final pin = _getPin(false);
-      if (pin.length == 6) {
-        setState(() {
-          _showConfirmPin = true;
-        });
-        Future.delayed(const Duration(milliseconds: 100), () {
-          _confirmPinFocusNodes[0].requestFocus();
-        });
-      }
+    if (!isConfirm && index == 5 && value.isNotEmpty && _getPin(false).length == 6) {
+      setState(() => _showConfirmPin = true);
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _confirmPinFocusNodes[0].requestFocus();
+      });
     }
 
-    // Auto-submit when confirm PIN is complete
-    if (isConfirm && index == 5 && value.isNotEmpty) {
-      final confirmPin = _getPin(true);
-      if (confirmPin.length == 6) {
-        _handleSetPin();
-      }
+    if (isConfirm && index == 5 && value.isNotEmpty && _getPin(true).length == 6) {
+      _handleSetPin();
     }
   }
 
   String _getPin(bool isConfirm) {
     final controllers = isConfirm ? _confirmPinControllers : _pinControllers;
-    return controllers.map((controller) => controller.text).join();
+    return controllers.map((c) => c.text).join();
   }
 
   void _clearPin(bool isConfirm) {
     if (isConfirm) {
-      for (var controller in _confirmPinControllers) {
-        controller.clear();
-      }
+      for (var c in _confirmPinControllers) c.clear();
       _confirmPinFocusNodes[0].requestFocus();
     } else {
-      for (var controller in _pinControllers) {
-        controller.clear();
-      }
+      for (var c in _pinControllers) c.clear();
       _pinFocusNodes[0].requestFocus();
     }
   }
@@ -105,66 +86,78 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     final confirmPin = _getPin(true);
 
     if (pin.length != 6) {
-      NavigationHelper.showSnackBar(
-        context,
-        'Please enter all 6 digits for PIN',
-        backgroundColor: Colors.red,
-      );
+      NavigationHelper.showSnackBar(context, 'Please enter all 6 digits for PIN', backgroundColor: Colors.red);
       return;
     }
-
     if (confirmPin.length != 6) {
-      NavigationHelper.showSnackBar(
-        context,
-        'Please confirm your PIN',
-        backgroundColor: Colors.red,
-      );
+      NavigationHelper.showSnackBar(context, 'Please confirm your PIN', backgroundColor: Colors.red);
       return;
     }
-
     if (pin != confirmPin) {
-      NavigationHelper.showSnackBar(
-        context,
-        'PINs do not match. Please try again.',
-        backgroundColor: Colors.red,
-      );
+      NavigationHelper.showSnackBar(context, 'PINs do not match. Please try again.', backgroundColor: Colors.red);
       _clearPin(true);
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Save PIN to storage
+    setState(() => _isLoading = true);
     await StorageService.saveString(_pinKey, pin);
-    
-    // Simulate a small delay
     await Future.delayed(const Duration(milliseconds: 500));
-
-    setState(() {
-      _isLoading = false;
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    NavigationHelper.showSnackBar(context, 'PIN set successfully!', backgroundColor: _lightGreen);
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) context.pop();
     });
-
-    if (mounted) {
-      NavigationHelper.showSnackBar(
-        context,
-        'PIN set successfully!',
-        backgroundColor: const Color(0xFFb3ee9a),
-      );
-      // Navigate back to settings or security screen
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          context.pop();
-        }
-      });
-    }
   }
 
-  void _togglePinVisibility() {
-    setState(() {
-      _obscurePin = !_obscurePin;
-    });
+  void _togglePinVisibility() => setState(() => _obscurePin = !_obscurePin);
+
+  Widget _buildPinRow(bool isConfirm) {
+    final controllers = isConfirm ? _confirmPinControllers : _pinControllers;
+    final focusNodes = isConfirm ? _confirmPinFocusNodes : _pinFocusNodes;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        6,
+        (index) => Container(
+          width: 44,
+          height: 48,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: _lightGreenBg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: focusNodes[index].hasFocus ? _lightGreen : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: TextField(
+            controller: controllers[index],
+            focusNode: focusNodes[index],
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            maxLength: 1,
+            obscureText: _obscurePin,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: _headerDark,
+            ),
+            decoration: const InputDecoration(
+              filled: true,
+              fillColor: _lightGreenBg,
+              counterText: '',
+              contentPadding: EdgeInsets.zero,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+            ),
+            onChanged: (value) => _onPinChanged(index, value, isConfirm),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -172,391 +165,277 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     return PopScope(
       canPop: true,
       child: Scaffold(
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: const Color(0xFFb3ee9a), // Main Green background
-          child: Stack(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          top: false,
+          child: Column(
             children: [
-              // Back Button
-              Positioned(
-                top: 50,
-                left: 24,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Color(0xFF093030),
+              // Header – light green, rounded bottom
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + 12,
+                  left: 16,
+                  right: 16,
+                  bottom: 20,
+                ),
+                decoration: const BoxDecoration(
+                  color: _lightGreen,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(28),
+                    bottomRight: Radius.circular(28),
                   ),
-                  onPressed: () => context.pop(),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: _headerDark, size: 24),
+                        onPressed: () => context.pop(),
+                      ),
+                    ),
+                    const Text(
+                      'Set PIN',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: _headerDark,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              // Title
-              Positioned(
-                top: 50,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Text(
-                    'Set PIN',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 30,
-                      fontWeight: FontWeight.w500,
-                      height: 22 / 15,
-                      color: Color(0xFF093030),
-                    ),
-                  ),
-                ),
-              ),
+              // White content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Lock icon – outline in light green circle
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: _lightGreenBg.withOpacity(0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock_outline,
+                          size: 40,
+                          color: _lightGreen,
+                        ),
+                      ),
 
-              // Main Content Card
-              Positioned(
-                top: 150,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF1FFF3), // Background Green White
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(60),
-                      topRight: Radius.circular(60),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 40),
+                      const SizedBox(height: 28),
 
-                        // Lock Icon
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2), // Light Green
-                            shape: BoxShape.circle,
+                      Text(
+                        _showConfirmPin ? 'Confirm your 6-digit PIN' : 'Create a 6-digit PIN',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: _headerDark,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      const Text(
+                        'This PIN will be used for quick login',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: _textMuted,
+                          height: 1.4,
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      _buildPinRow(false),
+
+                      if (_showConfirmPin) ...[
+                        const SizedBox(height: 28),
+                        _buildPinRow(true),
+                      ],
+
+                      const SizedBox(height: 20),
+
+                      // Show PIN
+                      GestureDetector(
+                        onTap: _togglePinVisibility,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _obscurePin ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                              color: _textMuted.withOpacity(0.8),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _obscurePin ? 'Show PIN' : 'Hide PIN',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: _textMuted.withOpacity(0.8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 36),
+
+                      // Set PIN button
+                      if (_isLoading)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: _lightGreen),
                           ),
-                          child: const Icon(
-                            Icons.lock_open_outlined,
-                            size: 40,
-                            color: Color(0xFFb3ee9a),
+                        )
+                      else
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_showConfirmPin) {
+                                _handleSetPin();
+                              } else if (_getPin(false).length == 6) {
+                                setState(() => _showConfirmPin = true);
+                                _confirmPinFocusNodes[0].requestFocus();
+                              } else {
+                                NavigationHelper.showSnackBar(
+                                  context,
+                                  'Please enter all 6 digits',
+                                  backgroundColor: Colors.red,
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _lightGreen,
+                              foregroundColor: _headerDark,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
+                              ),
+                            ),
+                            child: const Text(
+                              'Set PIN',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
 
-                        const SizedBox(height: 30),
+                      const SizedBox(height: 16),
 
-                        // Description text
-                        Text(
-                          _showConfirmPin ? 'Confirm your 6-digit PIN' : 'Create a 6-digit PIN',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            height: 1.5,
-                            color: Color(0xFF093030),
+                      // Clear button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: TextButton(
+                          onPressed: () {
+                            if (_showConfirmPin) {
+                              setState(() => _showConfirmPin = false);
+                              _clearPin(true);
+                              _pinFocusNodes[0].requestFocus();
+                            } else {
+                              _clearPin(false);
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            backgroundColor: _lightGreenBg.withOpacity(0.5),
+                            foregroundColor: _headerDark,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28),
+                            ),
+                          ),
+                          child: Text(
+                            _showConfirmPin ? 'Back' : 'Clear',
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 10),
+                      const SizedBox(height: 40),
 
-                        const Text(
-                          'This PIN will be used for quick login',
-                          textAlign: TextAlign.center,
+                      // Security Tips
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Security Tips:',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            height: 1.5,
-                            color: Color(0xFF0E3E3E),
+                            fontWeight: FontWeight.w600,
+                            color: _headerDark,
                           ),
                         ),
-
-                        const SizedBox(height: 40),
-
-                        // PIN Input Fields
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            6,
-                            (index) => Container(
-                              width: 50,
-                              height: 50,
-                              margin: const EdgeInsets.symmetric(horizontal: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFDFF7E2), // Light Green
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: _pinFocusNodes[index].hasFocus
-                                      ? const Color(0xFFb3ee9a)
-                                      : Colors.transparent,
-                                  width: 2,
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _pinControllers[index],
-                                focusNode: _pinFocusNodes[index],
-                                textAlign: TextAlign.center,
-                                keyboardType: TextInputType.number,
-                                maxLength: 1,
-                                obscureText: _obscurePin,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF093030),
-                                ),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color(0xFFDFF7E2),
-                                  counterText: '',
-                                  contentPadding: EdgeInsets.zero,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                onChanged: (value) => _onPinChanged(index, value, false),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        if (_showConfirmPin) ...[
-                          const SizedBox(height: 40),
-
-                          // Confirm PIN Label
-                          const Text(
-                            'Confirm PIN',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              height: 1.5,
-                              color: Color(0xFF093030),
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Confirm PIN Input Fields
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              6,
-                              (index) => Container(
-                                width: 50,
-                                height: 50,
-                                margin: const EdgeInsets.symmetric(horizontal: 6),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFDFF7E2), // Light Green
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(
-                                    color: _confirmPinFocusNodes[index].hasFocus
-                                        ? const Color(0xFFb3ee9a)
-                                        : Colors.transparent,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: TextField(
-                                  controller: _confirmPinControllers[index],
-                                  focusNode: _confirmPinFocusNodes[index],
-                                  textAlign: TextAlign.center,
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 1,
-                                  obscureText: _obscurePin,
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF093030),
-                                  ),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: const Color(0xFFDFF7E2),
-                                    counterText: '',
-                                    contentPadding: EdgeInsets.zero,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                  ),
-                                  onChanged: (value) => _onPinChanged(index, value, true),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-
-                        const SizedBox(height: 20),
-
-                        // Toggle PIN Visibility
-                        GestureDetector(
-                          onTap: _togglePinVisibility,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _obscurePin
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: const Color(0xFF0E3E3E).withOpacity(0.6),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _obscurePin ? 'Show PIN' : 'Hide PIN',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF0E3E3E).withOpacity(0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 50),
-
-                        // Set PIN Button
-                        if (_isLoading)
-                          const CircularProgressIndicator(
-                            color: Color(0xFFb3ee9a),
-                          )
-                        else
-                          Container(
-                            width: 207,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFb3ee9a), // Main Green
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: TextButton(
-                              onPressed: _handleSetPin,
-                              child: const Text(
-                                'Set PIN',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  height: 22 / 20,
-                                  color: Color(0xFF093030),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        const SizedBox(height: 20),
-
-                        // Clear Button
-                        Container(
-                          width: 207,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2), // Light Green
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              if (_showConfirmPin) {
-                                setState(() {
-                                  _showConfirmPin = false;
-                                });
-                                _clearPin(true);
-                                _pinFocusNodes[0].requestFocus();
-                              } else {
-                                _clearPin(false);
-                              }
-                            },
-                            child: Text(
-                              _showConfirmPin ? 'Back' : 'Clear',
-                              style: const TextStyle(
+                      ),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              '• Don\'t use obvious PINs like 123456',
+                              style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                height: 22 / 20,
-                                color: Color(0xFF0E3E3E),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: _textMuted,
+                                height: 1.5,
                               ),
                             ),
-                          ),
+                            Text(
+                              '• Don\'t share your PIN with anyone',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: _textMuted,
+                                height: 1.5,
+                              ),
+                            ),
+                            Text(
+                              '• Choose a PIN you can remember',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: _textMuted,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
 
-                        const SizedBox(height: 30),
-
-                        // Security Tips
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDFF7E2).withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Security Tips:',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF093030),
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                '• Don\'t use obvious PINs like 123456',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF0E3E3E),
-                                ),
-                              ),
-                              Text(
-                                '• Don\'t share your PIN with anyone',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF0E3E3E),
-                                ),
-                              ),
-                              Text(
-                                '• Choose a PIN you can remember',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF0E3E3E),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
               ),
@@ -567,4 +446,3 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     );
   }
 }
-

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../utils/navigation_helper.dart';
-import '../../utils/theme.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -21,8 +21,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   User? _user;
   bool _isLoading = false;
-  bool _darkThemeEnabled = false;
-  bool _pushNotificationsEnabled = true;
 
   @override
   void initState() {
@@ -101,62 +99,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
-          borderRadius: BorderRadius.all(Radius.circular(40)),
-        ),
+        decoration: const BoxDecoration(color: AppTheme.primaryColor),
+
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // White bottom section
+           
+            // White main content card (rounded top, overlaps header)
             Positioned(
               left: 0,
               bottom: 0,
               right: 0,
-              top: 176,
+              top: 140,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3),
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                    topRight: Radius.circular(70),
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
                   ),
                 ),
               ),
             ),
-            // Status bar
+            
+            // Back button (white)
             Positioned(
-              left: 0,
-              top: 0,
-              width: 430,
-              height: 32,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 37,
-                    top: 9,
-                    child: SizedBox(
-                      width: 30,
-                      height: 14,
-                      child: Text(
-                        '16:04',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'League Spartan',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Back button (arrow icon)
-            Positioned(
-              left: 38,
-              top: 69,
+              left: 20,
+              top: MediaQuery.of(context).padding.top + 36,
               child: GestureDetector(
                 onTap: () {
                   if (Navigator.of(context).canPop()) {
@@ -167,29 +136,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
                 child: const Icon(
                   Icons.arrow_back,
-                  color: Color(0xFFF1FFF3),
-                  size: 19,
+                  color: Colors.white,
+                  size: 24,
                 ),
               ),
             ),
-
-            // Title (centered)
+            // Title centered (white, bold)
             Positioned(
               left: 0,
               right: 0,
-              top: 64,
-              child: const SizedBox(
-                width: 148,
-                child: Center(
-                  child: Text(
-                    'Edit my Profile',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF093030),
-                      fontSize: 20,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                      height: 1.10,
+              top: MediaQuery.of(context).padding.top + 38,
+              child: const Center(
+                child: Text(
+                  'Edit my Profile',
+                  style: TextStyle(
+                    color: Color(0xFF052224),
+                    fontSize: 20,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            // Notification bell (white circle with dark-outlined bell)
+            Positioned(
+              right: 20,
+              top: MediaQuery.of(context).padding.top + 32,
+              child: GestureDetector(
+                onTap: () => context.push('/notifications'),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF9E9E9E),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      color: Color(0xFF424242),
+                      size: 22,
                     ),
                   ),
                 ),
@@ -200,7 +190,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Positioned(
               left: 0,
               right: 0,
-              top: 117,
+              top: 100,
               child: Center(
                 child: Container(
                   width: 117,
@@ -213,7 +203,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             fit: BoxFit.cover,
                           )
                         : null,
-                    color: _user?.profilePicture == null ? const Color(0xFF6CB5FD) : null,
+                    color: _user?.profilePicture == null ? const Color(0xFF2196F3) : null,
                   ),
                   child: _user?.profilePicture == null
                       ? Center(
@@ -238,7 +228,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Positioned(
               left: 0,
               right: 0,
-              top: 209,
+              top: 175,
               child: Center(
                 child: Transform.translate(
                   offset: const Offset(46, 46), // Position at bottom right of 117x117 circle
@@ -250,7 +240,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: 25,
                       height: 25,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFb3ee9a),
+                        color: AppTheme.primaryColor,
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       child: const Icon(
@@ -264,397 +254,137 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
 
-            // User name (centered)
+            // User name with small green icon (centered)
             Positioned(
               left: 0,
               right: 0,
-              top: 267,
+              top: 215,
               child: Center(
-                child: Text(
-                  _user?.name ?? 'User',
-                  style: const TextStyle(
-                    color: Color(0xFF093030),
-                    fontSize: 20,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-
-            // User ID (centered)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 288,
-              child: Center(
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'ID: ',
-                        style: TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 13,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      TextSpan(
-                        text: _user?.id.toString() ?? '25030024',
-                        style: const TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 13,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Account settings header
-            const Positioned(
-              left: 38,
-              top: 331,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 177,
-                    height: 25,
-                    child: Text(
-                      'account settings',
-                      style: TextStyle(
-                        color: Color(0xFF093030),
-                        fontSize: 20,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        height: 1.10,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Dark theme toggle switch (positioned on right)
-            Positioned(
-              right: 36,
-              top: 650,
-              child: Transform.rotate(
-                angle: 3.14159, // 180 degrees in radians
-                child: Switch(
-                  value: _darkThemeEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _darkThemeEnabled = value;
-                    });
-                  },
-                  activeColor: const Color(0xFFb3ee9a),
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: const Color(0xFFDFF7E2),
-                ),
-              ),
-            ),
-
-            // Push notifications toggle switch (positioned on right)
-            Positioned(
-              right: 36,
-              top: 702,
-              child: Transform.rotate(
-                angle: 3.14159, // 180 degrees in radians
-                child: Opacity(
-                  opacity: _pushNotificationsEnabled ? 1.0 : 0.51,
-                  child: Switch(
-                    value: _pushNotificationsEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        _pushNotificationsEnabled = value;
-                      });
-                    },
-                    activeColor: const Color(0xFFb3ee9a),
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: const Color(0xFFDFF7E2),
-                  ),
-                ),
-              ),
-            ),
-
-            // Form fields section
-            Positioned(
-              left: 38,
-              top: 386,
-              child: Form(
-                key: _formKey,
-                child: Column(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Username field
-                    const SizedBox(
-                      width: 130,
-                      height: 14,
-                      child: Text(
-                        'Username',
-                        style: TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 15,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 13),
-                    Container(
-                      width: 356,
-                      height: 32,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDFF7E2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextFormField(
-                        controller: _usernameController,
-                        style: const TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 13,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a username';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 61),
-
-                    // Phone field
-                    const Text(
-                      'phone',
-                      style: TextStyle(
+                    Text(
+                      _user?.name ?? 'User',
+                      style: const TextStyle(
                         color: Color(0xFF093030),
-                        fontSize: 15,
+                        fontSize: 22,
                         fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 13),
-                    Container(
-                      width: 356,
-                      height: 32,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDFF7E2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextFormField(
-                        controller: _phoneController,
-                        style: const TextStyle(
-                          color: Color(0xFF0E3E3E),
-                          fontSize: 13,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a phone number';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 61),
-
-                    // Email field
-                    const Text(
-                      'email address',
-                      style: TextStyle(
-                        color: Color(0xFF093030),
-                        fontSize: 15,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 13),
-                    Container(
-                      width: 356,
-                      height: 32,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDFF7E2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextFormField(
-                        controller: _emailController,
-                        style: const TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 13,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter an email address';
-                          }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 61),
-
-                    // Dark theme toggle
-                    const SizedBox(
-                      width: 174,
-                      height: 14,
-                      child: Text(
-                        'Turn dark Theme',
-                        style: TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 15,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 61),
-
-                    // Push notifications toggle
-                    const SizedBox(
-                      width: 150,
-                      height: 14,
-                      child: Text(
-                        'push notifications',
-                        style: TextStyle(
-                          color: Color(0xFF093030),
-                          fontSize: 15,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
             ),
 
-            // Update Profile button (centered)
+
+            // Form fields section - NOT scrollable, responsive width
             Positioned(
-              left: 0,
-              right: 0,
-              top: 754,
-              child: Center(
-                child: GestureDetector(
-                  onTap: _updateProfile,
-                  child: Container(
-                    width: 169,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFb3ee9a),
-                      borderRadius: BorderRadius.circular(30),
+              left: 24,
+              right: 24,
+              top: 260,
+              bottom: 100,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Username field (white bg, border, person icon)
+                    _buildLabel('Username'),
+                    const SizedBox(height: 8),
+                    _buildTextField(
+                      controller: _usernameController,
+                      hint: 'Enter username',
+                      icon: Icons.person_outline,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a username';
+                        }
+                        return null;
+                      },
                     ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Update Profile',
+                    const SizedBox(height: 14),
+
+                    _buildLabel('Phone'),
+                    const SizedBox(height: 8),
+                    _buildTextField(
+                      controller: _phoneController,
+                      hint: 'Enter phone number',
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+
+                    _buildLabel('Email Address'),
+                    const SizedBox(height: 8),
+                    _buildTextField(
+                      controller: _emailController,
+                      hint: 'Enter email address',
+                      icon: Icons.mail_outline,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an email address';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Profile Tips section
+                    const Text(
+                      'Profile Tips:',
                       style: TextStyle(
                         color: Color(0xFF093030),
-                        fontSize: 15,
+                        fontSize: 16,
                         fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    _profileTip('Keep your information up to date'),
+                    const SizedBox(height: 8),
+                    _profileTip('Use a valid email for notifications'),
+                    const SizedBox(height: 8),
+                    _profileTip('Verify your phone number for security'),
+                    const SizedBox(height: 18),
+                  ],
                 ),
               ),
             ),
 
-            // Notification icon (bell)
+            // Update Profile button (light green, bold white text, full width)
             Positioned(
-              right: 36,
-              top: 61,
+              left: 24,
+              right: 24,
+              bottom: 20,
               child: GestureDetector(
-                onTap: () {
-                  context.go('/notifications');
-                },
+                onTap: _updateProfile,
                 child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFDFF7E2),
-                    borderRadius: BorderRadius.all(Radius.circular(25.71)),
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  child: Center(
-                    child: Stack(
-                      children: [
-                        // Bell shape
-                        Positioned(
-                          left: 7.71,
-                          top: 5.14,
-                          child: Container(
-                            width: 14.57,
-                            height: 18.86,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFF052224),
-                                width: 1.29,
-                              ),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8),
-                                bottomLeft: Radius.circular(2),
-                                bottomRight: Radius.circular(2),
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                // Bell clapper
-                                Positioned(
-                                  left: 6,
-                                  bottom: 2,
-                                  child: Container(
-                                    width: 2.5,
-                                    height: 3,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF052224),
-                                      borderRadius: BorderRadius.circular(1),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Update Profile',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -665,6 +395,97 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       bottomNavigationBar: const BottomNavBarFigma(currentIndex: 4),
     );
+  }
+
+  static const _inputTextStyle = TextStyle(
+    color: Color(0xFF093030),
+    fontSize: 15,
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w400,
+  );
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Color(0xFF093030),
+        fontSize: 15,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required String? Function(String?) validator,
+    TextInputType? keyboardType,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        style: _inputTextStyle,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            color: Color(0x80093030),
+            fontSize: 15,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Icon(icon, color: const Color(0xFF757575), size: 22),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          isDense: false,
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  Widget _profileTip(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFF093030),
+              fontSize: 14,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatTime(DateTime dt) {
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   @override

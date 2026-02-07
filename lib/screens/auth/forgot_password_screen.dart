@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Password reset email sent!'),
-          backgroundColor: Color(0xFFb3ee9a),
+          backgroundColor: AppTheme.primaryColor,
         ),
       );
       // Navigate to security pin screen after a short delay
@@ -69,7 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: const Color(0xFFb3ee9a), // Main Green background
+        color: AppTheme.primaryColor, // Main Green background
         child: Stack(
           children: [
             // Back Button
@@ -115,7 +116,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               bottom: 0,
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1FFF3), // Background Green White and Letters
+                  color: Color(0xFFFFFFFF), // Background Green White and Letters
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(60),
                     topRight: Radius.circular(60),
@@ -128,7 +129,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 60),
+                        const SizedBox(height: 30),
 
                         // Description text
                         const Text(
@@ -218,14 +219,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         // Reset Password Button
                         if (_isLoading)
                           const CircularProgressIndicator(
-                            color: Color(0xFFb3ee9a),
+                            color: AppTheme.primaryColor,
                           )
                         else
                           Container(
                             width: 207,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFb3ee9a), // Main Green
+                              color: AppTheme.primaryColor, // Main Green
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(
@@ -243,7 +244,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                           ),
 
-                        const SizedBox(height: 130),
+                        const SizedBox(height: 30),
 
                         // Sign Up Button
                         Container(

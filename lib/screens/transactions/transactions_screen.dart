@@ -6,6 +6,7 @@ import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
 import '../../models/transaction.dart';
 import '../../models/bank_account.dart';
+import '../../utils/theme.dart';
 import '../../widgets/triangle_painter.dart';
 
 
@@ -101,7 +102,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     }
   }
 
-  static const _primaryGreen = Color(0xFFb3ee9a);
+  static const _primaryGreen = AppTheme.primaryColor;
   static const _headerDark = Color(0xFF093030);
   static const _debitRed = Color(0xFFD32F2F);
   static const _debitBg = Color(0xFFFFEBE7);
@@ -134,13 +135,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Transactions',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Center(
+                          child: const Text(
+                            'Transactions',
+                            style: TextStyle(
+                              color: Color(0xFF093030),
+                              fontSize: 22,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                       Container(
@@ -789,7 +794,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFb3ee9a),
+                                  backgroundColor: AppTheme.primaryColor,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -944,7 +949,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFFb3ee9a).withOpacity(0.3),
+            color: AppTheme.primaryColor.withOpacity(0.3),
             width: 1,
           ),
           boxShadow: [
@@ -963,12 +968,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFFb3ee9a).withOpacity(0.1),
+                color: AppTheme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFFb3ee9a),
+                color: AppTheme.primaryColor,
                 size: 24,
               ),
             ),
@@ -1152,7 +1157,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                                   isRecurring = value;
                                 });
                               },
-                              activeColor: const Color(0xFFb3ee9a),
+                              activeColor: AppTheme.primaryColor,
                             ),
                           ],
                         ),
@@ -1287,7 +1292,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                             height: 56,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color(0xFFb3ee9a).withOpacity(0.3),
+                                color: AppTheme.primaryColor.withOpacity(0.3),
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -1335,7 +1340,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFb3ee9a),
+                        backgroundColor: AppTheme.primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1375,7 +1380,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
           height: 56,
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFFb3ee9a).withOpacity(0.3),
+              color: AppTheme.primaryColor.withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1401,7 +1406,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
               onChanged: onChanged,
               icon: const Icon(
                 Icons.keyboard_arrow_down,
-                color: Color(0xFFb3ee9a),
+                color: AppTheme.primaryColor,
               ),
             ),
           ),
@@ -1432,7 +1437,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
         Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFFb3ee9a).withOpacity(0.3),
+              color: AppTheme.primaryColor.withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1481,7 +1486,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
             height: 56,
             decoration: BoxDecoration(
               border: Border.all(
-                color: const Color(0xFFb3ee9a).withOpacity(0.3),
+                color: AppTheme.primaryColor.withOpacity(0.3),
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -1501,7 +1506,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                 ),
                 const Icon(
                   Icons.calendar_today,
-                  color: Color(0xFFb3ee9a),
+                  color: AppTheme.primaryColor,
                   size: 20,
                 ),
               ],

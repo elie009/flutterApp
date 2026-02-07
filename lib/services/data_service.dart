@@ -644,6 +644,40 @@ class DataService {
     }
   }
 
+  /// Monthly cash flow for analysis chart. GET /Analytics/monthly-cash-flow?year=YYYY
+  /// Returns map with monthlyData: List<{month, monthAbbreviation, incoming, outgoing, net}>
+  Future<Map<String, dynamic>> getMonthlyCashFlow({int? year}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (year != null) queryParams['year'] = year;
+
+      final response = await ApiService().get(
+        '/Analytics/monthly-cash-flow',
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
+
+      final data = response.data;
+      if (data == null || data is! Map) {
+        throw Exception('Invalid response from monthly cash flow API');
+      }
+      final map = Map<String, dynamic>.from(data as Map<dynamic, dynamic>);
+
+      // Support both { success, data: { monthlyData } } and { monthlyData } response shapes
+      if (map['success'] == true && map['data'] != null) {
+        final inner = map['data'];
+        if (inner is Map) {
+          return Map<String, dynamic>.from(inner as Map<dynamic, dynamic>);
+        }
+      }
+      if (map['monthlyData'] != null) {
+        return map;
+      }
+      throw Exception(map['message']?.toString() ?? 'Failed to load monthly cash flow');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Get total balance across all accounts (excluding credit cards)
   Future<double> getTotalBalance() async {
     try {

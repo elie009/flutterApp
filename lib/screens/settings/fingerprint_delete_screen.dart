@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/navigation_helper.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
@@ -57,7 +58,7 @@ class _FingerprintDeleteScreenState extends State<FingerprintDeleteScreen> {
         width: 430,
         height: 932,
         decoration: const BoxDecoration(
-          color: Color(0xFFb3ee9a),
+          color: AppTheme.primaryColor,
         ),
         child: Stack(
           children: [
@@ -138,7 +139,7 @@ class _FingerprintDeleteScreenState extends State<FingerprintDeleteScreen> {
                 width: 195,
                 height: 195,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFb3ee9a),
+                  color: AppTheme.primaryColor,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -195,7 +196,7 @@ class _FingerprintDeleteScreenState extends State<FingerprintDeleteScreen> {
                   width: 202,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFb3ee9a),
+                    color: AppTheme.primaryColor,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,

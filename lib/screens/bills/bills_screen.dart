@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../models/bill.dart';
 import '../../services/data_service.dart';
@@ -355,24 +356,24 @@ class _BillsScreenState extends State<BillsScreen> {
                 width: 65,
                 height: 65,
                 decoration: BoxDecoration(
-                  color: isHovered ? const Color(0xFFb3ee9a) : Colors.white,
+                  color: isHovered ? AppTheme.primaryColor : Colors.white,
                   border: Border.all(
-                    color: const Color(0xFFb3ee9a),
+                    color: AppTheme.primaryColor,
                     width: 2.5,
                   ),
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x29b3ee9a),
+                      color: AppTheme.primaryColor.withOpacity(0.16),
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Center(
                   child: Icon(
                     Icons.add,
-                    color: isHovered ? Colors.white : const Color(0xFFb3ee9a),
+                    color: isHovered ? Colors.white : AppTheme.primaryColor,
                     size: 36,
                   ),
                 ),

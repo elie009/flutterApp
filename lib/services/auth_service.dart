@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../config/app_config.dart';
 import 'api_service.dart';
+import 'device_service.dart';
 import 'storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
@@ -92,16 +93,33 @@ class AuthService {
 
   /// Restore session from stored token and user data (e.g. after PIN or biometric unlock).
   /// Returns true if a valid session was restored.
+  /// If token exists but user_data is missing/invalid, fetches user from API and saves it.
   static Future<bool> restoreSessionFromStorage() async {
     try {
       final token = await StorageService.getToken();
       if (token == null || token.isEmpty) return false;
-      final userDataString = StorageService.getString(AppConfig.userKey);
-      if (userDataString == null || userDataString.isEmpty) return false;
-      final userData = jsonDecode(userDataString) as Map<String, dynamic>;
-      _currentUser = User.fromJson(userData);
+
+      // Set auth header so API calls work
       await ApiService().updateAuthHeader(token);
-      return true;
+
+      // Try to restore user from storage first
+      final userDataString = StorageService.getString(AppConfig.userKey);
+      if (userDataString != null && userDataString.isNotEmpty) {
+        try {
+          final userData = jsonDecode(userDataString) as Map<String, dynamic>;
+          _currentUser = User.fromJson(userData);
+          return true;
+        } catch (_) {
+          // Corrupted user_data, fall through to fetch from API
+        }
+      }
+
+      // No user_data or corrupted: fetch user from API (same as _restoreUserFromStorage)
+      final user = await getUserProfile();
+      if (user != null) {
+        return true;
+      }
+      return false;
     } catch (e) {
       return false;
     }
@@ -225,6 +243,23 @@ class AuthService {
         'success': false,
         'message': e.toString().replaceAll('Exception: ', ''),
       };
+    }
+  }
+
+  /// Register current device ID with backend (e.g. after PIN login). Fire-and-forget; failures are ignored.
+  static Future<void> registerDeviceId() async {
+    try {
+      final deviceId = await DeviceService.getDeviceId();
+      if (deviceId == null || deviceId.isEmpty) return;
+      await ApiService().post(
+        '/Auth/register-device',
+        data: {
+          'deviceId': deviceId,
+          'platform': DeviceService.platform,
+        },
+      );
+    } catch (_) {
+      // Backend may not have endpoint yet; don't block or surface error
     }
   }
 
