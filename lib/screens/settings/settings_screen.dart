@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
+import '../../services/biometric_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
@@ -78,7 +79,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final user = AuthService.getCurrentUser();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: AppTheme.primaryColor,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -98,9 +102,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: const CircleAvatar(
               child: Icon(Icons.person),
             ),
-            title: Text(user?.name ?? 'User'),
-            subtitle: Text(user?.email ?? ''),
-            trailing: const Icon(Icons.chevron_right),
+            title: Text(
+              user?.name ?? 'User',
+              style: const TextStyle(color: Color(0xFF093030)),
+            ),
+            subtitle: Text(
+              user?.email ?? '',
+              style: const TextStyle(color: Color(0xFF093030)),
+            ),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'profile');
             },
@@ -110,88 +124,119 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSectionHeader('General'),
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Profile'),
-            trailing: const Icon(Icons.chevron_right),
+            title: const Text('Profile', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'profile');
             },
           ),
           ListTile(
             leading: const Icon(Icons.account_balance_wallet),
-            title: const Text('Bank Accounts'),
-            trailing: const Icon(Icons.chevron_right),
+            title: const Text('Bank Accounts', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'banks');
             },
           ),
           ListTile(
             leading: const Icon(Icons.attach_money),
-            title: const Text('Income Sources'),
-            trailing: const Icon(Icons.chevron_right),
+            title: const Text('Income Sources', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'income');
             },
           ),
           ListTile(
             leading: const Icon(Icons.credit_card),
-            title: const Text('Loans'),
-            trailing: const Icon(Icons.chevron_right),
+            title: const Text('Loans', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'loans');
             },
           ),
           ListTile(
             leading: const Icon(Icons.notifications),
-            title: const Text('Notifications'),
-            trailing: const Icon(Icons.chevron_right),
+            title: const Text('Notifications', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'notifications');
             },
           ),
           ListTile(
             leading: const Icon(Icons.category),
-            title: const Text('Transaction Categories'),
-            trailing: const Icon(Icons.chevron_right),
+            title: const Text('Transaction Categories', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: () {
               NavigationHelper.navigateTo(context, 'transaction-categories');
             },
           ),
           const Divider(),
           _buildSectionHeader('Security'),
-          SwitchListTile(
-            secondary: const Icon(Icons.fingerprint),
-            title: const Text('Biometric Authentication'),
-            subtitle: const Text('Use fingerprint or face ID to login'),
-            value: _biometricEnabled,
-            onChanged: (value) async {
-              // Save the scaffold messenger before async gap
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              
-              setState(() {
-                _biometricEnabled = value;
-              });
-              await StorageService.saveBool('biometric_enabled', value);
-              
-              if (mounted) {
-                NavigationHelper.showSnackBar(
-                  context,
-                  value ? 'Biometric authentication enabled' : 'Biometric authentication disabled',
-                  backgroundColor: value ? AppTheme.successColor : Colors.grey,
-                );
-              }
-            },
-          ),
+          if (BiometricService.isAndroid)
+            SwitchListTile(
+              secondary: const Icon(Icons.fingerprint),
+              title: const Text('Biometric Authentication', style: TextStyle(color: Color(0xFF093030))),
+              subtitle: const Text('Use fingerprint or face ID to login (Android only)', style: TextStyle(color: Color(0xFF093030))),
+              value: _biometricEnabled,
+              onChanged: (value) async {
+                // Save the scaffold messenger before async gap
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                
+                setState(() {
+                  _biometricEnabled = value;
+                });
+                await StorageService.saveBool('biometric_enabled', value);
+                
+                if (mounted) {
+                  NavigationHelper.showSnackBar(
+                    context,
+                    value ? 'Biometric authentication enabled' : 'Biometric authentication disabled',
+                    backgroundColor: value ? AppTheme.successColor : Colors.grey,
+                  );
+                }
+              },
+            ),
           const Divider(),
           _buildSectionHeader('About'),
           const ListTile(
             leading: Icon(Icons.info),
-            title: Text('App Version'),
-            subtitle: Text('1.0.0'),
-          ),
-          const ListTile(
-            leading: Icon(Icons.help),
-            title: Text('Help & Support'),
-            trailing: Icon(Icons.chevron_right),
+            title: Text('App Version', style: TextStyle(color: Color(0xFF093030))),
+            subtitle: Text('1.0.0', style: TextStyle(color: Color(0xFF093030))),
+            trailing: SizedBox(width: 24),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),         ),
+          ListTile(
+            leading: const Icon(Icons.help),
+            title: const Text('Help & Support', style: TextStyle(color: Color(0xFF093030))),
+            trailing: const SizedBox(
+              width: 24,
+              child: Icon(Icons.chevron_right, size: 24),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            onTap: () => context.pushNamed('help'),
           ),
           const Divider(),
           // Logout
@@ -201,6 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Logout',
               style: TextStyle(color: Colors.red),
             ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             onTap: _handleLogout,
           ),
         ],

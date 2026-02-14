@@ -2,12 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class NavigationHelper {
+  /// Navigate by replacing (go). Use for tab/root switching.
   static void navigateTo(BuildContext context, String route,
       {Map<String, String>? params, Object? extra}) {
     if (params != null) {
       context.goNamed(route, pathParameters: params, extra: extra);
     } else {
       context.goNamed(route, extra: extra);
+    }
+  }
+
+  /// Navigate by pushing onto the stack. Use for sub-screens so back pops.
+  static void pushTo(BuildContext context, String route,
+      {Map<String, String>? params, Object? extra}) {
+    if (params != null) {
+      context.pushNamed(route, pathParameters: params, extra: extra);
+    } else {
+      context.pushNamed(route, extra: extra);
     }
   }
 

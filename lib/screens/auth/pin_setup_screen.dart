@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/app_config.dart';
+import '../../services/auth_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
@@ -51,7 +53,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     if (value.isNotEmpty && index < 5) {
       focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
-      focusNodes[index - 1].requestFocus();
+      // Defer focus move so the current field finishes processing backspace first
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) focusNodes[index - 1].requestFocus();
+      });
     }
 
     if (!isConfirm && index == 5 && value.isNotEmpty && _getPin(false).length == 6) {
@@ -79,6 +84,25 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
       for (var c in _pinControllers) c.clear();
       _pinFocusNodes[0].requestFocus();
     }
+    setState(() {});
+  }
+
+  /// Removes the last entered digit (for when keyboard has no backspace).
+  void _handleBackspace(bool isConfirm) {
+    final controllers = isConfirm ? _confirmPinControllers : _pinControllers;
+    final focusNodes = isConfirm ? _confirmPinFocusNodes : _pinFocusNodes;
+    int lastFilledIndex = -1;
+    for (int i = 5; i >= 0; i--) {
+      if (controllers[i].text.isNotEmpty) {
+        lastFilledIndex = i;
+        break;
+      }
+    }
+    if (lastFilledIndex >= 0) {
+      controllers[lastFilledIndex].clear();
+      focusNodes[lastFilledIndex].requestFocus();
+      setState(() {});
+    }
   }
 
   Future<void> _handleSetPin() async {
@@ -101,10 +125,24 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
     setState(() => _isLoading = true);
     await StorageService.saveString(_pinKey, pin);
+    // Sync PIN with backend and save email for PIN login after logout
+    final setupResult = await AuthService.setupPin(pin);
+    final email = AuthService.getCurrentUser()?.email ?? '';
+    if (email.isNotEmpty) {
+      await StorageService.saveString(AppConfig.pinLoginEmailKey, email);
+    }
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
     setState(() => _isLoading = false);
-    NavigationHelper.showSnackBar(context, 'PIN set successfully!', backgroundColor: _lightGreen);
+    if (setupResult['success'] != true && setupResult['message'] != null) {
+      NavigationHelper.showSnackBar(
+        context,
+        setupResult['message'] as String,
+        backgroundColor: Colors.orange,
+      );
+    } else {
+      NavigationHelper.showSnackBar(context, 'PIN set successfully!', backgroundColor: _lightGreen);
+    }
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) context.pop();
     });
@@ -126,7 +164,6 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: _lightGreenBg,
-            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: focusNodes[index].hasFocus ? _lightGreen : Colors.transparent,
               width: 2,
@@ -267,7 +304,16 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                         _buildPinRow(true),
                       ],
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+
+                      // On-screen backspace (numeric keypad often has no backspace key)
+                      IconButton(
+                        onPressed: () => _handleBackspace(_showConfirmPin),
+                        icon: const Icon(Icons.backspace_outlined, color: _textMuted, size: 28),
+                        tooltip: 'Delete last digit',
+                      ),
+
+                      const SizedBox(height: 8),
 
                       // Show PIN
                       GestureDetector(

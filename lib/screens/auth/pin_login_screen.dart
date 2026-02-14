@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/app_config.dart';
 import '../../services/auth_service.dart';
+import '../../services/biometric_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
@@ -67,6 +69,45 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
     setState(() => _pin = '');
   }
 
+  Future<void> _handleBiometricLogin() async {
+    final hasSupport = await BiometricService.hasBiometricSupport;
+    if (!mounted) return;
+    if (!hasSupport) {
+      NavigationHelper.showSnackBar(
+        context,
+        'Biometric is not set up. Set up fingerprint or face unlock in your device settings.',
+        backgroundColor: Colors.orange,
+      );
+      return;
+    }
+    final ok = await BiometricService.authenticate(reason: 'Unlock UtilityHub360');
+    if (!mounted) return;
+    if (!ok) {
+      NavigationHelper.showSnackBar(
+        context,
+        'Biometric authentication failed or was cancelled',
+        backgroundColor: Colors.orange,
+      );
+      return;
+    }
+    setState(() => _isLoading = true);
+    final restored = await AuthService.restoreSessionFromStorage();
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    if (restored) {
+      await AuthService.registerDeviceId();
+      if (!mounted) return;
+      NavigationHelper.showSnackBar(context, 'Welcome back!', backgroundColor: _lightGreen);
+      context.go('/');
+    } else {
+      NavigationHelper.showSnackBar(
+        context,
+        'No saved session. Log in with email/password.',
+        backgroundColor: Colors.orange,
+      );
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (_pin.length != 6) return;
     final storedPin = StorageService.getString(_pinKey);
@@ -87,22 +128,44 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
     if (!mounted) return;
     if (storedPin == _pin) {
-      final restored = await AuthService.restoreSessionFromStorage();
+      bool restored = await AuthService.restoreSessionFromStorage();
       if (!mounted) return;
-      setState(() => _isLoading = false);
       if (restored) {
+        setState(() => _isLoading = false);
         await AuthService.registerDeviceId();
         if (!mounted) return;
         NavigationHelper.showSnackBar(context, 'Welcome back!', backgroundColor: _lightGreen);
         context.go('/');
-      } else {
-        NavigationHelper.showSnackBar(
-          context,
-          'No saved session. Log in with email/password.',
-          backgroundColor: Colors.orange,
-        );
-        _clearPin();
+        return;
       }
+      // No session (e.g. after logout): log in with PIN via backend
+      final email = StorageService.getString(AppConfig.pinLoginEmailKey);
+      if (email != null && email.isNotEmpty) {
+        final result = await AuthService.loginWithPin(email: email, pin: _pin);
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        if (result['success'] == true) {
+          await AuthService.registerDeviceId();
+          if (!mounted) return;
+          NavigationHelper.showSnackBar(context, 'Welcome back!', backgroundColor: _lightGreen);
+          context.go('/');
+        } else {
+          NavigationHelper.showSnackBar(
+            context,
+            result['message'] as String? ?? 'PIN login failed',
+            backgroundColor: Colors.red,
+          );
+          _clearPin();
+        }
+        return;
+      }
+      setState(() => _isLoading = false);
+      NavigationHelper.showSnackBar(
+        context,
+        'No saved session. Log in with email/password.',
+        backgroundColor: Colors.orange,
+      );
+      _clearPin();
     } else {
       setState(() => _isLoading = false);
       NavigationHelper.showSnackBar(context, 'Incorrect PIN. Try again.', backgroundColor: Colors.red);
@@ -276,16 +339,22 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _KeypadButton(
-                          customChild: SvgPicture.asset(
-                            'assets/icons/face_id.svg',
-                            width: 28,
-                            height: 28,
-                            colorFilter: const ColorFilter.mode(
-                              Colors.black,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          onTap: _clearPin,
+                          customChild: BiometricService.isAndroid
+                              ? const Icon(
+                                  Icons.fingerprint_rounded,
+                                  size: 28,
+                                  color: Color(0xFF1a1a1a),
+                                )
+                              : SvgPicture.asset(
+                                  'assets/icons/face_id.svg',
+                                  width: 28,
+                                  height: 28,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFF1a1a1a),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                          onTap: _handleBiometricLogin,
                         ),
                         _KeypadButton(label: '0', onTap: () => _onKeyTap('0')),
                         _KeypadButton(

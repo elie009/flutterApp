@@ -50,8 +50,9 @@ class AuthSelectionScreen extends StatelessWidget {
           ),
 
           SafeArea(
-            child: Column(
-              children: [
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
                 // Top bar: time left, menu right
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -257,7 +258,8 @@ class AuthSelectionScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                   ],
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

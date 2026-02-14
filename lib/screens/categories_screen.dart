@@ -51,17 +51,39 @@ class CategoriesScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_outlined,
-                          color: _headerDark,
-                          size: 22,
+                      GestureDetector(
+                        onTap: () => context.push('/notifications'),
+                        behavior: HitTestBehavior.opaque,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.notifications_outlined,
+                                color: _headerDark,
+                                size: 22,
+                              ),
+                            ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1)),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

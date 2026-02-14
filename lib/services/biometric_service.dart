@@ -1,12 +1,15 @@
 import 'package:local_auth/local_auth.dart';
 import '../utils/platform_utils.dart' as platform_utils;
 
-/// Service for face and fingerprint authentication (mobile only).
+/// Service for face and fingerprint authentication (Android and iOS).
 class BiometricService {
   static final LocalAuthentication _auth = LocalAuthentication();
 
   /// True when running on Android or iOS (not web/desktop).
   static bool get isMobile => platform_utils.isMobile;
+
+  /// True when running on Android (e.g. for showing fingerprint icon).
+  static bool get isAndroid => platform_utils.isAndroid;
 
   /// Returns true if device supports and has biometrics (face or fingerprint) available.
   static Future<bool> get hasBiometricSupport async {

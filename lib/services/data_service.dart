@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../models/transaction.dart';
 import '../models/bill.dart';
@@ -229,6 +230,52 @@ class DataService {
       final response = await ApiService().post(
         '/BankAccounts/transactions/analyze-text',
         data: requestBody,
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw Exception('Invalid response from server');
+      }
+      final success = data['success'] as bool? ?? false;
+      final message = data['message'] as String? ?? 'Unknown error';
+      final transactionData = data['data'];
+
+      if (!success) {
+        throw Exception(message);
+      }
+      if (transactionData == null) {
+        throw Exception('No transaction data in response');
+      }
+      final map = transactionData is Map<String, dynamic>
+          ? transactionData
+          : Map<String, dynamic>.from(transactionData as Map);
+      return Transaction.fromJson(map);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Upload receipt image (photo or gallery) for AI analysis and create transaction.
+  /// Calls POST /BankAccounts/transactions/analyze-receipt (multipart).
+  Future<Transaction> uploadReceiptImage({
+    required String filePath,
+    String? bankAccountId,
+  }) async {
+    try {
+      final fileName = filePath.split(RegExp(r'[/\\]')).last;
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath, filename: fileName.isNotEmpty ? fileName : 'receipt.jpg'),
+        if (bankAccountId != null && bankAccountId.isNotEmpty) 'bankAccountId': bankAccountId,
+      });
+
+      final response = await ApiService().dio.post(
+        '/BankAccounts/transactions/analyze-receipt',
+        data: formData,
+        options: Options(
+          contentType: Headers.multipartFormDataContentType,
+          sendTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 60),
+        ),
       );
 
       final data = response.data;

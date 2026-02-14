@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/app_config.dart';
+import '../../services/auth_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/navigation_helper.dart';
 import '../../utils/theme.dart';
@@ -121,10 +123,23 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
     setState(() => _isLoading = true);
     await StorageService.saveString(_pinKey, pin);
+    final setupResult = await AuthService.setupPin(pin);
+    final email = AuthService.getCurrentUser()?.email ?? '';
+    if (email.isNotEmpty) {
+      await StorageService.saveString(AppConfig.pinLoginEmailKey, email);
+    }
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
     setState(() => _isLoading = false);
-    NavigationHelper.showSnackBar(context, 'PIN changed successfully!', backgroundColor: _lightGreen);
+    if (setupResult['success'] != true && setupResult['message'] != null) {
+      NavigationHelper.showSnackBar(
+        context,
+        setupResult['message'] as String,
+        backgroundColor: Colors.orange,
+      );
+    } else {
+      NavigationHelper.showSnackBar(context, 'PIN changed successfully!', backgroundColor: _lightGreen);
+    }
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     } else {
@@ -238,14 +253,18 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () => context.push('/notifications'),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.notifications_outlined, color: _headerDark, size: 22),
                 ),
-                child: const Icon(Icons.notifications_outlined, color: _headerDark, size: 22),
               ),
             ],
           ),

@@ -24,6 +24,8 @@ class AppConfig {
   static const String refreshTokenKey = 'refresh_token';
   static const String userKey = 'user_data';
   static const String biometricEnabledKey = 'biometric_enabled';
+  /// Email for the account that set PIN (used for login with PIN after logout).
+  static const String pinLoginEmailKey = 'pin_login_email';
 
   // Pagination
   static const int defaultPageSize = 20;

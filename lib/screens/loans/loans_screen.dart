@@ -141,37 +141,41 @@ class _LoansScreenState extends State<LoansScreen> {
                           ),
                         ),
                       ),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.notifications_outlined,
-                              color: _headerDark,
-                              size: 22,
-                            ),
-                          ),
-                          Positioned(
-                            top: 6,
-                            right: 6,
-                            child: Container(
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: Colors.red,
+                      GestureDetector(
+                        onTap: () => context.push('/notifications'),
+                        behavior: HitTestBehavior.opaque,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: Colors.white, width: 1),
+                              ),
+                              child: const Icon(
+                                Icons.notifications_outlined,
+                                color: _headerDark,
+                                size: 22,
                               ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Colors.white, width: 1),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -251,7 +255,7 @@ class _LoansScreenState extends State<LoansScreen> {
                                             iconColor: _loanIconColor(index),
                                             formatDate: _formatLoanDate,
                                             onTap: () =>
-                                                NavigationHelper.navigateTo(
+                                                NavigationHelper.pushTo(
                                               context,
                                               'loan-detail',
                                               params: {'id': loan.id},

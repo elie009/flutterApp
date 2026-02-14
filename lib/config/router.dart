@@ -26,6 +26,7 @@ import '../screens/settings/fingerprint_screen.dart';
 import '../screens/settings/fingerprint_delete_screen.dart';
 import '../screens/settings/fingerprint_delete_success_screen.dart';
 import '../screens/settings/terms_conditions_screen.dart';
+import '../screens/settings/help_screen.dart';
 import '../screens/settings/transaction_categories_screen.dart';
 import '../screens/analysis/analysis_screen.dart';
 import '../screens/analysis/quick_analysis_screen.dart';
@@ -285,6 +286,11 @@ class AppRouter {
         path: '/transaction-categories',
         name: 'transaction-categories',
         builder: (context, state) => const AuthGuard(child: TransactionCategoriesScreen()),
+      ),
+      GoRoute(
+        path: '/help',
+        name: 'help',
+        builder: (context, state) => const AuthGuard(child: HelpScreen()),
       ),
     ],
   );

@@ -101,7 +101,7 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           // Edit Profile
                           GestureDetector(
-                            onTap: () => context.go('/edit-profile'),
+                            onTap: () => context.push('/edit-profile'),
                             child: _buildMenuItem(
                               icon: _buildEditProfileIcon(),
                               label: 'Edit Profile',
@@ -112,7 +112,7 @@ class ProfileScreen extends StatelessWidget {
 
                           // Security
                           GestureDetector(
-                            onTap: () => context.go('/security'),
+                            onTap: () => context.push('/security'),
                             child: _buildMenuItem(
                               icon: _buildSecurityIcon(),
                               label: 'Security',
@@ -123,7 +123,7 @@ class ProfileScreen extends StatelessWidget {
 
                           // Setting
                           GestureDetector(
-                            onTap: () => context.go('/settings'),
+                            onTap: () => context.push('/settings'),
                             child: _buildMenuItem(
                               icon: _buildSettingsIcon(),
                               label: 'Setting',
@@ -228,23 +228,43 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Notification icon
+            // Notification icon (same as dashboard: white circle + red badge, tap to open notifications)
             Positioned(
               left: 364,
               top: 51,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.notifications,
-                    color: Color(0xFF093030),
-                    size: 21,
-                  ),
+              child: GestureDetector(
+                onTap: () => context.push('/notifications'),
+                behavior: HitTestBehavior.opaque,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.notifications_outlined,
+                        color: Color(0xFF093030),
+                        size: 22,
+                      ),
+                    ),
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

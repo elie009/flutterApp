@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../config/app_config.dart';
 import '../../widgets/bottom_nav_bar_figma.dart';
 import '../../services/data_service.dart';
 import '../../models/transaction.dart';
 import '../../models/bank_account.dart';
+import '../../models/bill.dart';
 import '../../utils/theme.dart';
 import '../../widgets/triangle_painter.dart';
 
@@ -148,18 +150,39 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           ),
                         ),
                       ),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: _primaryGreen, width: 1.5),
-                        ),
-                        child: const Icon(
-                          Icons.notifications_outlined,
-                          color: _headerDark,
-                          size: 22,
+                      GestureDetector(
+                        onTap: () => context.push('/notifications'),
+                        behavior: HitTestBehavior.opaque,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.notifications_outlined,
+                                color: _headerDark,
+                                size: 22,
+                              ),
+                            ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1)),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -905,7 +928,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     description: 'Fast Entry With Essential Fields Only',
                     onTap: () {
                       Navigator.of(context).pop();
-                      // TODO: Navigate to quick add
+                      _showQuickAddSheet(context);
                     },
                   ),
                   _buildModalOption(
@@ -914,7 +937,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     description: 'AI-Powered Text Analysis To Extract Transaction Details',
                     onTap: () {
                       Navigator.of(context).pop();
-                      // TODO: Navigate to transaction analyzer
+                      _showTransactionAnalyzerSheet(context);
                     },
                   ),
                   _buildModalOption(
@@ -923,7 +946,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     description: 'AI-Powered Text Analysis To Extract Transaction Details',
                     onTap: () {
                       Navigator.of(context).pop();
-                      // TODO: Navigate to upload receipt
+                      _showUploadReceiptSheet(context);
                     },
                   ),
                 ],
@@ -931,6 +954,686 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               const SizedBox(height: 20),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showTransactionAnalyzerSheet(BuildContext context) {
+    final textController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) {
+        String? selectedBankId;
+        bool isAnalyzing = false;
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            void updateState(VoidCallback fn) {
+              fn();
+              setSheetState(() {});
+            }
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Transaction Analyzer',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF052224),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Paste SMS or transaction text to extract details',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: textController,
+                      maxLines: 5,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'e.g. You received P1,500.00 from Juan...',
+                        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppTheme.primaryColor.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                    ),
+                    if (_bankAccounts.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: selectedBankId,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'Bank account (optional)',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        items: [
+                          const DropdownMenuItem(value: null, child: Text('None')),
+                          ..._bankAccounts.map((a) => DropdownMenuItem(
+                                value: a.id,
+                                child: Text('${a.accountName}${a.accountNumber != null ? ' (${a.accountNumber})' : ''}'),
+                              )),
+                        ],
+                        onChanged: (v) => updateState(() => selectedBankId = v),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: isAnalyzing
+                            ? null
+                            : () async {
+                                final text = textController.text.trim();
+                                if (text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Please enter transaction text'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                updateState(() => isAnalyzing = true);
+                                try {
+                                  await DataService().analyzeTransactionText(
+                                    transactionText: text,
+                                    bankAccountId: selectedBankId,
+                                  );
+                                  if (!sheetContext.mounted) return;
+                                  Navigator.of(sheetContext).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text('Transaction created successfully'),
+                                      backgroundColor: AppTheme.primaryColor,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  _loadData();
+                                } catch (e) {
+                                  if (!sheetContext.mounted) return;
+                                  updateState(() => isAnalyzing = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Failed: ${e.toString().replaceFirst('Exception: ', '')}'),
+                                      backgroundColor: Colors.red,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: isAnalyzing
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Text('Analyze & Add', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).then((_) => textController.dispose());
+  }
+
+  void _showQuickAddSheet(BuildContext context) {
+    final amountController = TextEditingController(text: '0.00');
+    final descriptionController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) {
+        String? selectedBankId = _bankAccounts.isNotEmpty ? _bankAccounts.first.id : null;
+        String transactionType = 'DEBIT';
+        bool isSubmitting = false;
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            void updateState(VoidCallback fn) {
+              fn();
+              setSheetState(() {});
+            }
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Quick Add',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF052224),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Fast entry with essential fields only',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (_bankAccounts.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          'Add a bank account first to create transactions.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.orange[800],
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      )
+                    else ...[
+                      DropdownButtonFormField<String>(
+                        value: selectedBankId,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'Bank account *',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        items: _bankAccounts
+                            .map((a) => DropdownMenuItem(
+                                  value: a.id,
+                                  child: Text('${a.accountName}${a.accountNumber != null ? ' (${a.accountNumber})' : ''}'),
+                                ))
+                            .toList(),
+                        onChanged: (v) => updateState(() => selectedBankId = v),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    TextField(
+                      controller: amountController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: 'Amount *',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => updateState(() => transactionType = 'CREDIT'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                color: transactionType == 'CREDIT'
+                                    ? AppTheme.primaryColor.withOpacity(0.2)
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: transactionType == 'CREDIT' ? AppTheme.primaryColor : Colors.grey[400]!,
+                                  width: transactionType == 'CREDIT' ? 2 : 1,
+                                ),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Credit',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Poppins',
+                                    color: Color(0xFF093030),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => updateState(() => transactionType = 'DEBIT'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                color: transactionType == 'DEBIT'
+                                    ? AppTheme.primaryColor.withOpacity(0.2)
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: transactionType == 'DEBIT' ? AppTheme.primaryColor : Colors.grey[400]!,
+                                  width: transactionType == 'DEBIT' ? 2 : 1,
+                                ),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Debit',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Poppins',
+                                    color: Color(0xFF093030),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: 'Description *',
+                        hintText: 'e.g. Groceries, Salary',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _bankAccounts.isEmpty || isSubmitting
+                            ? null
+                            : () async {
+                                final amountStr = amountController.text.trim().replaceAll(',', '');
+                                final amount = double.tryParse(amountStr);
+                                final description = descriptionController.text.trim();
+                                if (amount == null || amount <= 0) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Please enter a valid amount'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (description.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Please enter a description'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (selectedBankId == null || selectedBankId!.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Please select a bank account'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                updateState(() => isSubmitting = true);
+                                try {
+                                  await DataService().createTransaction(
+                                    bankAccountId: selectedBankId!,
+                                    amount: amount,
+                                    transactionType: transactionType,
+                                    description: description,
+                                  );
+                                  if (!sheetContext.mounted) return;
+                                  Navigator.of(sheetContext).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text('Transaction added successfully'),
+                                      backgroundColor: AppTheme.primaryColor,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  _loadData();
+                                } catch (e) {
+                                  if (!sheetContext.mounted) return;
+                                  updateState(() => isSubmitting = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Failed: ${e.toString().replaceFirst('Exception: ', '')}'),
+                                      backgroundColor: Colors.red,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: isSubmitting
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Text('Add Transaction', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).then((_) {
+      amountController.dispose();
+      descriptionController.dispose();
+    });
+  }
+
+  void _showUploadReceiptSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) {
+        String? selectedBankId = _bankAccounts.isNotEmpty ? _bankAccounts.first.id : null;
+        bool isUploading = false;
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            void updateState(VoidCallback fn) {
+              fn();
+              setSheetState(() {});
+            }
+            Future<void> pickAndUpload(ImageSource source) async {
+              if (isUploading) return;
+              final picker = ImagePicker();
+              final XFile? xFile = await picker.pickImage(
+                source: source,
+                maxWidth: 1920,
+                maxHeight: 1920,
+                imageQuality: 85,
+              );
+              if (xFile == null || !sheetContext.mounted) return;
+              updateState(() => isUploading = true);
+              try {
+                await DataService().uploadReceiptImage(
+                  filePath: xFile.path,
+                  bankAccountId: selectedBankId,
+                );
+                if (!sheetContext.mounted) return;
+                Navigator.of(sheetContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Receipt uploaded and transaction created'),
+                    backgroundColor: AppTheme.primaryColor,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+                _loadData();
+              } catch (e) {
+                if (!sheetContext.mounted) return;
+                updateState(() => isUploading = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed: ${e.toString().replaceFirst('Exception: ', '')}'),
+                    backgroundColor: Colors.red,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            }
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Upload Receipt',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF052224),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Take a photo or choose from gallery to extract transaction details',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    if (_bankAccounts.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        value: selectedBankId,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'Bank account (optional)',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        items: [
+                          const DropdownMenuItem(value: null, child: Text('None')),
+                          ..._bankAccounts.map((a) => DropdownMenuItem(
+                                value: a.id,
+                                child: Text('${a.accountName}${a.accountNumber != null ? ' (${a.accountNumber})' : ''}'),
+                              )),
+                        ],
+                        onChanged: (v) => updateState(() => selectedBankId = v),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: isUploading ? null : () => pickAndUpload(ImageSource.camera),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 24),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppTheme.primaryColor.withOpacity(0.5)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.camera_alt_rounded, size: 48, color: AppTheme.primaryColor),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      'Take picture',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: Color(0xFF052224),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: isUploading ? null : () => pickAndUpload(ImageSource.gallery),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 24),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppTheme.primaryColor.withOpacity(0.5)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.photo_library_rounded, size: 48, color: AppTheme.primaryColor),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      'Choose from gallery',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: Color(0xFF052224),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isUploading) ...[
+                      const SizedBox(height: 20),
+                      const Center(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 32,
+                              width: 32,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            SizedBox(height: 8),
+                            Text('Uploading and analyzing receipt...', style: TextStyle(fontFamily: 'Poppins', fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -1074,6 +1777,19 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
     descriptionController.dispose();
     notesController.dispose();
     super.dispose();
+  }
+
+  void _showSplitTransactionModal(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) {
+        return _SplitTransactionModalContent(
+          onDone: () => Navigator.of(sheetContext).pop(),
+        );
+      },
+    );
   }
 
   @override
@@ -1285,9 +2001,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {
-                            // TODO: Implement split transaction
-                          },
+                          onTap: () => _showSplitTransactionModal(context),
                           child: Container(
                             height: 56,
                             decoration: BoxDecoration(
@@ -1379,6 +2093,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
         Container(
           height: 56,
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(
               color: AppTheme.primaryColor.withOpacity(0.3),
             ),
@@ -1436,6 +2151,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(
               color: AppTheme.primaryColor.withOpacity(0.3),
             ),
@@ -1451,9 +2167,11 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
               fontWeight: FontWeight.w400,
               color: Color(0xFF052224),
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
         ),
@@ -1485,6 +2203,7 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
           child: Container(
             height: 56,
             decoration: BoxDecoration(
+              color: Colors.white,
               border: Border.all(
                 color: AppTheme.primaryColor.withOpacity(0.3),
               ),
@@ -1514,6 +2233,180 @@ class _FullFormModalContentState extends State<_FullFormModalContent> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Split Transaction modal: BILL / CATEGORY shows bill name (value is bill id).
+class _SplitTransactionModalContent extends StatefulWidget {
+  final VoidCallback onDone;
+
+  const _SplitTransactionModalContent({required this.onDone});
+
+  @override
+  State<_SplitTransactionModalContent> createState() => _SplitTransactionModalContentState();
+}
+
+class _SplitTransactionModalContentState extends State<_SplitTransactionModalContent> {
+  List<Bill> _bills = [];
+  bool _loading = true;
+  String? _selectedBillId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBills();
+  }
+
+  Future<void> _loadBills() async {
+    try {
+      final result = await DataService().getBills(limit: 100);
+      final bills = (result['bills'] as List<Bill>?) ?? [];
+      if (mounted) setState(() { _bills = bills; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Split Transaction',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF052224),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // BILL / CATEGORY - display bill name, store bill id
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'BILL / CATEGORY',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF666666),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withOpacity(0.3),
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _loading
+                      ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                      : DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedBillId,
+                            isExpanded: true,
+                            hint: const Text(
+                              'Select bill',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF052224),
+                              ),
+                            ),
+                            items: [
+                              const DropdownMenuItem<String>(
+                                value: null,
+                                child: Text(
+                                  'None',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF052224),
+                                  ),
+                                ),
+                              ),
+                              ..._bills.map((Bill bill) {
+                                return DropdownMenuItem<String>(
+                                  value: bill.id,
+                                  child: Text(
+                                    bill.billName,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF052224),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                            onChanged: (String? value) {
+                              setState(() => _selectedBillId = value);
+                            },
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: widget.onDone,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text('Done', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

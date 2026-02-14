@@ -327,7 +327,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                         ],
                                       ),
                                       onTap: () {
-                                        NavigationHelper.navigateTo(
+                                        NavigationHelper.pushTo(
                                           context,
                                           'bill-detail',
                                           params: {'id': bill.id},
@@ -349,7 +349,7 @@ class _BillsScreenState extends State<BillsScreen> {
             onExit: (_) => setState(() => isHovered = false),
             child: GestureDetector(
               onTap: () {
-                NavigationHelper.navigateTo(context, 'add-bill');
+                NavigationHelper.pushTo(context, 'add-bill');
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),

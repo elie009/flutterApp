@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../utils/theme.dart';
 import '../../utils/navigation_helper.dart';
 
@@ -323,27 +324,24 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
               ),
             ),
 
-            // Notification icon
+            // Notification icon (same as dashboard: white circle, tap to open notifications)
             Positioned(
               left: 364,
-              top: 61,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: Center(
-                  child: Container(
-                    width: 14.57,
-                    height: 18.86,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFF093030),
-                        width: 1.29,
-                      ),
-                    ),
+              top: 51,
+              child: GestureDetector(
+                onTap: () => context.push('/notifications'),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.notifications_outlined,
+                    color: Color(0xFF093030),
+                    size: 22,
                   ),
                 ),
               ),

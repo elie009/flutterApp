@@ -86,6 +86,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     if (_isLoading && _user == null) {
       return const Scaffold(
+        backgroundColor: Colors.white,
         body: Center(
           child: CircularProgressIndicator(),
         ),
@@ -96,6 +97,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         width: screenWidth,
         height: screenHeight,
@@ -287,10 +289,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               bottom: 100,
               child: Form(
                 key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     // Username field (white bg, border, person icon)
                     _buildLabel('Username'),
                     const SizedBox(height: 8),
@@ -359,7 +362,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 8),
                     _profileTip('Verify your phone number for security'),
                     const SizedBox(height: 18),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -434,6 +438,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         keyboardType: keyboardType,
         style: _inputTextStyle,
         decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
           hintText: hint,
           hintStyle: const TextStyle(
             color: Color(0x80093030),

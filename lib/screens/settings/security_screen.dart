@@ -96,8 +96,7 @@ class SecurityScreen extends StatelessWidget {
                 onTap: () => context.push('/pin-setup'),
                 child: Row(
                   children: [
-                    const SizedBox(
-                      width: 157,
+                    const Expanded(
                       child: Text(
                         'Setup Login PIN',
                         style: TextStyle(
@@ -108,11 +107,13 @@ class SecurityScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.navigate_next,
-                      color: Color(0xFF093030),
-                      size: 28,
+                    const SizedBox(
+                      width: 24,
+                      child: Icon(
+                        Icons.chevron_right,
+                        color: Color(0xFF093030),
+                        size: 24,
+                      ),
                     ),
                   ],
                 ),
@@ -123,12 +124,13 @@ class SecurityScreen extends StatelessWidget {
             Positioned(
               left: 38,
               top: 293,
+              right: 38,
               child: GestureDetector(
-                onTap: () => context.go('/change-pin'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => context.push('/change-pin'),
                 child: Row(
                   children: [
-                    const SizedBox(
-                      width: 157,
+                    const Expanded(
                       child: Text(
                         'Change pin',
                         style: TextStyle(
@@ -139,12 +141,13 @@ class SecurityScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 170),
-                    // Use the 'next page' icon
-                    const Icon(
-                      Icons.navigate_next,
-                      color: Color(0xFF093030),
-                      size: 28,
+                    const SizedBox(
+                      width: 24,
+                      child: Icon(
+                        Icons.chevron_right,
+                        color: Color(0xFF093030),
+                        size: 24,
+                      ),
                     ),
                   ],
                 ),
@@ -155,12 +158,13 @@ class SecurityScreen extends StatelessWidget {
             Positioned(
               left: 38,
               top: 367,
+              right: 38,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => context.go('/fingerprint'),
                 child: Row(
                   children: [
-                    const SizedBox(
-                      width: 157,
+                    const Expanded(
                       child: Text(
                         'Fingerprint',
                         style: TextStyle(
@@ -171,12 +175,13 @@ class SecurityScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 170),
-                    // Use the 'next page' icon
-                    const Icon(
-                      Icons.navigate_next,
-                      color: Color(0xFF093030),
-                      size: 28,
+                    const SizedBox(
+                      width: 24,
+                      child: Icon(
+                        Icons.chevron_right,
+                        color: Color(0xFF093030),
+                        size: 24,
+                      ),
                     ),
                   ],
                 ),
@@ -187,25 +192,30 @@ class SecurityScreen extends StatelessWidget {
             Positioned(
               left: 38,
               top: 441,
+              right: 38,
               child: GestureDetector(
-                onTap: () => context.go('/terms-conditions'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => context.push('/terms-conditions'),
                 child: Row(
                   children: [
-                    const Text(
-                      'Terms and conditions',
-                      style: TextStyle(
-                        color: Color(0xFF093030),
-                        fontSize: 15,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
+                    const Expanded(
+                      child: Text(
+                        'Terms and conditions',
+                        style: TextStyle(
+                          color: Color(0xFF093030),
+                          fontSize: 15,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 170),
-                    // Use the 'next page' icon
-                    const Icon(
-                      Icons.navigate_next,
-                      color: Color(0xFF093030),
-                      size: 28,
+                    const SizedBox(
+                      width: 24,
+                      child: Icon(
+                        Icons.chevron_right,
+                        color: Color(0xFF093030),
+                        size: 24,
+                      ),
                     ),
                   ],
                 ),
@@ -273,23 +283,43 @@ class SecurityScreen extends StatelessWidget {
               ),
             ),
 
-            // Notification icon
+            // Notification icon (same as dashboard: white circle + red badge, tap to open notifications)
             Positioned(
               left: 364,
               top: 51,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.notifications,
-                    color: Color(0xFF093030),
-                    size: 21,
-                  ),
+              child: GestureDetector(
+                onTap: () => context.push('/notifications'),
+                behavior: HitTestBehavior.opaque,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.notifications_outlined,
+                        color: Color(0xFF093030),
+                        size: 22,
+                      ),
+                    ),
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -162,7 +162,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => context.go('/fingerprint-delete', extra: fingerprint),
+                    onTap: () => context.push('/fingerprint-delete', extra: fingerprint),
                     borderRadius: BorderRadius.circular(22),
                     child: Container(
                       width: 356, // Match the width of other items
@@ -272,22 +272,24 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
               ),
             ),
 
-            // Notification icon
+            // Notification icon (same as dashboard: white circle, tap to open notifications)
             Positioned(
               left: 364,
               top: 51,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDFF7E2),
-                  borderRadius: BorderRadius.all(Radius.circular(25.71)),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.notifications,
+              child: GestureDetector(
+                onTap: () => context.push('/notifications'),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.notifications_outlined,
                     color: Color(0xFF093030),
-                    size: 21,
+                    size: 22,
                   ),
                 ),
               ),

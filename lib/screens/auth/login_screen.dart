@@ -285,13 +285,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   if (BiometricService.isMobile) ...[
                     const SizedBox(height: 28),
-                    // Biometric and PIN icon buttons (side by side)
+                    // Biometric (fingerprint on Android, face on iOS) and PIN icon buttons (side by side)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _IconActionButton(
-                          icon: Icons.fingerprint_rounded,
+                          icon: BiometricService.isAndroid
+                              ? Icons.fingerprint_rounded
+                              : Icons.face_rounded,
                           onTap: () async {
+                            final hasSupport = await BiometricService.hasBiometricSupport;
+                            if (!mounted) return;
+                            if (!hasSupport) {
+                              NavigationHelper.showSnackBar(
+                                context,
+                                'Biometric is not set up. Set up fingerprint or face unlock in your device settings.',
+                                backgroundColor: Colors.orange,
+                              );
+                              return;
+                            }
                             final ok = await BiometricService.authenticate(reason: 'Log in to UtilityHub360');
                             if (!mounted) return;
                             if (!ok) {

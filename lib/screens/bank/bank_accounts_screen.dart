@@ -52,8 +52,14 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Bank Accounts'),
+        title: const Text(
+          'Bank Accounts',
+          style: TextStyle(color: Color(0xFF093030)),
+        ),
+        backgroundColor: AppTheme.primaryColor,
+        foregroundColor: const Color(0xFF093030),
       ),
       body: _isLoading
           ? const LoadingIndicator(message: 'Loading bank accounts...')
@@ -81,7 +87,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                               Text(
                                 'Total Balance',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: Color(0xFF093030),
                                   fontSize: 14,
                                 ),
                               ),
@@ -90,7 +96,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                           Text(
                             Formatters.formatCurrency(_totalBalance),
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFF093030),
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
@@ -116,6 +122,14 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                                     horizontal: 16,
                                     vertical: 4,
                                   ),
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(
+                                      color: AppTheme.primaryColor,
+                                      width: 1,
+                                    ),
+                                  ),
                                   child: ListTile(
                                     leading: CircleAvatar(
                                       backgroundColor: AppTheme.primaryColor,
@@ -128,17 +142,25 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                                       account.accountName,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
+                                        color: Color(0xFF093030),
                                       ),
                                     ),
                                     subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${account.accountType}${account.accountNumber != null ? ' • ${account.accountNumber}' : ''}',
+                                          style: const TextStyle(
+                                            color: Color(0xFF093030),
+                                          ),
                                         ),
                                         if (account.financialInstitution != null)
-                                          Text(account.financialInstitution!),
+                                          Text(
+                                            account.financialInstitution!,
+                                            style: const TextStyle(
+                                              color: Color(0xFF093030),
+                                            ),
+                                          ),
                                       ],
                                     ),
                                     trailing: Text(
@@ -146,7 +168,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: AppTheme.primaryColor,
+                                        color: Color(0xFF093030),
                                       ),
                                     ),
                                   ),

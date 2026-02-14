@@ -188,7 +188,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                   } else {
                     // Navigate to loans list (loan-detail was opened with goNamed, so pop would fail)
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) context.go('/loans');
+                      if (mounted) context.pop();
                     });
                   }
                 },
